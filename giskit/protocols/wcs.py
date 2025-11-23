@@ -20,6 +20,7 @@ from giskit.protocols.base import Protocol
 
 class WCSError(Exception):
     """Raised when WCS requests fail."""
+
     pass
 
 
@@ -161,7 +162,7 @@ class WCSProtocol(Protocol):
                             float(coords[0]),
                             float(coords[1]),
                             float(coords[2]),
-                            float(coords[3])
+                            float(coords[3]),
                         ]
 
             self._metadata = metadata
@@ -184,8 +185,7 @@ class WCSProtocol(Protocol):
             NotImplementedError: WCS is raster-only
         """
         raise NotImplementedError(
-            "WCS protocol does not support vector features. "
-            "Use get_coverage() for raster data."
+            "WCS protocol does not support vector features. " "Use get_coverage() for raster data."
         )
 
     async def get_coverage(
@@ -233,8 +233,7 @@ class WCSProtocol(Protocol):
 
         if progress_callback:
             progress_callback(
-                f"Grid size: {width_px}x{height_px} pixels at {resolution}m resolution",
-                0.1
+                f"Grid size: {width_px}x{height_px} pixels at {resolution}m resolution", 0.1
             )
 
         # Build GetCoverage request
@@ -287,8 +286,7 @@ class WCSProtocol(Protocol):
 
                     if progress_callback:
                         progress_callback(
-                            f"Loaded {data.shape[0]}x{data.shape[1]} elevation grid",
-                            0.9
+                            f"Loaded {data.shape[0]}x{data.shape[1]} elevation grid", 0.9
                         )
 
             return data
@@ -325,7 +323,7 @@ class WCSProtocol(Protocol):
             resolution=resolution,
             crs=crs,
             progress_callback=progress_callback,
-            **kwargs
+            **kwargs,
         )
 
         if progress_callback:
@@ -341,15 +339,15 @@ class WCSProtocol(Protocol):
         # Save as GeoTIFF
         with rasterio.open(
             output_path,
-            'w',
-            driver='GTiff',
+            "w",
+            driver="GTiff",
             height=data.shape[0],
             width=data.shape[1],
             count=1,
             dtype=data.dtype,
             crs=crs,
             transform=transform,
-            compress='lzw',
+            compress="lzw",
         ) as dst:
             dst.write(data, 1)
 
@@ -357,4 +355,3 @@ class WCSProtocol(Protocol):
             progress_callback(f"Saved to {output_path.name}", 1.0)
 
         return output_path
-

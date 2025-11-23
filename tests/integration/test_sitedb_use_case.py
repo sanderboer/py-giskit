@@ -124,9 +124,7 @@ class TestSitedbUseCase:
         bbox = (4.328, 51.838, 4.332, 51.842)
 
         provider = get_provider("pdok")
-        dataset = Dataset(
-            provider="pdok", service="bgt", layers=["pand", "wegdeel", "waterdeel"]
-        )
+        dataset = Dataset(provider="pdok", service="bgt", layers=["pand", "wegdeel", "waterdeel"])
         location = Location(type=LocationType.BBOX, value=list(bbox), crs="EPSG:4326")
 
         gdf = await provider.download_dataset(
@@ -211,9 +209,7 @@ class TestSitedbUseCase:
         """Test bbox calculation for all location types."""
         # 1. Bbox type (direct)
         recipe_bbox = Recipe(
-            location=Location(
-                type=LocationType.BBOX, value=[4.88, 52.36, 4.92, 52.38]
-            ),
+            location=Location(type=LocationType.BBOX, value=[4.88, 52.36, 4.92, 52.38]),
             datasets=[Dataset(provider="pdok", service="bgt", layers=["pand"])],
             output=Output(path=Path("/tmp/test.gpkg")),
         )
@@ -222,9 +218,7 @@ class TestSitedbUseCase:
 
         # 2. Point type (buffering)
         recipe_point = Recipe(
-            location=Location(
-                type=LocationType.POINT, value=[4.9, 52.37], radius=100
-            ),
+            location=Location(type=LocationType.POINT, value=[4.9, 52.37], radius=100),
             datasets=[Dataset(provider="pdok", service="bgt", layers=["pand"])],
             output=Output(path=Path("/tmp/test.gpkg")),
         )
@@ -352,8 +346,7 @@ class TestQuirksIntegration:
 
         # Verify quirks are applied to URLs
         protocol = OGCFeaturesProtocol(
-            base_url="https://api.pdok.nl/lv/bgt/ogc/v1_0",
-            quirks=quirks
+            base_url="https://api.pdok.nl/lv/bgt/ogc/v1_0", quirks=quirks
         )
         assert protocol.base_url.endswith("/"), "URL should have trailing slash"
 
@@ -377,8 +370,7 @@ class TestQuirksIntegration:
 
         # Create protocol with quirks (use service root URL, not collection-specific)
         protocol = OGCFeaturesProtocol(
-            base_url="https://api.pdok.nl/lv/bgt/ogc/v1_0",
-            quirks=quirks
+            base_url="https://api.pdok.nl/lv/bgt/ogc/v1_0", quirks=quirks
         )
 
         # Verify URL was constructed with trailing slash

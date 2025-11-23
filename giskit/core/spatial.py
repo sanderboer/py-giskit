@@ -44,21 +44,19 @@ def buffer_point_to_bbox(
         if crs == "EPSG:4326":
             # Use Azimuthal Equidistant projection centered on point
             # This gives accurate distances in all directions from the center
-            proj_string = f"+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0 +datum=WGS84 +units=m"
+            proj_string = (
+                f"+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0 +datum=WGS84 +units=m"
+            )
 
             # Transform to projected CRS
-            transformer_to_proj = Transformer.from_crs(
-                "EPSG:4326", proj_string, always_xy=True
-            )
+            transformer_to_proj = Transformer.from_crs("EPSG:4326", proj_string, always_xy=True)
             point_proj = transform(transformer_to_proj.transform, point)
 
             # Buffer in meters
             buffered_proj = point_proj.buffer(radius_m)
 
             # Transform back to WGS84
-            transformer_to_wgs84 = Transformer.from_crs(
-                proj_string, "EPSG:4326", always_xy=True
-            )
+            transformer_to_wgs84 = Transformer.from_crs(proj_string, "EPSG:4326", always_xy=True)
             buffered = transform(transformer_to_wgs84.transform, buffered_proj)
         else:
             # For other CRS, assume units are meters (or accept inaccuracy)
@@ -134,14 +132,10 @@ def transform_bbox(
         return transformed_geom.bounds
 
     except Exception as e:
-        raise SpatialError(
-            f"Failed to transform bbox from {from_crs} to {to_crs}: {e}"
-        ) from e
+        raise SpatialError(f"Failed to transform bbox from {from_crs} to {to_crs}: {e}") from e
 
 
-def transform_point(
-    lon: float, lat: float, from_crs: str, to_crs: str
-) -> Tuple[float, float]:
+def transform_point(lon: float, lat: float, from_crs: str, to_crs: str) -> Tuple[float, float]:
     """Transform a point from one CRS to another.
 
     Args:
@@ -166,9 +160,7 @@ def transform_point(
         return (x, y)
 
     except Exception as e:
-        raise SpatialError(
-            f"Failed to transform point from {from_crs} to {to_crs}: {e}"
-        ) from e
+        raise SpatialError(f"Failed to transform point from {from_crs} to {to_crs}: {e}") from e
 
 
 def validate_crs(crs: str) -> bool:

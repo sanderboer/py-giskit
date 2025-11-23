@@ -220,6 +220,7 @@ class WCSProvider(Provider):
         # Return GeoDataFrame with metadata
         # (WCS returns raster data, but we return metadata as GeoDataFrame for consistency)
         from shapely.geometry import box
+
         gdf = gpd.GeoDataFrame(
             {
                 "coverage": [protocol_key],
@@ -278,8 +279,7 @@ class WCSProvider(Provider):
         """
         if service not in self.services:
             raise ValueError(
-                f"Service '{service}' not found. "
-                f"Available: {', '.join(self.services.keys())}"
+                f"Service '{service}' not found. " f"Available: {', '.join(self.services.keys())}"
             )
 
         service_config = self.services[service]
@@ -295,10 +295,7 @@ class WCSProvider(Provider):
             }
         else:
             # New format - full metadata
-            return {
-                "name": service,
-                **service_config
-            }
+            return {"name": service, **service_config}
 
     def list_categories(self) -> list[str]:
         """Get list of all service categories.

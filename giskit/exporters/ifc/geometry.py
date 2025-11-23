@@ -35,7 +35,7 @@ def normalize_z_to_ground(geom):
         Transformed geometry with minimum Z = 0
     """
     # Find minimum Z coordinate
-    min_z = float('inf')
+    min_z = float("inf")
 
     if isinstance(geom, MultiPolygon):
         for poly in geom.geoms:
@@ -50,7 +50,7 @@ def normalize_z_to_ground(geom):
             min_z = min(z_coords)
 
     # If no Z coordinates found or already at 0, return as-is
-    if min_z == float('inf') or min_z == 0.0:
+    if min_z == float("inf") or min_z == 0.0:
         return geom
 
     # Translate vertically to set min_z to 0
@@ -136,12 +136,7 @@ def polygon_3d_to_ifc_face(ifc_file, polygon: Polygon) -> object:
     return ifc_file.createIfcFace([face_bound])
 
 
-def create_extruded_area_solid(
-    ifc_file,
-    polygon: Polygon,
-    height: float,
-    position = None
-) -> object:
+def create_extruded_area_solid(ifc_file, polygon: Polygon, height: float, position=None) -> object:
     """Create an extruded solid from a 2D polygon.
 
     Args:
@@ -162,11 +157,7 @@ def create_extruded_area_solid(
     polyline = ifc_file.createIfcPolyline(ifc_points)
 
     # Create closed profile
-    profile = ifc_file.createIfcArbitraryClosedProfileDef(
-        "AREA",
-        None,
-        polyline
-    )
+    profile = ifc_file.createIfcArbitraryClosedProfileDef("AREA", None, polyline)
 
     # Default position at origin
     if position is None:
@@ -174,19 +165,14 @@ def create_extruded_area_solid(
         position = ifc_file.createIfcAxis2Placement3D(
             origin,
             None,  # Default Z-axis
-            None   # Default X-axis
+            None,  # Default X-axis
         )
 
     # Extrusion direction (upward)
     direction = ifc_file.createIfcDirection((0.0, 0.0, 1.0))
 
     # Create extruded solid
-    return ifc_file.createIfcExtrudedAreaSolid(
-        profile,
-        position,
-        direction,
-        height
-    )
+    return ifc_file.createIfcExtrudedAreaSolid(profile, position, direction, height)
 
 
 def create_faceted_brep(ifc_file, faces: list) -> object:
@@ -219,7 +205,7 @@ def classify_surface(polygon: Polygon) -> str:
     z_coords = [c[2] for c in coords if len(c) >= 3]
 
     if not z_coords:
-        return 'FLOOR'  # Default for 2D
+        return "FLOOR"  # Default for 2D
 
     z_min = min(z_coords)
     z_max = max(z_coords)
@@ -229,23 +215,18 @@ def classify_surface(polygon: Polygon) -> str:
     # Nearly horizontal surfaces
     if z_range < 0.5:
         if z_avg < 1.0:
-            return 'FLOOR'
+            return "FLOOR"
         else:
-            return 'ROOF'
+            return "ROOF"
 
     # Vertical or slanted surfaces
     if z_range > 3.0:
-        return 'WALL'
+        return "WALL"
     else:
-        return 'ROOF'  # Slanted roof
+        return "ROOF"  # Slanted roof
 
 
-def create_shape_representation(
-    ifc_file,
-    context,
-    representation_type: str,
-    items: list
-) -> object:
+def create_shape_representation(ifc_file, context, representation_type: str, items: list) -> object:
     """Create an IFC Shape Representation.
 
     Args:
@@ -258,8 +239,5 @@ def create_shape_representation(
         IfcShapeRepresentation
     """
     return ifc_file.createIfcShapeRepresentation(
-        context,
-        context.ContextIdentifier,
-        representation_type,
-        items
+        context, context.ContextIdentifier, representation_type, items
     )

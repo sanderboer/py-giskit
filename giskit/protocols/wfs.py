@@ -14,6 +14,7 @@ from giskit.protocols.base import Protocol
 
 class WFSError(Exception):
     """Raised when WFS requests fail."""
+
     pass
 
 
@@ -162,6 +163,5 @@ class WFSProtocol(Protocol):
             NotImplementedError: WFS is vector-only
         """
         raise NotImplementedError(
-            "WFS protocol does not support raster coverage. "
-            "Use WCS or WMTS protocol instead."
+            "WFS protocol does not support raster coverage. " "Use WCS or WMTS protocol instead."
         )

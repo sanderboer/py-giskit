@@ -66,8 +66,8 @@ jobs:
     - name: Install dependencies
       run: poetry install --no-interaction
     
-    - name: Run ruff
+    - name: Run ruff linter
       run: poetry run ruff check .
     
-    - name: Check formatting with black
-      run: poetry run black --check .
+    - name: Run ruff formatter
+      run: poetry run ruff format --check .

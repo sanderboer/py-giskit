@@ -15,6 +15,7 @@ from giskit.protocols.base import Protocol
 
 class WMTSError(Exception):
     """Raised when WMTS requests fail."""
+
     pass
 
 
@@ -57,7 +58,9 @@ class WMTSProtocol(Protocol):
         self.tile_format = tile_format
 
         # Parse EPSG code from tile_matrix_set
-        self.crs_code = tile_matrix_set.split(":")[-1] if ":" in tile_matrix_set else tile_matrix_set
+        self.crs_code = (
+            tile_matrix_set.split(":")[-1] if ":" in tile_matrix_set else tile_matrix_set
+        )
 
         # Tile matrix configuration
         self._init_tile_matrix()
@@ -145,22 +148,17 @@ class WMTSProtocol(Protocol):
 
         # Find zoom level closest to target resolution
         best_zoom = 13  # Default
-        min_diff = float('inf')
+        min_diff = float("inf")
 
         for zoom, info in self.tile_matrix.items():
-            diff = abs(info['res'] - target_resolution)
+            diff = abs(info["res"] - target_resolution)
             if diff < min_diff:
                 min_diff = diff
                 best_zoom = zoom
 
         return best_zoom
 
-    def coords_to_tile(
-        self,
-        x: float,
-        y: float,
-        zoom: int
-    ) -> Tuple[int, int]:
+    def coords_to_tile(self, x: float, y: float, zoom: int) -> Tuple[int, int]:
         """Convert coordinates to tile indices.
 
         Args:
@@ -171,7 +169,7 @@ class WMTSProtocol(Protocol):
         Returns:
             (tile_col, tile_row) indices
         """
-        res = self.tile_matrix[zoom]['res']
+        res = self.tile_matrix[zoom]["res"]
 
         # Calculate offset from origin
         dx = x - self.tile_origin_x
@@ -183,12 +181,7 @@ class WMTSProtocol(Protocol):
 
         return tile_col, tile_row
 
-    def tile_to_coords(
-        self,
-        tile_col: int,
-        tile_row: int,
-        zoom: int
-    ) -> Tuple[float, float]:
+    def tile_to_coords(self, tile_col: int, tile_row: int, zoom: int) -> Tuple[float, float]:
         """Convert tile indices to coordinates (top-left corner).
 
         Args:
@@ -199,19 +192,14 @@ class WMTSProtocol(Protocol):
         Returns:
             (x, y) coordinates of tile's top-left corner
         """
-        res = self.tile_matrix[zoom]['res']
+        res = self.tile_matrix[zoom]["res"]
 
         x = self.tile_origin_x + tile_col * self.tile_size * res
         y = self.tile_origin_y - tile_row * self.tile_size * res
 
         return x, y
 
-    def get_tile_url(
-        self,
-        zoom: int,
-        tile_col: int,
-        tile_row: int
-    ) -> str:
+    def get_tile_url(self, zoom: int, tile_col: int, tile_row: int) -> str:
         """Construct WMTS tile URL.
 
         Args:
@@ -229,12 +217,7 @@ class WMTSProtocol(Protocol):
             f"{zoom:02d}/{tile_col}/{tile_row}.{self.tile_format}"
         )
 
-    async def download_tile(
-        self,
-        zoom: int,
-        tile_col: int,
-        tile_row: int
-    ) -> Optional[Image.Image]:
+    async def download_tile(self, zoom: int, tile_col: int, tile_row: int) -> Optional[Image.Image]:
         """Download a single tile.
 
         Args:
@@ -317,11 +300,8 @@ class WMTSProtocol(Protocol):
             zoom = self.calculate_zoom_level(bbox, target_resolution=resolution)
 
         if progress_callback:
-            res = self.tile_matrix[zoom]['res']
-            progress_callback(
-                f"Using zoom level {zoom} (resolution: {res:.3f}m/px)",
-                0.0
-            )
+            res = self.tile_matrix[zoom]["res"]
+            progress_callback(f"Using zoom level {zoom} (resolution: {res:.3f}m/px)", 0.0)
 
         # Calculate tile range
         min_col, max_row = self.coords_to_tile(minx, miny, zoom)  # bottom-left
@@ -332,10 +312,7 @@ class WMTSProtocol(Protocol):
         total_tiles = len(cols) * len(rows)
 
         if progress_callback:
-            progress_callback(
-                f"Downloading {len(cols)}x{len(rows)} = {total_tiles} tiles",
-                0.1
-            )
+            progress_callback(f"Downloading {len(cols)}x{len(rows)} = {total_tiles} tiles", 0.1)
 
         # Download tiles in parallel
         tiles = {}
@@ -364,7 +341,7 @@ class WMTSProtocol(Protocol):
         # Stitch tiles into single image
         width = len(cols) * self.tile_size
         height = len(rows) * self.tile_size
-        result = Image.new('RGB', (width, height))
+        result = Image.new("RGB", (width, height))
 
         for (col, row), tile_img in tiles.items():
             x = (col - min_col) * self.tile_size
@@ -372,7 +349,7 @@ class WMTSProtocol(Protocol):
             result.paste(tile_img, (x, y))
 
         # Crop to exact bbox
-        res = self.tile_matrix[zoom]['res']
+        res = self.tile_matrix[zoom]["res"]
 
         # Calculate pixel offsets for exact bbox
         tile_min_x, tile_max_y = self.tile_to_coords(min_col, min_row, zoom)
@@ -391,9 +368,6 @@ class WMTSProtocol(Protocol):
         result = result.crop((left_px, top_px, right_px, bottom_px))
 
         if progress_callback:
-            progress_callback(
-                f"Final image: {result.width}x{result.height} pixels",
-                0.9
-            )
+            progress_callback(f"Final image: {result.width}x{result.height} pixels", 0.9)
 
         return result

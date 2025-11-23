@@ -56,12 +56,7 @@ class QuirksMonitor:
         )
         self._enabled = True
 
-    def record_quirk_applied(
-        self,
-        provider: str,
-        protocol: str,
-        quirk_type: str
-    ):
+    def record_quirk_applied(self, provider: str, protocol: str, quirk_type: str):
         """Record that a quirk was applied.
 
         Args:
@@ -75,9 +70,7 @@ class QuirksMonitor:
         # Get or create usage record
         if quirk_type not in self._usage[provider][protocol]:
             self._usage[provider][protocol][quirk_type] = QuirkUsage(
-                provider=provider,
-                protocol=protocol,
-                quirk_type=quirk_type
+                provider=provider, protocol=protocol, quirk_type=quirk_type
             )
 
         # Record application
@@ -86,8 +79,7 @@ class QuirksMonitor:
 
         # Log at debug level
         logger.debug(
-            f"Applied quirk: {provider}/{protocol}/{quirk_type} "
-            f"(count: {usage.applied_count})"
+            f"Applied quirk: {provider}/{protocol}/{quirk_type} " f"(count: {usage.applied_count})"
         )
 
     def get_statistics(self) -> dict:
@@ -190,12 +182,7 @@ def get_monitor() -> QuirksMonitor:
     return _global_monitor
 
 
-def log_quirk_application(
-    quirks: ProtocolQuirks,
-    provider: str,
-    protocol: str,
-    operation: str
-):
+def log_quirk_application(quirks: ProtocolQuirks, provider: str, protocol: str, operation: str):
     """Log which quirks were applied for an operation.
 
     Args:
@@ -227,7 +214,9 @@ def log_quirk_application(
     if quirks.requires_trailing_slash:
         active_quirks.append("trailing_slash")
     if quirks.require_format_param:
-        active_quirks.append(f"format_param({quirks.format_param_name}={quirks.format_param_value})")
+        active_quirks.append(
+            f"format_param({quirks.format_param_name}={quirks.format_param_value})"
+        )
     if quirks.max_features_limit:
         active_quirks.append(f"max_limit={quirks.max_features_limit}")
     if quirks.custom_timeout:
@@ -237,8 +226,7 @@ def log_quirk_application(
 
     if active_quirks:
         logger.debug(
-            f"{provider}/{protocol}.{operation} - "
-            f"Active quirks: {', '.join(active_quirks)}"
+            f"{provider}/{protocol}.{operation} - " f"Active quirks: {', '.join(active_quirks)}"
         )
     else:
         logger.debug(f"{provider}/{protocol}.{operation} - No quirks applied")

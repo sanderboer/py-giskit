@@ -40,15 +40,13 @@ class SchemaAdapter:
             element: Element to assign
             method: 'aggregate' or 'container'
         """
-        if method == 'aggregate':
-            ifcopenshell.api.run("aggregate.assign_object", self.ifc,
-                relating_object=site,
-                products=[element]
+        if method == "aggregate":
+            ifcopenshell.api.run(
+                "aggregate.assign_object", self.ifc, relating_object=site, products=[element]
             )
-        elif method == 'container':
-            ifcopenshell.api.run("spatial.assign_container", self.ifc,
-                relating_structure=site,
-                products=[element]
+        elif method == "container":
+            ifcopenshell.api.run(
+                "spatial.assign_container", self.ifc, relating_structure=site, products=[element]
             )
         else:
             raise ValueError(f"Unknown assignment method: {method}")
@@ -59,31 +57,28 @@ class IFC4Adapter(SchemaAdapter):
 
     def create_road(self, name: str) -> Tuple[Any, str]:
         """Create road as IfcCivilElement in IFC4."""
-        road = ifcopenshell.api.run("root.create_entity", self.ifc,
-            ifc_class="IfcCivilElement",
-            name=name
+        road = ifcopenshell.api.run(
+            "root.create_entity", self.ifc, ifc_class="IfcCivilElement", name=name
         )
         # Set ObjectType to indicate it's a road
         road.ObjectType = "Road"
-        return road, 'container'
+        return road, "container"
 
     def create_bridge(self, name: str) -> Tuple[Any, str]:
         """Create bridge as IfcCivilElement in IFC4."""
-        bridge = ifcopenshell.api.run("root.create_entity", self.ifc,
-            ifc_class="IfcCivilElement",
-            name=name
+        bridge = ifcopenshell.api.run(
+            "root.create_entity", self.ifc, ifc_class="IfcCivilElement", name=name
         )
         bridge.ObjectType = "Bridge"
-        return bridge, 'container'
+        return bridge, "container"
 
     def create_railway(self, name: str) -> Tuple[Any, str]:
         """Create railway as IfcCivilElement in IFC4."""
-        railway = ifcopenshell.api.run("root.create_entity", self.ifc,
-            ifc_class="IfcCivilElement",
-            name=name
+        railway = ifcopenshell.api.run(
+            "root.create_entity", self.ifc, ifc_class="IfcCivilElement", name=name
         )
         railway.ObjectType = "Railway"
-        return railway, 'container'
+        return railway, "container"
 
 
 class IFC4X3Adapter(SchemaAdapter):
@@ -91,27 +86,22 @@ class IFC4X3Adapter(SchemaAdapter):
 
     def create_road(self, name: str) -> Tuple[Any, str]:
         """Create road as IfcRoad in IFC4X3."""
-        road = ifcopenshell.api.run("root.create_entity", self.ifc,
-            ifc_class="IfcRoad",
-            name=name
-        )
-        return road, 'aggregate'
+        road = ifcopenshell.api.run("root.create_entity", self.ifc, ifc_class="IfcRoad", name=name)
+        return road, "aggregate"
 
     def create_bridge(self, name: str) -> Tuple[Any, str]:
         """Create bridge as IfcBridge in IFC4X3."""
-        bridge = ifcopenshell.api.run("root.create_entity", self.ifc,
-            ifc_class="IfcBridge",
-            name=name
+        bridge = ifcopenshell.api.run(
+            "root.create_entity", self.ifc, ifc_class="IfcBridge", name=name
         )
-        return bridge, 'aggregate'
+        return bridge, "aggregate"
 
     def create_railway(self, name: str) -> Tuple[Any, str]:
         """Create railway as IfcRailway in IFC4X3."""
-        railway = ifcopenshell.api.run("root.create_entity", self.ifc,
-            ifc_class="IfcRailway",
-            name=name
+        railway = ifcopenshell.api.run(
+            "root.create_entity", self.ifc, ifc_class="IfcRailway", name=name
         )
-        return railway, 'aggregate'
+        return railway, "aggregate"
 
 
 def get_schema_adapter(ifc_file: Any) -> SchemaAdapter:
@@ -125,11 +115,11 @@ def get_schema_adapter(ifc_file: Any) -> SchemaAdapter:
     """
     schema = ifc_file.schema
 
-    if schema.startswith('IFC4X3'):
+    if schema.startswith("IFC4X3"):
         return IFC4X3Adapter(ifc_file)
-    elif schema == 'IFC4':
+    elif schema == "IFC4":
         return IFC4Adapter(ifc_file)
-    elif schema == 'IFC2X3':
+    elif schema == "IFC2X3":
         return IFC4Adapter(ifc_file)  # IFC2X3 similar to IFC4 for civil elements
     else:
         raise ValueError(f"Unsupported IFC schema: {schema}")

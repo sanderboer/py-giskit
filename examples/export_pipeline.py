@@ -68,7 +68,7 @@ def export_pipeline(input_gpkg: Path, output_dir: Path):
     print(f"  Platform: {info['platform']}")
     print()
 
-    if not info['available']:
+    if not info["available"]:
         print("ERROR: IfcConvert not found!")
         print("In Docker, this should be pre-installed.")
         print("For local use, run: python bin/install_ifcconvert.py")
@@ -82,11 +82,7 @@ def export_pipeline(input_gpkg: Path, output_dir: Path):
     exporter = IFCExporter(ifc_version="IFC4X3_ADD2")
 
     print(f"Exporting {input_gpkg} to {ifc_path}...")
-    exporter.export(
-        db_path=input_gpkg,
-        output_path=ifc_path,
-        site_name=stem
-    )
+    exporter.export(db_path=input_gpkg, output_path=ifc_path, site_name=stem)
 
     if ifc_path.exists():
         ifc_mb = ifc_path.stat().st_size / (1024 * 1024)
@@ -109,7 +105,7 @@ def export_pipeline(input_gpkg: Path, output_dir: Path):
         glb_path=glb_path,
         use_world_coords=True,
         generate_uvs=True,
-        center_model=False
+        center_model=False,
     )
 
     if glb_path.exists():
@@ -150,5 +146,5 @@ def main():
     export_pipeline(input_gpkg, output_dir)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

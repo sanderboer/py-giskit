@@ -16,6 +16,7 @@ async def test_bag3d_transform():
 
     # Convert RD to WGS84 for API
     from pyproj import Transformer
+
     transformer = Transformer.from_crs("EPSG:28992", "EPSG:4326", always_xy=True)
     minx, miny = transformer.transform(bbox[0], bbox[1])
     maxx, maxy = transformer.transform(bbox[2], bbox[3])
@@ -37,8 +38,8 @@ async def test_bag3d_transform():
 
         # Extract transform from page 1
         transform1 = None
-        if 'metadata' in page1 and isinstance(page1['metadata'], dict):
-            transform1 = page1['metadata'].get('transform')
+        if "metadata" in page1 and isinstance(page1["metadata"], dict):
+            transform1 = page1["metadata"].get("transform")
 
         print(f"Page 1 transform: {transform1}")
         print(f"Page 1 features: {len(page1.get('features', []))}")
@@ -64,8 +65,8 @@ async def test_bag3d_transform():
 
             # Extract transform from page 2
             transform2 = None
-            if 'metadata' in page2 and isinstance(page2['metadata'], dict):
-                transform2 = page2['metadata'].get('transform')
+            if "metadata" in page2 and isinstance(page2["metadata"], dict):
+                transform2 = page2["metadata"].get("transform")
 
             print(f"Page 2 transform: {transform2}")
             print(f"Page 2 features: {len(page2.get('features', []))}")
@@ -102,6 +103,7 @@ async def test_bag3d_transform():
                     print("  ✓ All coordinates in valid RD range")
         else:
             print("\nNo next page available (small dataset)")
+
 
 if __name__ == "__main__":
     asyncio.run(test_bag3d_transform())

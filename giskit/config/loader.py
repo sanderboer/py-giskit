@@ -126,7 +126,9 @@ class QuirkDefinition(BaseModel):
     custom_timeout: Optional[float] = Field(None)
 
     # CRS quirks
-    bbox_crs: Optional[str] = Field(None, description="CRS for bbox parameter (e.g., 'EPSG:28992' for BAG3D)")
+    bbox_crs: Optional[str] = Field(
+        None, description="CRS for bbox parameter (e.g., 'EPSG:28992' for BAG3D)"
+    )
 
     # CityJSON format quirks
     format_is_cityjson: bool = Field(False)
@@ -247,8 +249,7 @@ def load_services(
         if fallback is not None:
             return fallback
         raise FileNotFoundError(
-            f"Config file not found: {file_path}\n"
-            f"Create it or provide fallback parameter"
+            f"Config file not found: {file_path}\n" f"Create it or provide fallback parameter"
         )
 
 
@@ -307,7 +308,7 @@ def load_quirks(
                         # We need to split intelligently:
                         # - For formats: "cityjson-format" -> provider="cityjson", protocol="format"
                         # - For providers: "pdok-ogc-features" -> provider="pdok", protocol="ogc-features"
-                        parts = quirk_id.split('-', 1)  # Split on FIRST dash only
+                        parts = quirk_id.split("-", 1)  # Split on FIRST dash only
                         if len(parts) == 2:
                             provider_id, protocol_id = parts
                         else:
@@ -336,7 +337,7 @@ def save_services(
     provider_name: str,
     provider_title: str,
     output_path: Optional[Path] = None,
-    **provider_metadata
+    **provider_metadata,
 ) -> Path:
     """Export services dict to YAML config file.
 
@@ -369,19 +370,15 @@ def save_services(
 
     # Create config structure
     config = ServicesConfig(
-        provider=ProviderConfig(
-            name=provider_name,
-            title=provider_title,
-            **provider_metadata
-        ),
-        services=service_defs
+        provider=ProviderConfig(name=provider_name, title=provider_title, **provider_metadata),
+        services=service_defs,
     )
 
     # Convert to dict and write YAML
     output_data = config.model_dump(exclude_none=True, exclude_defaults=False)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         yaml.dump(output_data, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
 
     return output_path
@@ -425,7 +422,7 @@ def save_quirks(
             quirk_id = f"{category_id}-{protocol_id}"
 
             # Convert to dict if it has model_dump method (Pydantic model)
-            if hasattr(quirk_obj, 'model_dump'):
+            if hasattr(quirk_obj, "model_dump"):
                 quirk_data = quirk_obj.model_dump(exclude_none=True, exclude_defaults=True)
             elif isinstance(quirk_obj, dict):
                 quirk_data = quirk_obj.copy()
@@ -433,7 +430,7 @@ def save_quirks(
                 raise TypeError(f"Unknown quirk type: {type(quirk_obj)}")
 
             # Add name field
-            quirk_data['name'] = quirk_id
+            quirk_data["name"] = quirk_id
 
             quirk_defs[quirk_id] = QuirkDefinition(**quirk_data)
 
@@ -444,7 +441,7 @@ def save_quirks(
     output_data = config.model_dump(exclude_none=True, exclude_defaults=True)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         yaml.dump(output_data, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
 
     return output_path

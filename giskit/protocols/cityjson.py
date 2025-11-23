@@ -72,8 +72,8 @@ def cityjson_to_geodataframe(cityjson_data: dict, lod: str = "0") -> gpd.GeoData
     # Extract transform from metadata (CityJSON 2.0 per-page transform)
     # This is CRITICAL - without this, coordinates will be completely wrong!
     page_transform = None
-    if 'metadata' in cityjson_data and isinstance(cityjson_data['metadata'], dict):
-        page_transform = cityjson_data['metadata'].get('transform')
+    if "metadata" in cityjson_data and isinstance(cityjson_data["metadata"], dict):
+        page_transform = cityjson_data["metadata"].get("transform")
 
     rows = []
 
@@ -149,7 +149,9 @@ def cityjson_to_geodataframe(cityjson_data: dict, lod: str = "0") -> gpd.GeoData
     return gdf
 
 
-def _extract_lod0_geometry(city_object: dict, vertices: list, transform: Optional[dict] = None) -> Optional[Polygon]:
+def _extract_lod0_geometry(
+    city_object: dict, vertices: list, transform: Optional[dict] = None
+) -> Optional[Polygon]:
     """Extract LOD 0 (2D footprint) geometry from CityObject.
 
     Args:
@@ -179,9 +181,9 @@ def _extract_lod0_geometry(city_object: dict, vertices: list, transform: Optiona
                             if vertex_idx < len(vertices):
                                 v = vertices[vertex_idx]
                                 # Apply transform if available (CityJSON 2.0)
-                                if transform and 'scale' in transform and 'translate' in transform:
-                                    scale = transform['scale']
-                                    translate = transform['translate']
+                                if transform and "scale" in transform and "translate" in transform:
+                                    scale = transform["scale"]
+                                    translate = transform["translate"]
                                     x = v[0] * scale[0] + translate[0]
                                     y = v[1] * scale[1] + translate[1]
                                     ring_coords.append((x, y))
@@ -197,7 +199,9 @@ def _extract_lod0_geometry(city_object: dict, vertices: list, transform: Optiona
     return None
 
 
-def _extract_lod_geometry(city_object: dict, vertices: list, lod: str, transform: Optional[dict] = None) -> Optional[MultiPolygon]:
+def _extract_lod_geometry(
+    city_object: dict, vertices: list, lod: str, transform: Optional[dict] = None
+) -> Optional[MultiPolygon]:
     """Extract 3D geometry for a specific LOD from BuildingPart.
 
     Args:
@@ -230,9 +234,13 @@ def _extract_lod_geometry(city_object: dict, vertices: list, lod: str, transform
                                 if vertex_idx < len(vertices):
                                     v = vertices[vertex_idx]
                                     # Apply transform if available (CityJSON 2.0)
-                                    if transform and 'scale' in transform and 'translate' in transform:
-                                        scale = transform['scale']
-                                        translate = transform['translate']
+                                    if (
+                                        transform
+                                        and "scale" in transform
+                                        and "translate" in transform
+                                    ):
+                                        scale = transform["scale"]
+                                        translate = transform["translate"]
                                         x = v[0] * scale[0] + translate[0]
                                         y = v[1] * scale[1] + translate[1]
                                         z = (v[2] * scale[2] + translate[2]) if len(v) > 2 else 0

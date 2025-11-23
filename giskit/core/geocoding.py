@@ -28,9 +28,7 @@ class Geocoder:
         self.user_agent = user_agent
         self.base_url = base_url
 
-    async def geocode(
-        self, address: str, timeout: float = 10.0
-    ) -> Tuple[float, float]:
+    async def geocode(self, address: str, timeout: float = 10.0) -> Tuple[float, float]:
         """Geocode an address to WGS84 coordinates.
 
         Args:
@@ -76,9 +74,7 @@ class Geocoder:
 
             return (lon, lat)
 
-    async def reverse_geocode(
-        self, lon: float, lat: float, timeout: float = 10.0
-    ) -> str:
+    async def reverse_geocode(self, lon: float, lat: float, timeout: float = 10.0) -> str:
         """Reverse geocode coordinates to an address.
 
         Args:

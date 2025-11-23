@@ -44,14 +44,14 @@ def find_ifcconvert_binary() -> Optional[str]:
     binary_name = get_binary_name()
 
     # 1. Check system PATH
-    path_binary = shutil.which('IfcConvert')
+    path_binary = shutil.which("IfcConvert")
     if path_binary:
         return path_binary
 
     # 2. Check project bin/ directory
     # Go up from giskit/exporters/glb_exporter.py to project root
     project_root = Path(__file__).parent.parent.parent.parent
-    bin_dir = project_root / 'bin'
+    bin_dir = project_root / "bin"
     local_binary = bin_dir / binary_name
 
     if local_binary.exists() and local_binary.is_file():
@@ -60,10 +60,10 @@ def find_ifcconvert_binary() -> Optional[str]:
     # 3. Check common installation paths (Unix-like systems)
     if platform_module.system() != "Windows":
         common_paths = [
-            '/opt/conda/bin/IfcConvert',
-            '/usr/local/bin/IfcConvert',
-            '/usr/bin/IfcConvert',
-            str(Path.home() / '.local' / 'bin' / 'IfcConvert'),
+            "/opt/conda/bin/IfcConvert",
+            "/usr/local/bin/IfcConvert",
+            "/usr/bin/IfcConvert",
+            str(Path.home() / ".local" / "bin" / "IfcConvert"),
         ]
         for path in common_paths:
             if Path(path).exists():
@@ -103,7 +103,7 @@ class GLBExporter:
         glb_path: Path,
         use_world_coords: bool = True,
         generate_uvs: bool = True,
-        center_model: bool = False
+        center_model: bool = False,
     ) -> None:
         """Convert IFC file to GLB using IfcConvert.
 
@@ -133,29 +133,24 @@ class GLBExporter:
 
         # Add options
         if use_world_coords:
-            cmd.append('--use-world-coords')
+            cmd.append("--use-world-coords")
 
         if generate_uvs:
-            cmd.append('--generate-uvs')
+            cmd.append("--generate-uvs")
 
         if center_model:
-            cmd.append('--center-model')
+            cmd.append("--center-model")
 
         # Run conversion
         print(f"  Running: {' '.join(cmd)}")
 
         try:
-            result = subprocess.run(
-                cmd,
-                check=True,
-                capture_output=True,
-                text=True
-            )
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
 
             # Print IfcConvert output
             if result.stdout:
                 print("  IfcConvert output:")
-                for line in result.stdout.strip().split('\n'):
+                for line in result.stdout.strip().split("\n"):
                     print(f"    {line}")
 
             print(f"✓ GLB export complete: {glb_path}")
@@ -180,7 +175,7 @@ def convert_ifc_to_glb(
     glb_path: Path,
     use_world_coords: bool = True,
     generate_uvs: bool = True,
-    center_model: bool = False
+    center_model: bool = False,
 ) -> None:
     """Convenience function to convert IFC to GLB.
 
@@ -201,7 +196,7 @@ def convert_ifc_to_glb(
         glb_path,
         use_world_coords=use_world_coords,
         generate_uvs=generate_uvs,
-        center_model=center_model
+        center_model=center_model,
     )
 
 
@@ -215,22 +210,19 @@ def check_ifcconvert_installation() -> dict:
     exporter = GLBExporter()
 
     info = {
-        'available': exporter.is_available(),
-        'path': exporter.ifcconvert_path,
-        'version': None,
-        'platform': f"{platform_module.system()} {platform_module.machine()}",
-        'binary_name': get_binary_name(),
+        "available": exporter.is_available(),
+        "path": exporter.ifcconvert_path,
+        "version": None,
+        "platform": f"{platform_module.system()} {platform_module.machine()}",
+        "binary_name": get_binary_name(),
     }
 
     if exporter.is_available() and exporter.ifcconvert_path:
         try:
             result = subprocess.run(
-                [exporter.ifcconvert_path, '--version'],
-                capture_output=True,
-                text=True,
-                timeout=5
+                [exporter.ifcconvert_path, "--version"], capture_output=True, text=True, timeout=5
             )
-            info['version'] = result.stdout.strip() or result.stderr.strip()
+            info["version"] = result.stdout.strip() or result.stderr.strip()
         except Exception:
             pass
 

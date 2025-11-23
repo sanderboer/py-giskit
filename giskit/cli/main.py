@@ -42,9 +42,9 @@ def _normalize_layer_name(name: str) -> str:
         pand -> pand (already lowercase)
     """
     # Insert underscore before uppercase letters (but not at start)
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
     # Insert underscore before uppercase letters that follow lowercase
-    s2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1)
+    s2 = re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1)
     # Convert to lowercase
     return s2.lower()
 
@@ -76,9 +76,7 @@ async def _execute_recipe(recipe: Recipe, console: Console, verbose: bool):
     layers = {}
 
     for i, dataset in enumerate(recipe.datasets, 1):
-        console.print(
-            f"\n[bold]Dataset {i}/{len(recipe.datasets)}:[/bold] {dataset.provider}"
-        )
+        console.print(f"\n[bold]Dataset {i}/{len(recipe.datasets)}:[/bold] {dataset.provider}")
 
         if dataset.service:
             console.print(f"  Service: {dataset.service}")
@@ -92,9 +90,7 @@ async def _execute_recipe(recipe: Recipe, console: Console, verbose: bool):
             # Convert bbox to Location for compatibility
             from giskit.core.recipe import Location, LocationType
 
-            bbox_location = Location(
-                type=LocationType.BBOX, value=list(bbox), crs="EPSG:4326"
-            )
+            bbox_location = Location(type=LocationType.BBOX, value=list(bbox), crs="EPSG:4326")
 
             # Download dataset
             with console.status(f"[bold green]Downloading from {dataset.provider}..."):
@@ -161,29 +157,29 @@ async def _execute_recipe(recipe: Recipe, console: Console, verbose: bool):
 
         # Build metadata dict - exact column order matching Sitedb
         metadata_dict = {
-            'address': [None],
-            'x': [center_x],
-            'y': [center_y],
-            'radius': [None],
-            'bbox_minx': [bbox_output_crs[0]],
-            'bbox_miny': [bbox_output_crs[1]],
-            'bbox_maxx': [bbox_output_crs[2]],
-            'bbox_maxy': [bbox_output_crs[3]],
-            'download_date': [datetime.now().isoformat()],
-            'crs': [recipe.output.crs],
-            'grid_size': [None],  # For raster data, optional
-            'bgt_layers': [None],  # Which BGT layers were requested
-            'bag3d_lods': [None],  # Which BAG3D LOD levels were requested
+            "address": [None],
+            "x": [center_x],
+            "y": [center_y],
+            "radius": [None],
+            "bbox_minx": [bbox_output_crs[0]],
+            "bbox_miny": [bbox_output_crs[1]],
+            "bbox_maxx": [bbox_output_crs[2]],
+            "bbox_maxy": [bbox_output_crs[3]],
+            "download_date": [datetime.now().isoformat()],
+            "crs": [recipe.output.crs],
+            "grid_size": [None],  # For raster data, optional
+            "bgt_layers": [None],  # Which BGT layers were requested
+            "bag3d_lods": [None],  # Which BAG3D LOD levels were requested
         }
 
         # Add location-specific fields
         if recipe.location.type.value == "address":
-            metadata_dict['address'] = [recipe.location.value]
+            metadata_dict["address"] = [recipe.location.value]
             if recipe.location.radius is not None:
-                metadata_dict['radius'] = [recipe.location.radius]
+                metadata_dict["radius"] = [recipe.location.radius]
         elif recipe.location.type.value == "point":
             if recipe.location.radius is not None:
-                metadata_dict['radius'] = [recipe.location.radius]
+                metadata_dict["radius"] = [recipe.location.radius]
 
         # Extract dataset-specific metadata for traceability
         bgt_layers_list = []
@@ -209,28 +205,26 @@ async def _execute_recipe(recipe: Recipe, console: Console, verbose: bool):
 
             # Track grid_size if resolution is specified (for raster data)
             if dataset.resolution is not None:
-                metadata_dict['grid_size'] = [dataset.resolution]
+                metadata_dict["grid_size"] = [dataset.resolution]
 
         # Store BGT layers (or "all" if many layers)
         if bgt_layers_list:
             # Sitedb uses "all" if all BGT layers are included
             if len(bgt_layers_list) > 40:  # Heuristic: if many layers, assume "all"
-                metadata_dict['bgt_layers'] = ['all']
+                metadata_dict["bgt_layers"] = ["all"]
             else:
-                metadata_dict['bgt_layers'] = [','.join(sorted(bgt_layers_list))]
+                metadata_dict["bgt_layers"] = [",".join(sorted(bgt_layers_list))]
 
         # Store BAG3D LOD levels
         if bag3d_lods_list:
-            metadata_dict['bag3d_lods'] = [','.join(sorted(bag3d_lods_list))]
+            metadata_dict["bag3d_lods"] = [",".join(sorted(bag3d_lods_list))]
 
         # Create metadata GeoDataFrame
         metadata_gdf = gpd.GeoDataFrame(
-            metadata_dict,
-            geometry=[Point(center_x, center_y)],
-            crs=recipe.output.crs
+            metadata_dict, geometry=[Point(center_x, center_y)], crs=recipe.output.crs
         )
 
-        layers['_metadata'] = metadata_gdf
+        layers["_metadata"] = metadata_gdf
 
     return layers if layers else None
 
@@ -295,7 +289,7 @@ def run(
 
         # Convert dry_run to bool if it's a string (Typer bug workaround)
         if isinstance(dry_run, str):
-            dry_run = dry_run.lower() in ('true', '1', 'yes')
+            dry_run = dry_run.lower() in ("true", "1", "yes")
 
         if dry_run:
             console.print("\n[yellow]Dry run - no data downloaded[/yellow]")
@@ -320,7 +314,7 @@ def run(
                         for layer_name, gdf in layers.items():
                             # Remove internal columns before saving
                             save_gdf = gdf.copy()
-                            for col in ['_provider', '_service', '_layer', '_collection']:
+                            for col in ["_provider", "_service", "_layer", "_collection"]:
                                 if col in save_gdf.columns:
                                     save_gdf = save_gdf.drop(columns=[col])
 
@@ -333,7 +327,10 @@ def run(
                     elif output_format == "geojson":
                         # GeoJSON doesn't support layers - combine all
                         import geopandas as gpd
-                        combined = gpd.GeoDataFrame(gpd.pd.concat(layers.values(), ignore_index=True))
+
+                        combined = gpd.GeoDataFrame(
+                            gpd.pd.concat(layers.values(), ignore_index=True)
+                        )
                         combined.to_file(output_path, driver="GeoJSON")
                         console.print(
                             f"\n[bold green]✓[/bold green] Successfully saved {len(combined)} features to {output_path}"
@@ -341,7 +338,10 @@ def run(
                     elif output_format == "shp":
                         # Shapefile doesn't support layers - combine all
                         import geopandas as gpd
-                        combined = gpd.GeoDataFrame(gpd.pd.concat(layers.values(), ignore_index=True))
+
+                        combined = gpd.GeoDataFrame(
+                            gpd.pd.concat(layers.values(), ignore_index=True)
+                        )
                         combined.to_file(output_path, driver="ESRI Shapefile")
                         console.print(
                             f"\n[bold green]✓[/bold green] Successfully saved {len(combined)} features to {output_path}"
@@ -349,7 +349,10 @@ def run(
                     elif output_format == "fgb":
                         # FlatGeobuf doesn't support layers - combine all
                         import geopandas as gpd
-                        combined = gpd.GeoDataFrame(gpd.pd.concat(layers.values(), ignore_index=True))
+
+                        combined = gpd.GeoDataFrame(
+                            gpd.pd.concat(layers.values(), ignore_index=True)
+                        )
                         combined.to_file(output_path, driver="FlatGeobuf")
                         console.print(
                             f"\n[bold green]✓[/bold green] Successfully saved {len(combined)} features to {output_path}"
@@ -426,7 +429,7 @@ def providers_list() -> None:
 
 @providers_app.command("info")
 def providers_info(
-    provider_name: str = typer.Argument(..., help="Provider name (e.g., 'pdok')")
+    provider_name: str = typer.Argument(..., help="Provider name (e.g., 'pdok')"),
 ) -> None:
     """Show detailed information about a provider.
 
@@ -485,7 +488,7 @@ def quirks_list() -> None:
 @quirks_app.command("show")
 def quirks_show(
     provider: str = typer.Argument(..., help="Provider name (e.g., 'pdok')"),
-    protocol: str = typer.Argument(..., help="Protocol name (e.g., 'ogc-features')")
+    protocol: str = typer.Argument(..., help="Protocol name (e.g., 'ogc-features')"),
 ) -> None:
     """Show detailed quirks for a specific provider/protocol.
 
@@ -573,15 +576,11 @@ def export_ifc(
     input_path: Path = typer.Argument(
         ..., help="Path to input GeoPackage file", exists=True, dir_okay=False
     ),
-    output_path: Path = typer.Argument(
-        ..., help="Path to output IFC file"
-    ),
+    output_path: Path = typer.Argument(..., help="Path to output IFC file"),
     ifc_version: str = typer.Option(
         "IFC4X3_ADD2", "--version", "-v", help="IFC schema version (IFC4X3_ADD2, IFC4, IFC2X3)"
     ),
-    site_name: str = typer.Option(
-        "Site", "--site-name", "-s", help="Name for the IFC site"
-    ),
+    site_name: str = typer.Option("Site", "--site-name", "-s", help="Name for the IFC site"),
     absolute: bool = typer.Option(
         False, "--absolute", help="Use absolute RD coordinates (default: relative)"
     ),
@@ -628,11 +627,7 @@ def export_ifc(
         console.print()
 
         # Create exporter
-        exporter = IFCExporter(
-            ifc_version=ifc_version,
-            author="GISKit",
-            organization="A190"
-        )
+        exporter = IFCExporter(ifc_version=ifc_version, author="GISKit", organization="A190")
 
         # Export with progress
         with console.status("[bold green]Exporting layers..."):
@@ -644,7 +639,7 @@ def export_ifc(
                 normalize_z=normalize_z,
                 site_name=site_name,
                 ref_x=ref_x,
-                ref_y=ref_y
+                ref_y=ref_y,
             )
 
         console.print("\n[bold green]✓[/bold green] Export complete!")

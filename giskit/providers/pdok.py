@@ -23,7 +23,6 @@ from giskit.providers.base import Provider, register_provider
 LEGACY_PDOK_SERVICES = {
     # ===== BASE REGISTERS (Basisregistraties) =====
     # Core Dutch government registers
-
     "bgt": {
         "url": "https://api.pdok.nl/lv/bgt/ogc/v1_0/",
         "title": "Basisregistratie Grootschalige Topografie",
@@ -45,10 +44,8 @@ LEGACY_PDOK_SERVICES = {
         "description": "Cadastral map with parcel boundaries",
         "keywords": ["brk", "kadaster", "percelen", "eigendom"],
     },
-
     # ===== TOPOGRAPHY (Topografie) =====
     # Maps and 3D models
-
     "3d-basisvoorziening": {
         "url": "https://api.pdok.nl/kadaster/3d-basisvoorziening/ogc/v1",
         "title": "3D Basisvoorziening",
@@ -114,10 +111,8 @@ LEGACY_PDOK_SERVICES = {
         "description": "Sea areas (INSPIRE harmonized)",
         "keywords": ["zee", "noordzee", "kustwater", "inspire"],
     },
-
     # ===== CBS STATISTICS (Statistieken) =====
     # Demographics and statistical data
-
     "cbs-wijken-buurten-2024": {
         "url": "https://api.pdok.nl/cbs/wijken-en-buurten-2024/ogc/v1",
         "title": "CBS Wijken en Buurten 2024",
@@ -237,10 +232,8 @@ LEGACY_PDOK_SERVICES = {
         "description": "Health statistics (INSPIRE harmonized)",
         "keywords": ["cbs", "gezondheid", "health", "inspire"],
     },
-
     # ===== INFRASTRUCTURE (Infrastructuur) =====
     # Roads, railways, waterways
-
     "nwb-wegen": {
         "url": "https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/",
         "title": "Nationaal Wegenbestand - Wegen",
@@ -276,10 +269,8 @@ LEGACY_PDOK_SERVICES = {
         "description": "Waterway markings and navigation aids",
         "keywords": ["vaarweg", "markering", "scheepvaart", "navigatie"],
     },
-
     # ===== ENVIRONMENT (Milieu & Natuur) =====
     # Nature, water, sustainability
-
     "natura2000": {
         "url": "https://api.pdok.nl/rvo/natura2000/ogc/v1",
         "title": "Natura 2000",
@@ -350,10 +341,8 @@ LEGACY_PDOK_SERVICES = {
         "description": "Wetland areas (INSPIRE harmonized)",
         "keywords": ["wetland", "moeras", "natuur", "inspire"],
     },
-
     # ===== OTHER (Overig) =====
     # Miscellaneous datasets
-
     "bestuurlijkegebieden": {
         "url": "https://api.pdok.nl/kadaster/bestuurlijkegebieden/ogc/v1/",
         "title": "Bestuurlijke Gebieden",
@@ -375,12 +364,10 @@ LEGACY_PDOK_SERVICES = {
         "description": "Restricted airspace for drones",
         "keywords": ["drone", "luchtruim", "vliegverbod"],
     },
-
     # ===== SPECIAL CASE: BAG3D (Different Host) =====
     # === EXTERNAL SERVICES (not hosted by PDOK) ===
     # These services are registered under "pdok" provider for convenience,
     # but are actually hosted externally and may use different formats/protocols
-
     # BAG3D: 3D building models from api.3dbag.nl (NOT api.pdok.nl)
     # Uses CityJSON format instead of standard GeoJSON
     # Provides multiple LODs (Level of Detail): 0, 1.2, 1.3, 2.2
@@ -430,13 +417,14 @@ class PDOKProvider(Provider):
             Use OGCProvider("pdok") instead. PDOKProvider will be removed in v1.0.0.
         """
         import warnings
+
         warnings.warn(
             "PDOKProvider is deprecated and will be removed in version 1.0.0. "
             "Use OGCProvider('pdok') instead:\n"
             "  from giskit.providers.ogc import OGCProvider\n"
             "  provider = OGCProvider('pdok')",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
         super().__init__(name, **kwargs)
@@ -457,21 +445,17 @@ class PDOKProvider(Provider):
 
             protocol = OGCFeaturesProtocol(
                 base_url=service_url,
-                quirks=service_quirks  # Apply service-specific quirks
+                quirks=service_quirks,  # Apply service-specific quirks
             )
             self.register_protocol(f"ogc-features-{service_name}", protocol)
 
         # Register WFS protocols for services that don't have OGC API Features yet
         # BAG - Buildings and addresses
-        bag_wfs = WFSProtocol(
-            base_url="https://service.pdok.nl/lv/bag/wfs/v2_0"
-        )
+        bag_wfs = WFSProtocol(base_url="https://service.pdok.nl/lv/bag/wfs/v2_0")
         self.register_protocol("wfs-bag", bag_wfs)
 
         # BRK - Cadastral map
-        brk_wfs = WFSProtocol(
-            base_url="https://service.pdok.nl/kadaster/kadastralekaart/wfs/v5_0"
-        )
+        brk_wfs = WFSProtocol(base_url="https://service.pdok.nl/kadaster/kadastralekaart/wfs/v5_0")
         self.register_protocol("wfs-brk", brk_wfs)
 
     async def get_metadata(self) -> dict[str, Any]:
@@ -594,6 +578,7 @@ class PDOKProvider(Provider):
         if dataset.service in ["bag", "brk"]:
             # WFS services use RD coordinates
             from pyproj import Transformer
+
             transformer = Transformer.from_crs("EPSG:4326", "EPSG:28992", always_xy=True)
             minx, miny = transformer.transform(bbox[0], bbox[1])
             maxx, maxy = transformer.transform(bbox[2], bbox[3])
@@ -698,8 +683,7 @@ class PDOKProvider(Provider):
         """
         if service not in PDOK_SERVICES:
             raise ValueError(
-                f"Service '{service}' not found. "
-                f"Available: {', '.join(PDOK_SERVICES.keys())}"
+                f"Service '{service}' not found. " f"Available: {', '.join(PDOK_SERVICES.keys())}"
             )
 
         service_config = PDOK_SERVICES[service]
@@ -715,10 +699,7 @@ class PDOKProvider(Provider):
             }
         else:
             # New format - full metadata
-            return {
-                "name": service,
-                **service_config
-            }
+            return {"name": service, **service_config}
 
     def list_categories(self) -> list[str]:
         """Get list of all service categories.

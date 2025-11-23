@@ -42,14 +42,16 @@ class TestBAG3DAPICityJSON:
         # Check for CityJSON-specific structure
         # CityJSON has either 'vertices' or features have CityJSON geometry
         has_cityjson_structure = (
-            "vertices" in data or  # CityJSON 1.x/2.0 format
-            ("metadata" in data and "transform" in data.get("metadata", {})) or  # Transform metadata
-            any("CityObjects" in str(f) for f in data.get("features", [])[:1])  # CityObjects in features
+            "vertices" in data  # CityJSON 1.x/2.0 format
+            or (
+                "metadata" in data and "transform" in data.get("metadata", {})
+            )  # Transform metadata
+            or any(
+                "CityObjects" in str(f) for f in data.get("features", [])[:1]
+            )  # CityObjects in features
         )
 
-        assert has_cityjson_structure, (
-            f"Expected CityJSON format but got: {list(data.keys())}"
-        )
+        assert has_cityjson_structure, f"Expected CityJSON format but got: {list(data.keys())}"
 
     def test_bag3d_has_transform_metadata(self):
         """Test BAG3D returns transform metadata (CRITICAL for coordinate scaling)."""
@@ -66,8 +68,8 @@ class TestBAG3DAPICityJSON:
 
         # CityJSON format should have transform in metadata
         has_transform = (
-            ("metadata" in data and "transform" in data["metadata"]) or
-            ("transform" in data)  # Some versions put it at top level
+            ("metadata" in data and "transform" in data["metadata"])
+            or ("transform" in data)  # Some versions put it at top level
         )
 
         if has_transform:
@@ -79,10 +81,16 @@ class TestBAG3DAPICityJSON:
             assert "translate" in transform, "Transform missing 'translate' array"
 
             # Scale and translate should be 3D arrays (x, y, z)
-            assert len(transform["scale"]) == 3, f"Scale should be [x,y,z] but got: {transform['scale']}"
-            assert len(transform["translate"]) == 3, f"Translate should be [x,y,z] but got: {transform['translate']}"
+            assert (
+                len(transform["scale"]) == 3
+            ), f"Scale should be [x,y,z] but got: {transform['scale']}"
+            assert (
+                len(transform["translate"]) == 3
+            ), f"Translate should be [x,y,z] but got: {transform['translate']}"
 
-            print(f"✓ Transform found: scale={transform['scale']}, translate={transform['translate']}")
+            print(
+                f"✓ Transform found: scale={transform['scale']}, translate={transform['translate']}"
+            )
         else:
             # If no transform, vertices should be regular floats (not integers)
             pytest.skip("BAG3D API format may have changed - no transform found")
@@ -112,12 +120,13 @@ class TestBAG3DAPICityJSON:
             are_integers = all(isinstance(coord, int) for coord in first_vertex)
 
             if are_integers:
-                print(f"✓ Vertices are integers: {first_vertex} (requires transform to get real coords)")
+                print(
+                    f"✓ Vertices are integers: {first_vertex} (requires transform to get real coords)"
+                )
 
                 # If vertices are integers, transform MUST be present
-                has_transform = (
-                    ("metadata" in data and "transform" in data["metadata"]) or
-                    ("transform" in data)
+                has_transform = ("metadata" in data and "transform" in data["metadata"]) or (
+                    "transform" in data
                 )
                 assert has_transform, (
                     "CRITICAL: Vertices are integers but no transform found! "
@@ -152,8 +161,10 @@ class TestBAG3DAPICityJSON:
         transform = data.get("transform") or data.get("metadata", {}).get("transform")
 
         if transform:
-            print(f"Page {page_num} transform: scale={transform.get('scale')}, "
-                  f"translate={transform.get('translate')}")
+            print(
+                f"Page {page_num} transform: scale={transform.get('scale')}, "
+                f"translate={transform.get('translate')}"
+            )
 
             # Save for comparison (in real implementation, you'd compare across pages)
             # This test just verifies transform exists per page

@@ -13,8 +13,9 @@ import yaml
 class MaterialsManager:
     """Manages colors and materials from YAML configuration."""
 
-    def __init__(self, colors_path: Optional[Path] = None,
-                 layer_mappings_path: Optional[Path] = None):
+    def __init__(
+        self, colors_path: Optional[Path] = None, layer_mappings_path: Optional[Path] = None
+    ):
         """Initialize materials manager.
 
         Args:
@@ -33,14 +34,16 @@ class MaterialsManager:
             layer_mappings_path = config_dir / "layer_mappings.yml"
 
         # Load YAML configs
-        with open(colors_path, 'r') as f:
+        with open(colors_path, "r") as f:
             self.colors = yaml.safe_load(f)
 
-        with open(layer_mappings_path, 'r') as f:
+        with open(layer_mappings_path, "r") as f:
             mappings_data = yaml.safe_load(f)
-            self.layer_mappings = mappings_data.get('layer_mappings', {})
+            self.layer_mappings = mappings_data.get("layer_mappings", {})
 
-    def get_color(self, layer_name: str, feature_data: Dict[str, Any]) -> Tuple[float, float, float, float]:
+    def get_color(
+        self, layer_name: str, feature_data: Dict[str, Any]
+    ) -> Tuple[float, float, float, float]:
         """Get RGB color for a feature based on its layer and attributes.
 
         Args:
@@ -54,15 +57,15 @@ class MaterialsManager:
         layer_colors = self.colors.get(layer_name, {})
 
         # Special handling for BAG3D surface classification
-        if layer_name.startswith('bag3d') and 'surface_type' in feature_data:
-            surface_type = feature_data.get('surface_type', '').lower()
+        if layer_name.startswith("bag3d") and "surface_type" in feature_data:
+            surface_type = feature_data.get("surface_type", "").lower()
             color = layer_colors.get(surface_type)
             if color:
                 return self._ensure_rgba(color)
 
         # Get layer mapping to find color_attributes priority order
         layer_config = self.layer_mappings.get(layer_name, {})
-        color_attributes = layer_config.get('color_attributes', [])
+        color_attributes = layer_config.get("color_attributes", [])
 
         # Try each color attribute in priority order
         for attr in color_attributes:
@@ -73,7 +76,7 @@ class MaterialsManager:
                     return self._ensure_rgba(color)
 
         # Fall back to default color
-        default_color = layer_colors.get('default', [0.7, 0.7, 0.7])
+        default_color = layer_colors.get("default", [0.7, 0.7, 0.7])
         return self._ensure_rgba(default_color)
 
     def _ensure_rgba(self, color: list) -> Tuple[float, float, float, float]:
@@ -103,19 +106,19 @@ class MaterialsManager:
             Material name string
         """
         # For BAG3D with surface classification
-        if layer_name.startswith('bag3d') and 'surface_type' in feature_data:
-            surface_type = feature_data.get('surface_type', 'default')
+        if layer_name.startswith("bag3d") and "surface_type" in feature_data:
+            surface_type = feature_data.get("surface_type", "default")
             return f"BAG3D_{surface_type.upper()}"
 
         # For layers with specific attribute-based naming
         layer_config = self.layer_mappings.get(layer_name, {})
-        color_attributes = layer_config.get('color_attributes', [])
+        color_attributes = layer_config.get("color_attributes", [])
 
         # Try to build name from first color attribute
         if color_attributes and color_attributes[0] in feature_data:
             attr_value = str(feature_data[color_attributes[0]])
             # Clean up name: replace spaces with underscores, remove special chars
-            clean_name = attr_value.replace(' ', '_').replace('-', '_')
+            clean_name = attr_value.replace(" ", "_").replace("-", "_")
             return f"{layer_name.upper()}_{clean_name.upper()}"
 
         # Default material name
@@ -132,7 +135,7 @@ class MaterialsManager:
         """
         return self.layer_mappings.get(layer_name, {})
 
-    def get_ifc_class(self, layer_name: str, ifc_schema: str = 'IFC4X3') -> str:
+    def get_ifc_class(self, layer_name: str, ifc_schema: str = "IFC4X3") -> str:
         """Get IFC class for a layer based on schema version.
 
         Args:
@@ -145,10 +148,10 @@ class MaterialsManager:
         layer_config = self.layer_mappings.get(layer_name, {})
 
         # Check for schema-specific fallback
-        if ifc_schema == 'IFC4' and 'ifc_class_fallback' in layer_config:
-            return layer_config['ifc_class_fallback']
+        if ifc_schema == "IFC4" and "ifc_class_fallback" in layer_config:
+            return layer_config["ifc_class_fallback"]
 
-        return layer_config.get('ifc_class', 'IfcGeographicElement')
+        return layer_config.get("ifc_class", "IfcGeographicElement")
 
     def get_default_height(self, layer_name: str) -> float:
         """Get default extrusion height for a layer.
@@ -160,7 +163,7 @@ class MaterialsManager:
             Height in meters
         """
         layer_config = self.layer_mappings.get(layer_name, {})
-        return layer_config.get('default_height', 0.1)
+        return layer_config.get("default_height", 0.1)
 
     def get_pset_config(self, layer_name: str) -> Tuple[str, list]:
         """Get property set configuration for a layer.
@@ -172,8 +175,8 @@ class MaterialsManager:
             Tuple of (pset_name, properties_list)
         """
         layer_config = self.layer_mappings.get(layer_name, {})
-        pset_name = layer_config.get('pset_name', f'Pset_{layer_name}')
-        properties = layer_config.get('properties', [])
+        pset_name = layer_config.get("pset_name", f"Pset_{layer_name}")
+        properties = layer_config.get("properties", [])
         return pset_name, properties
 
     def supports_surface_classification(self, layer_name: str) -> bool:
@@ -186,4 +189,4 @@ class MaterialsManager:
             True if surface classification enabled
         """
         layer_config = self.layer_mappings.get(layer_name, {})
-        return layer_config.get('surface_classification', False)
+        return layer_config.get("surface_classification", False)

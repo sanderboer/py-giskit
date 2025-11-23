@@ -99,6 +99,7 @@ class PDOKServiceMonitor:
                         # Make collections URL absolute
                         if not collections_url.startswith("http"):
                             from urllib.parse import urljoin
+
                             collections_url = urljoin(service_info["url"], collections_url)
 
                         try:

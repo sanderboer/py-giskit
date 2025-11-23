@@ -38,9 +38,7 @@ class TestProtocolQuirks:
     def test_format_param_quirk(self):
         """Test format parameter addition."""
         quirks = ProtocolQuirks(
-            require_format_param=True,
-            format_param_name="f",
-            format_param_value="json"
+            require_format_param=True, format_param_name="f", format_param_value="json"
         )
 
         params = {"bbox": "1,2,3,4"}
@@ -89,7 +87,7 @@ class TestProtocolQuirks:
             format_param_value="geojson",
             max_features_limit=1000,
             custom_timeout=45.0,
-            custom_headers={"User-Agent": "GISKit/1.0"}
+            custom_headers={"User-Agent": "GISKit/1.0"},
         )
 
         # URL
@@ -167,7 +165,7 @@ class TestQuirksDocumentation:
         quirks = ProtocolQuirks(
             description="API requires special header",
             issue_url="https://github.com/provider/issues/123",
-            workaround_date="2024-11-22"
+            workaround_date="2024-11-22",
         )
 
         assert quirks.description == "API requires special header"
@@ -202,10 +200,7 @@ class TestQuirksInProtocol:
         from giskit.protocols.ogc_features import OGCFeaturesProtocol
 
         quirks = ProtocolQuirks(requires_trailing_slash=True)
-        protocol = OGCFeaturesProtocol(
-            base_url="https://example.com/api",
-            quirks=quirks
-        )
+        protocol = OGCFeaturesProtocol(base_url="https://example.com/api", quirks=quirks)
 
         # Base URL should have trailing slash applied
         assert protocol.base_url.endswith("/")
@@ -215,10 +210,7 @@ class TestQuirksInProtocol:
         from giskit.protocols.ogc_features import OGCFeaturesProtocol
 
         quirks = ProtocolQuirks(requires_trailing_slash=True)
-        protocol = OGCFeaturesProtocol(
-            base_url="https://example.com/api/v1",
-            quirks=quirks
-        )
+        protocol = OGCFeaturesProtocol(base_url="https://example.com/api/v1", quirks=quirks)
 
         assert protocol.base_url == "https://example.com/api/v1/"
 
@@ -249,6 +241,7 @@ class TestQuirksRealWorld:
 
         # Now urljoin should work correctly
         from urllib.parse import urljoin
+
         result = urljoin(fixed_url, "collections")
         assert result == "https://api.pdok.nl/lv/bgt/ogc/v1_0/collections"
 
@@ -370,9 +363,9 @@ class TestServiceFormatMetadata:
         for service_id in cityjson_services:
             if service_id in PDOK_SERVICES:
                 service = PDOK_SERVICES[service_id]
-                assert service.get("format") == "cityjson", (
-                    f"Service {service_id} uses CityJSON but format not specified"
-                )
+                assert (
+                    service.get("format") == "cityjson"
+                ), f"Service {service_id} uses CityJSON but format not specified"
 
     def test_non_3d_services_no_cityjson_format(self):
         """Test regular 2D services don't have CityJSON format."""
@@ -384,6 +377,6 @@ class TestServiceFormatMetadata:
         for service_id in regular_services:
             if service_id in PDOK_SERVICES:
                 service = PDOK_SERVICES[service_id]
-                assert service.get("format") != "cityjson", (
-                    f"Service {service_id} is 2D but marked as CityJSON"
-                )
+                assert (
+                    service.get("format") != "cityjson"
+                ), f"Service {service_id} is 2D but marked as CityJSON"

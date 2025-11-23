@@ -161,8 +161,7 @@ class WMTSProvider(Provider):
         if protocol_key not in self.protocols:
             available = list(self.protocols.keys())
             raise ValueError(
-                f"Service layer '{protocol_key}' not found. "
-                f"Available: {', '.join(available)}"
+                f"Service layer '{protocol_key}' not found. " f"Available: {', '.join(available)}"
             )
 
         protocol = self.protocols[protocol_key]
@@ -252,8 +251,7 @@ class WMTSProvider(Provider):
         """
         if service not in self.services:
             raise ValueError(
-                f"Service '{service}' not found. "
-                f"Available: {', '.join(self.services.keys())}"
+                f"Service '{service}' not found. " f"Available: {', '.join(self.services.keys())}"
             )
 
         service_config = self.services[service]
@@ -269,10 +267,7 @@ class WMTSProvider(Provider):
             }
         else:
             # New format - full metadata
-            return {
-                "name": service,
-                **service_config
-            }
+            return {"name": service, **service_config}
 
     def list_categories(self) -> list[str]:
         """Get list of all service categories.

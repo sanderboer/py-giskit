@@ -46,9 +46,7 @@ class Location(BaseModel):
     radius: Optional[float] = Field(
         None, description="Radius in meters (for address/point)", ge=0, le=50000
     )
-    crs: str = Field(
-        "EPSG:4326", description="CRS of input coordinates (default WGS84)"
-    )
+    crs: str = Field("EPSG:4326", description="CRS of input coordinates (default WGS84)")
 
     @field_validator("value")
     @classmethod
@@ -115,18 +113,12 @@ class Dataset(BaseModel):
     layers: Optional[list[str]] = Field(
         None, description="Layer names to download (for vector services)"
     )
-    query: Optional[str] = Field(
-        None, description="Query string (for Overpass, WFS filters)"
-    )
-    product: Optional[str] = Field(
-        None, description="Product name (for raster providers)"
-    )
+    query: Optional[str] = Field(None, description="Query string (for Overpass, WFS filters)")
+    product: Optional[str] = Field(None, description="Product name (for raster providers)")
     resolution: Optional[int] = Field(
         None, description="Resolution in meters (for raster)", ge=1, le=1000
     )
-    extra: dict[str, Any] = Field(
-        default_factory=dict, description="Provider-specific parameters"
-    )
+    extra: dict[str, Any] = Field(default_factory=dict, description="Provider-specific parameters")
 
     @model_validator(mode="after")
     def validate_dataset(self) -> "Dataset":
@@ -158,9 +150,7 @@ class Output(BaseModel):
     """
 
     path: Path = Field(..., description="Output file path")
-    format: OutputFormat = Field(
-        OutputFormat.GPKG, description="Output format (default: gpkg)"
-    )
+    format: OutputFormat = Field(OutputFormat.GPKG, description="Output format (default: gpkg)")
     crs: str = Field("EPSG:4326", description="Output CRS (default: WGS84)")
     overwrite: bool = Field(False, description="Overwrite existing file")
     layer_prefix: Optional[str] = Field(
@@ -208,13 +198,9 @@ class Recipe(BaseModel):
     name: Optional[str] = Field(None, description="Human-readable recipe name")
     description: Optional[str] = Field(None, description="Recipe description")
     location: Location = Field(..., description="Location specification")
-    datasets: list[Dataset] = Field(
-        ..., description="Datasets to download", min_length=1
-    )
+    datasets: list[Dataset] = Field(..., description="Datasets to download", min_length=1)
     output: Output = Field(..., description="Output specification")
-    metadata: dict[str, Any] = Field(
-        default_factory=dict, description="Custom metadata"
-    )
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Custom metadata")
 
     @classmethod
     def from_file(cls, path: Path) -> "Recipe":

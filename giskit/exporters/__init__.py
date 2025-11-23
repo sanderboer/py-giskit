@@ -4,6 +4,7 @@
 # Users can install via: conda install -c conda-forge ifcopenshell
 try:
     from . import ifc
+
     __all__ = ["ifc"]
 except ImportError:
     # ifcopenshell not installed

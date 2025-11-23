@@ -31,104 +31,83 @@ class ProtocolQuirks(BaseModel):
 
     # URL Construction Quirks
     requires_trailing_slash: bool = Field(
-        False,
-        description="Add trailing slash to base URL to prevent urljoin() issues"
+        False, description="Add trailing slash to base URL to prevent urljoin() issues"
     )
 
     # Request Parameter Quirks
     require_format_param: bool = Field(
-        False,
-        description="Require explicit format parameter in requests"
+        False, description="Require explicit format parameter in requests"
     )
     format_param_name: str = Field(
-        "f",
-        description="Name of format parameter (e.g., 'f', 'format', 'outputFormat')"
+        "f", description="Name of format parameter (e.g., 'f', 'format', 'outputFormat')"
     )
     format_param_value: str = Field(
         "json",
-        description="Value for format parameter (e.g., 'json', 'geojson', 'application/json')"
+        description="Value for format parameter (e.g., 'json', 'geojson', 'application/json')",
     )
 
     # Pagination Quirks
     max_features_limit: Optional[int] = Field(
-        None,
-        description="Maximum features per request (if API ignores limit parameter)"
+        None, description="Maximum features per request (if API ignores limit parameter)"
     )
-    pagination_broken: bool = Field(
-        False,
-        description="API pagination doesn't work correctly"
-    )
+    pagination_broken: bool = Field(False, description="API pagination doesn't work correctly")
 
     # Timeout Quirks
     custom_timeout: Optional[float] = Field(
-        None,
-        description="Custom timeout for slow APIs (seconds)"
+        None, description="Custom timeout for slow APIs (seconds)"
     )
 
     # CRS Quirks
     force_crs_in_query: bool = Field(
-        False,
-        description="Force CRS parameter in query even if not needed"
+        False, description="Force CRS parameter in query even if not needed"
     )
     bbox_crs: Optional[str] = Field(
         None,
-        description="CRS for bbox parameter (if different from EPSG:4326). E.g., 'EPSG:28992' for BAG3D"
+        description="CRS for bbox parameter (if different from EPSG:4326). E.g., 'EPSG:28992' for BAG3D",
     )
 
     # Header Quirks
     custom_headers: dict[str, str] = Field(
-        default_factory=dict,
-        description="Custom HTTP headers required by API"
+        default_factory=dict, description="Custom HTTP headers required by API"
     )
 
     # Response Quirks
     empty_collections_return_404: bool = Field(
-        False,
-        description="API returns 404 instead of empty collection"
+        False, description="API returns 404 instead of empty collection"
     )
 
     # CityJSON Format Quirks (for 3D data like BAG3D)
     format_is_cityjson: bool = Field(
-        False,
-        description="Response is CityJSON format instead of GeoJSON"
+        False, description="Response is CityJSON format instead of GeoJSON"
     )
     cityjson_version: Optional[str] = Field(
-        None,
-        description="CityJSON version (e.g., '1.1', '2.0')"
+        None, description="CityJSON version (e.g., '1.1', '2.0')"
     )
     has_per_page_transform: bool = Field(
         False,
-        description="CRITICAL: Each pagination page has different transform (scale/translate)"
+        description="CRITICAL: Each pagination page has different transform (scale/translate)",
     )
     transform_applies_to_vertices: bool = Field(
         False,
-        description="Vertices are integers that need transform: real = vertex * scale + translate"
+        description="Vertices are integers that need transform: real = vertex * scale + translate",
     )
     vertices_are_integers: bool = Field(
-        False,
-        description="Vertex coordinates stored as integers requiring scaling"
+        False, description="Vertex coordinates stored as integers requiring scaling"
     )
     has_lod_hierarchy: bool = Field(
-        False,
-        description="Geometry has LOD (Level of Detail) hierarchy"
+        False, description="Geometry has LOD (Level of Detail) hierarchy"
     )
     geometry_in_city_objects: bool = Field(
-        False,
-        description="Geometry stored in CityObjects structure, not standard GeoJSON"
+        False, description="Geometry stored in CityObjects structure, not standard GeoJSON"
     )
 
     # Metadata
     description: Optional[str] = Field(
-        None,
-        description="Human-readable description of why these quirks are needed"
+        None, description="Human-readable description of why these quirks are needed"
     )
-    issue_url: Optional[str] = Field(
-        None,
-        description="Link to issue tracker or documentation"
-    )
+    issue_url: Optional[str] = Field(None, description="Link to issue tracker or documentation")
     workaround_date: Optional[str] = Field(
-        None,
-        description="Date when workaround was added (YYYY-MM-DD)"
+        None, description="Date when workaround was added (YYYY-MM-DD)"
     )
 
     def apply_to_url(self, url: str) -> str:
@@ -140,8 +119,8 @@ class ProtocolQuirks(BaseModel):
         Returns:
             Modified URL with quirks applied
         """
-        if self.requires_trailing_slash and not url.endswith('/'):
-            return url + '/'
+        if self.requires_trailing_slash and not url.endswith("/"):
+            return url + "/"
         return url
 
     def apply_to_params(self, params: dict[str, Any]) -> dict[str, Any]:
@@ -160,8 +139,8 @@ class ProtocolQuirks(BaseModel):
             params[self.format_param_name] = self.format_param_value
 
         # Override limit if max is set
-        if self.max_features_limit and 'limit' in params:
-            params['limit'] = min(params['limit'], self.max_features_limit)
+        if self.max_features_limit and "limit" in params:
+            params["limit"] = min(params["limit"], self.max_features_limit)
 
         return params
 
@@ -202,10 +181,9 @@ LEGACY_KNOWN_QUIRKS: dict[str, dict[str, ProtocolQuirks]] = {
             format_param_value="json",
             description="PDOK OGC API requires ?f=json and trailing slash in base URL",
             issue_url="https://github.com/PDOK/issues/ogc-features-format-param",
-            workaround_date="2024-11-22"
+            workaround_date="2024-11-22",
         )
     },
-
     # Format-specific quirks (apply to any service using this format)
     "cityjson": {
         "format": ProtocolQuirks(
@@ -214,15 +192,12 @@ LEGACY_KNOWN_QUIRKS: dict[str, dict[str, ProtocolQuirks]] = {
             cityjson_version="2.0",
             geometry_in_city_objects=True,
             has_lod_hierarchy=True,
-
             # CRITICAL: Transform quirks (affects ALL CityJSON sources)
             has_per_page_transform=True,
             transform_applies_to_vertices=True,
             vertices_are_integers=True,
-
             # Performance params
             custom_timeout=60.0,  # 3D data can be slow
-
             description=(
                 "CityJSON 2.0 format uses per-page transforms for vertex compression. "
                 "CRITICAL: Each pagination page has its own transform (scale/translate). "
@@ -231,10 +206,9 @@ LEGACY_KNOWN_QUIRKS: dict[str, dict[str, ProtocolQuirks]] = {
                 "This affects: BAG3D, 3D-basisvoorziening, and other 3D services."
             ),
             issue_url="https://www.cityjson.org/specs/2.0.0/#transform-object",
-            workaround_date="2024-11-22"
+            workaround_date="2024-11-22",
         )
     },
-
     # Service-specific quirks (inherits format quirks)
     "bag3d": {
         "ogc-features": ProtocolQuirks(
@@ -247,13 +221,11 @@ LEGACY_KNOWN_QUIRKS: dict[str, dict[str, ProtocolQuirks]] = {
             transform_applies_to_vertices=True,
             vertices_are_integers=True,
             custom_timeout=60.0,
-
             description="BAG3D uses CityJSON 2.0 format (see 'cityjson' format quirks)",
             issue_url="https://api.3dbag.nl/api.html",
-            workaround_date="2024-11-22"
+            workaround_date="2024-11-22",
         )
     },
-
     # Add more providers/formats as discovered
     # "other-provider": {
     #     "ogc-features": ProtocolQuirks(...)

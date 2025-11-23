@@ -18,11 +18,7 @@ class TestQuirkUsage:
 
     def test_initial_state(self):
         """Test initial state of QuirkUsage."""
-        usage = QuirkUsage(
-            provider="pdok",
-            protocol="ogc-features",
-            quirk_type="format_param"
-        )
+        usage = QuirkUsage(provider="pdok", protocol="ogc-features", quirk_type="format_param")
 
         assert usage.provider == "pdok"
         assert usage.protocol == "ogc-features"
@@ -33,11 +29,7 @@ class TestQuirkUsage:
 
     def test_record_first_application(self):
         """Test recording the first application."""
-        usage = QuirkUsage(
-            provider="pdok",
-            protocol="ogc-features",
-            quirk_type="format_param"
-        )
+        usage = QuirkUsage(provider="pdok", protocol="ogc-features", quirk_type="format_param")
 
         before = datetime.now()
         usage.record_application()
@@ -52,11 +44,7 @@ class TestQuirkUsage:
 
     def test_record_multiple_applications(self):
         """Test recording multiple applications."""
-        usage = QuirkUsage(
-            provider="pdok",
-            protocol="ogc-features",
-            quirk_type="format_param"
-        )
+        usage = QuirkUsage(provider="pdok", protocol="ogc-features", quirk_type="format_param")
 
         # First application
         usage.record_application()
@@ -64,6 +52,7 @@ class TestQuirkUsage:
 
         # Second application (simulate delay)
         import time
+
         time.sleep(0.01)
         usage.record_application()
 
@@ -73,11 +62,7 @@ class TestQuirkUsage:
 
     def test_multiple_applications_increment_count(self):
         """Test that count increments correctly."""
-        usage = QuirkUsage(
-            provider="test",
-            protocol="test-protocol",
-            quirk_type="test_quirk"
-        )
+        usage = QuirkUsage(provider="test", protocol="test-protocol", quirk_type="test_quirk")
 
         for _i in range(10):
             usage.record_application()
@@ -186,7 +171,7 @@ class TestQuirksMonitor:
         # Should be sorted by count (descending)
         assert most_used[0].applied_count == 15  # osm/overpass/timeout
         assert most_used[1].applied_count == 10  # pdok/ogc-features/format_param
-        assert most_used[2].applied_count == 5   # pdok/ogc-features/trailing_slash
+        assert most_used[2].applied_count == 5  # pdok/ogc-features/trailing_slash
 
     def test_get_most_used_quirks_empty(self, monitor):
         """Test getting most used quirks when none exist."""
@@ -313,9 +298,7 @@ class TestLogQuirkApplication:
     def test_log_format_param(self):
         """Test logging format_param quirk."""
         quirks = ProtocolQuirks(
-            require_format_param=True,
-            format_param_name="f",
-            format_param_value="json"
+            require_format_param=True, format_param_name="f", format_param_value="json"
         )
         log_quirk_application(quirks, "pdok", "ogc-features", "get_capabilities")
 
@@ -357,7 +340,7 @@ class TestLogQuirkApplication:
             require_format_param=True,
             format_param_name="f",
             format_param_value="json",
-            max_features_limit=1000
+            max_features_limit=1000,
         )
         log_quirk_application(quirks, "pdok", "ogc-features", "download")
 

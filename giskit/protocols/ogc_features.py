@@ -64,10 +64,7 @@ class OGCFeaturesProtocol(Protocol):
             params = self.quirks.apply_to_params({})
 
             # Get collections list
-            response = await client.get(
-                urljoin(self.base_url, "collections"),
-                params=params
-            )
+            response = await client.get(urljoin(self.base_url, "collections"), params=params)
             response.raise_for_status()
             data = response.json()
 
@@ -134,6 +131,7 @@ class OGCFeaturesProtocol(Protocol):
             bbox_crs = self.quirks.bbox_crs
             if bbox_crs != "EPSG:4326":
                 from pyproj import Transformer
+
                 transformer = Transformer.from_crs("EPSG:4326", bbox_crs, always_xy=True)
                 minx, miny = transformer.transform(bbox[0], bbox[1])
                 maxx, maxy = transformer.transform(bbox[2], bbox[3])
@@ -237,6 +235,7 @@ class OGCFeaturesProtocol(Protocol):
                 # Parse this page
                 if is_cityjson:
                     from giskit.protocols.cityjson import cityjson_to_geodataframe
+
                     gdf = cityjson_to_geodataframe(geojson, lod=lod)
                     if not gdf.empty:
                         gdf.set_crs("EPSG:28992", inplace=True)
@@ -281,9 +280,7 @@ class OGCFeaturesProtocol(Protocol):
             return combined
 
         except httpx.HTTPError as e:
-            raise OGCFeaturesError(
-                f"Failed to download collection {collection_id}: {e}"
-            ) from e
+            raise OGCFeaturesError(f"Failed to download collection {collection_id}: {e}") from e
 
     async def get_coverage(
         self,

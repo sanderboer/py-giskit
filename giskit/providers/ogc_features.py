@@ -99,10 +99,7 @@ class OGCFeaturesProvider(Provider):
                 quirks = provider_quirks
 
             # Create and register protocol for this service
-            protocol = OGCFeaturesProtocol(
-                base_url=service_url,
-                quirks=quirks
-            )
+            protocol = OGCFeaturesProtocol(base_url=service_url, quirks=quirks)
             self.register_protocol(f"ogc-features-{service_name}", protocol)
 
     async def get_metadata(self) -> dict[str, Any]:
@@ -224,8 +221,7 @@ class OGCFeaturesProvider(Provider):
         """
         if service not in self.services:
             raise ValueError(
-                f"Service '{service}' not found. "
-                f"Available: {', '.join(self.services.keys())}"
+                f"Service '{service}' not found. " f"Available: {', '.join(self.services.keys())}"
             )
 
         service_config = self.services[service]
@@ -241,10 +237,7 @@ class OGCFeaturesProvider(Provider):
             }
         else:
             # New format - full metadata
-            return {
-                "name": service,
-                **service_config
-            }
+            return {"name": service, **service_config}
 
     def list_categories(self) -> list[str]:
         """Get list of all service categories.

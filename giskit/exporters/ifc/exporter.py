@@ -23,7 +23,7 @@ class IFCExporter:
         ifc_version: str = "IFC4X3_ADD2",
         author: str = "GISKit",
         organization: str = "A190",
-        materials_manager: Optional[MaterialsManager] = None
+        materials_manager: Optional[MaterialsManager] = None,
     ):
         """Initialize IFC exporter.
 
@@ -67,7 +67,7 @@ class IFCExporter:
         normalize_z: bool = True,
         site_name: str = "Site",
         ref_x: Optional[float] = None,
-        ref_y: Optional[float] = None
+        ref_y: Optional[float] = None,
     ) -> None:
         """Export GeoPackage to IFC file.
 
@@ -110,9 +110,7 @@ class IFCExporter:
 
         # Filter to only supported layers
         supported_layers = [
-            layer
-            for layer in layers
-            if self.materials.get_layer_config(layer) is not None
+            layer for layer in layers if self.materials.get_layer_config(layer) is not None
         ]
 
         print(f"  Exporting {len(supported_layers)} layer(s)...")
@@ -135,7 +133,7 @@ class IFCExporter:
                     ref_x=self.ref_x,
                     ref_y=self.ref_y,
                     relative=relative,
-                    normalize_z=normalize_z
+                    normalize_z=normalize_z,
                 )
                 # Accumulate stats
                 for key, count in stats.items():
@@ -144,6 +142,7 @@ class IFCExporter:
             except Exception as e:
                 print(f"      ✗ Error: {e}")
                 import traceback
+
                 traceback.print_exc()
 
         # Write IFC file
@@ -158,29 +157,24 @@ class IFCExporter:
     def _create_project(self, site_name: str) -> None:
         """Create IFC Project with metadata."""
         # Create project using API
-        self.project = ifcopenshell.api.run("root.create_entity", self.ifc,
+        self.project = ifcopenshell.api.run(
+            "root.create_entity",
+            self.ifc,
             ifc_class="IfcProject",
-            name=f"GISKit Export - {site_name}"
+            name=f"GISKit Export - {site_name}",
         )
 
         # Set project metadata
-        person = self.ifc.createIfcPerson(
-            None, self.author, None, None, None, None, None, None
-        )
+        person = self.ifc.createIfcPerson(None, self.author, None, None, None, None, None, None)
 
         organization_entity = self.ifc.createIfcOrganization(
             None, self.organization, None, None, None
         )
 
-        person_and_org = self.ifc.createIfcPersonAndOrganization(
-            person, organization_entity, None
-        )
+        person_and_org = self.ifc.createIfcPersonAndOrganization(person, organization_entity, None)
 
         application = self.ifc.createIfcApplication(
-            organization_entity,
-            "1.0",
-            "GISKit IFC Exporter",
-            "GISKit"
+            organization_entity, "1.0", "GISKit IFC Exporter", "GISKit"
         )
 
         owner_history = self.ifc.createIfcOwnerHistory(
@@ -191,7 +185,7 @@ class IFCExporter:
             None,
             None,
             None,
-            int(datetime.now().timestamp())
+            int(datetime.now().timestamp()),
         )
 
         self.project.OwnerHistory = owner_history
@@ -201,13 +195,11 @@ class IFCExporter:
             None,
             "Model",
             3,
-            1.0E-5,
+            1.0e-5,
             self.ifc.createIfcAxis2Placement3D(
-                self.ifc.createIfcCartesianPoint((0.0, 0.0, 0.0)),
-                None,
-                None
+                self.ifc.createIfcCartesianPoint((0.0, 0.0, 0.0)), None, None
             ),
-            None
+            None,
         )
 
         # Set units (meters, square meters, cubic meters)
@@ -226,26 +218,23 @@ class IFCExporter:
     def _create_site(self, site_name: str) -> None:
         """Create IFC Site with geo-referencing."""
         # Create site
-        self.site = ifcopenshell.api.run("root.create_entity", self.ifc,
-            ifc_class="IfcSite",
-            name=site_name
+        self.site = ifcopenshell.api.run(
+            "root.create_entity", self.ifc, ifc_class="IfcSite", name=site_name
         )
 
         # Set site location (reference point in RD coordinates)
         # NOTE: This uses Amersfoort RD New (EPSG:28992)
         site_location = self.ifc.createIfcSite(
             self.site.GlobalId,
-            self.site.OwnerHistory if hasattr(self.site, 'OwnerHistory') else None,
+            self.site.OwnerHistory if hasattr(self.site, "OwnerHistory") else None,
             self.site.Name,
             None,  # Description
             None,  # ObjectType
             self.ifc.createIfcLocalPlacement(
                 None,
                 self.ifc.createIfcAxis2Placement3D(
-                    self.ifc.createIfcCartesianPoint((0.0, 0.0, 0.0)),
-                    None,
-                    None
-                )
+                    self.ifc.createIfcCartesianPoint((0.0, 0.0, 0.0)), None, None
+                ),
             ),
             None,  # Representation
             None,  # LongName
@@ -254,7 +243,7 @@ class IFCExporter:
             None,  # RefLongitude
             None,  # RefElevation
             None,  # LandTitleNumber
-            None   # SiteAddress
+            None,  # SiteAddress
         )
 
         # Replace site entity
@@ -262,14 +251,14 @@ class IFCExporter:
         self.site = site_location
 
         # Assign site to project
-        ifcopenshell.api.run("aggregate.assign_object", self.ifc,
-            relating_object=self.project,
-            products=[self.site]
+        ifcopenshell.api.run(
+            "aggregate.assign_object", self.ifc, relating_object=self.project, products=[self.site]
         )
 
     def _get_available_layers(self, db_path: Path) -> List[str]:
         """Get list of available layers in GeoPackage."""
         import fiona
+
         try:
             layers = fiona.listlayers(str(db_path))
             return layers
@@ -278,9 +267,7 @@ class IFCExporter:
             return []
 
     def _auto_detect_reference_point(
-        self,
-        db_path: Path,
-        layers: Optional[List[str]] = None
+        self, db_path: Path, layers: Optional[List[str]] = None
     ) -> tuple[float, float]:
         """Auto-detect reference point from first feature's centroid.
 

@@ -113,9 +113,7 @@ class Protocol(ABC):
         if miny >= maxy:
             raise ValueError(f"Invalid bbox: miny ({miny}) >= maxy ({maxy})")
 
-    def bbox_to_geometry(
-        self, bbox: tuple[float, float, float, float]
-    ) -> box:  # type: ignore
+    def bbox_to_geometry(self, bbox: tuple[float, float, float, float]) -> box:  # type: ignore
         """Convert bbox to Shapely box geometry.
 
         Args:
