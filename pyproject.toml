@@ -8,6 +8,7 @@ readme = "README.md"
 homepage = "https://github.com/sanderboer/py-giskit"
 repository = "https://github.com/sanderboer/py-giskit"
 keywords = ["gis", "spatial", "ogc", "wfs", "wmts", "geodata", "recipe", "openstreetmap", "pdok"]
+packages = [{include = "giskit"}]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
