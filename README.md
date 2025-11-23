@@ -183,7 +183,7 @@ GISKit provides access to **50+ Dutch government datasets** via PDOK's OGC API F
 - **Protected Areas** - Nature reserves, Natura 2000
 - **Soil Data** - Soil types, contamination
 
-See [PDOK_SERVICES.md](PDOK_SERVICES.md) for complete catalog with all layers.
+See [docs/PDOK_SERVICES.md](docs/PDOK_SERVICES.md) for complete catalog with all layers.
 
 ### Planned Providers
 
@@ -247,7 +247,7 @@ giskit export ifc data.gpkg output.ifc
 giskit export glb data.ifc output.glb
 ```
 
-See [EXPORT_GUIDE.md](EXPORT_GUIDE.md) for details.
+See [notes/EXPORT_GUIDE.md](notes/EXPORT_GUIDE.md) for details.
 
 
 ## How It Works
@@ -332,11 +332,16 @@ ruff format .
 
 ## Documentation
 
-- **[PDOK_SERVICES.md](PDOK_SERVICES.md)** - Complete PDOK service catalog
-- **[EXPORT_GUIDE.md](EXPORT_GUIDE.md)** - IFC/GLB export instructions
-- **[QUIRKS_SYSTEM.md](QUIRKS_SYSTEM.md)** - API compatibility handling
-- **[PLAN.md](PLAN.md)** - Project roadmap
-- **[ARCHITECTURE_BAG3D.md](ARCHITECTURE_BAG3D.md)** - 3D data handling
+- **[docs/PDOK_SERVICES.md](docs/PDOK_SERVICES.md)** - Complete PDOK service catalog
+- **[notes/EXPORT_GUIDE.md](notes/EXPORT_GUIDE.md)** - IFC/GLB export instructions
+- **[notes/QUIRKS_SYSTEM.md](notes/QUIRKS_SYSTEM.md)** - API compatibility handling
+- **[notes/BAG3D_ARCHITECTURE.md](notes/BAG3D_ARCHITECTURE.md)** - 3D data handling
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history
+
+### For Contributors
+
+- **[docs/publishing/](docs/publishing/)** - PyPI publication guides
+- **[notes/](notes/)** - Technical implementation notes
 
 ## Use Cases
 
