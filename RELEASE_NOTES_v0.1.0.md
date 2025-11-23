@@ -11,7 +11,7 @@ First stable release of py-giskit - Recipe-driven spatial data downloader with I
 - **BAG3D LOD22** 3D building geometry export
 - Site always at (0,0,0) with proper coordinate transformation
 
-### GLB Export  
+### GLB Export
 - **Automatic GLB conversion** from IFC via IfcConvert
 - **Web viewer ready** output with world coordinates
 - **No more hanging** on existing files

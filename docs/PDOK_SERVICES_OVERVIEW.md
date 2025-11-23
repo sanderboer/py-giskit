@@ -2,8 +2,8 @@
 
 **Complete coverage van PDOK data services voor Nederland**
 
-Last updated: 2024-11-22  
-Total services: **53**  
+Last updated: 2024-11-22
+Total services: **53**
 Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 
 ---
@@ -21,8 +21,8 @@ Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 
 ## 1. OGC API Features (Vector Data)
 
-**Config**: `giskit/config/services/pdok.yml`  
-**Provider**: `OGCFeaturesProvider("pdok")`  
+**Config**: `giskit/config/services/pdok.yml`
+**Provider**: `OGCFeaturesProvider("pdok")`
 **Total**: 48 services
 
 ### Topografie & Kaarten (9 services)
@@ -158,17 +158,17 @@ Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 
 ## 2. WMTS Services (Raster Tiles)
 
-**Config**: `giskit/config/services/pdok-wmts.yml`  
-**Provider**: `WMTSProvider("pdok-wmts")`  
+**Config**: `giskit/config/services/pdok-wmts.yml`
+**Provider**: `WMTSProvider("pdok-wmts")`
 **Total**: 4 services, 13 layers
 
 ### Luchtfoto RGB
 
-**Service**: `luchtfoto`  
-**Layers**: 6 (actueel_8cm, actueel_25cm, 2024_8cm, 2024_25cm, 2025_8cm, 2025_25cm)  
-**Format**: JPEG  
-**Resolution**: 8cm - 25cm  
-**TileMatrixSet**: EPSG:28992 (RD New)  
+**Service**: `luchtfoto`
+**Layers**: 6 (actueel_8cm, actueel_25cm, 2024_8cm, 2024_25cm, 2025_8cm, 2025_25cm)
+**Format**: JPEG
+**Resolution**: 8cm - 25cm
+**TileMatrixSet**: EPSG:28992 (RD New)
 **Zoom levels**: 0-19
 
 **Description**: Actuele luchtfoto's van Nederland in RGB (ware kleuren). Gemeten met orthofoto camera's vanaf vliegtuigen.
@@ -179,10 +179,10 @@ Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 
 ### Luchtfoto Infrarood
 
-**Service**: `luchtfoto-ir`  
-**Layers**: 1 (actueel)  
-**Format**: JPEG  
-**Resolution**: 25cm  
+**Service**: `luchtfoto-ir`
+**Layers**: 1 (actueel)
+**Format**: JPEG
+**Resolution**: 25cm
 **TileMatrixSet**: EPSG:28992
 
 **Description**: Infrarood luchtfoto's (CIR - Color Infrared) voor vegetatie-analyse.
@@ -193,10 +193,10 @@ Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 
 ### Satellietbeeld
 
-**Service**: `satellite`  
-**Layers**: 1 (actueel)  
-**Format**: PNG  
-**Resolution**: Variable (10-60m)  
+**Service**: `satellite`
+**Layers**: 1 (actueel)
+**Format**: PNG
+**Resolution**: Variable (10-60m)
 **TileMatrixSet**: EPSG:28992
 
 **Description**: Satellietbeelden van Nederland (Sentinel-2).
@@ -207,9 +207,9 @@ Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 
 ### BRT Achtergrondkaart
 
-**Service**: `brt-achtergrondkaart`  
-**Layers**: 4 (standaard, grijs, pastel, water)  
-**Format**: PNG  
+**Service**: `brt-achtergrondkaart`
+**Layers**: 4 (standaard, grijs, pastel, water)
+**Format**: PNG
 **TileMatrixSet**: EPSG:28992
 
 **Description**: Topografische achtergrondkaart afgeleid van TOP10NL.
@@ -220,18 +220,18 @@ Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 
 ## 3. WCS Services (Coverage/Elevation)
 
-**Config**: `giskit/config/services/pdok-wcs.yml`  
-**Provider**: `WCSProvider("pdok-wcs")`  
+**Config**: `giskit/config/services/pdok-wcs.yml`
+**Provider**: `WCSProvider("pdok-wcs")`
 **Total**: 1 service, 2 coverages
 
 ### Actueel Hoogtebestand Nederland (AHN)
 
-**Service**: `ahn`  
-**Coverages**: 2 (dsm, dtm)  
-**Format**: GeoTIFF  
-**Resolution**: 0.5m  
-**CRS**: EPSG:28992  
-**Vertical datum**: NAP (Normaal Amsterdams Peil)  
+**Service**: `ahn`
+**Coverages**: 2 (dsm, dtm)
+**Format**: GeoTIFF
+**Resolution**: 0.5m
+**CRS**: EPSG:28992
+**Vertical datum**: NAP (Normaal Amsterdams Peil)
 **Version**: AHN4 (2020-2022)
 
 **Coverage: DSM (Digital Surface Model)**
@@ -244,8 +244,8 @@ Coverage: **100%** of modern PDOK APIs (OGC Features, WMTS, WCS)
 - Bare earth terrain
 - Use: Water flow, flood modeling, terrain analysis
 
-**Measurement**: LIDAR (laser altimetry from aircraft)  
-**Accuracy**: ~10 measurements per m²  
+**Measurement**: LIDAR (laser altimetry from aircraft)
+**Accuracy**: ~10 measurements per m²
 **Extent**: All of Netherlands
 
 **Use cases**: Flood modeling, water management, solar panels, 3D city models
@@ -453,7 +453,7 @@ EOF
 ## Data Quality & Licenses
 
 ### License
-**CC0 1.0** - Public Domain  
+**CC0 1.0** - Public Domain
 All PDOK data is Open Data, free to use without restrictions.
 
 ### Update Frequency
@@ -470,8 +470,8 @@ All PDOK data is Open Data, free to use without restrictions.
 
 ### Coordinate Systems
 
-**Native CRS**: EPSG:28992 (RD New - Rijksdriehoekscoördinaten)  
-**WGS84**: EPSG:4326 (automatically transformed by GISKit)  
+**Native CRS**: EPSG:28992 (RD New - Rijksdriehoekscoördinaten)
+**WGS84**: EPSG:4326 (automatically transformed by GISKit)
 **Vertical datum**: NAP (Normaal Amsterdams Peil)
 
 ### Coverage
@@ -548,6 +548,6 @@ PDOK does not enforce strict rate limits but recommends:
 
 **End of Document**
 
-*Last updated: 2024-11-22*  
-*GISKit Version: 0.1.0*  
+*Last updated: 2024-11-22*
+*GISKit Version: 0.1.0*
 *PDOK API Versions: Various (see individual service configs)*

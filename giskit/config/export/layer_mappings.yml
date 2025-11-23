@@ -13,7 +13,7 @@ layer_mappings:
       - bag_pand_id
       - bgt_status
       - bronhouder
-  
+
   bgt_wegdeel:
     ifc_class: IfcRoad  # IFC4X3
     ifc_class_fallback: IfcCivilElement  # IFC4
@@ -29,7 +29,7 @@ layer_mappings:
     color_attributes:
       - plus_fysiek_voorkomen
       - functie
-  
+
   bgt_waterdeel:
     ifc_class: IfcGeographicElement
     assignment_method: spatial
@@ -44,7 +44,7 @@ layer_mappings:
     color_attributes:
       - type
       - plus_type
-  
+
   bgt_begroeidterreindeel:
     ifc_class: IfcGeographicElement
     assignment_method: spatial
@@ -59,7 +59,7 @@ layer_mappings:
     color_attributes:
       - plus_fysiek_voorkomen
       - fysiek_voorkomen
-  
+
   bgt_onbegroeidterreindeel:
     ifc_class: IfcGeographicElement
     assignment_method: spatial
@@ -74,7 +74,7 @@ layer_mappings:
     color_attributes:
       - fysiek_voorkomen
       - plus_fysiek_voorkomen
-  
+
   bgt_ondersteunendwegdeel:
     ifc_class: IfcCivilElement
     assignment_method: spatial
@@ -89,7 +89,7 @@ layer_mappings:
     color_attributes:
       - functie
       - plus_fysiek_voorkomen
-  
+
   bgt_ondersteunendwaterdeel:
     ifc_class: IfcGeographicElement
     assignment_method: spatial
@@ -104,7 +104,7 @@ layer_mappings:
     color_attributes:
       - type
       - plus_type
-  
+
   bgt_kunstwerkdeel:
     ifc_class: IfcCivilElement
     assignment_method: spatial
@@ -117,7 +117,7 @@ layer_mappings:
       - type
     color_attributes:
       - type
-  
+
   bag3d_lod22:
     ifc_class: IfcBuilding
     assignment_method: aggregate
@@ -134,7 +134,7 @@ layer_mappings:
       - opp_grond
       - dak_type
     surface_classification: false  # All faces in one B-rep (simpler, always works)
-  
+
   bag3d_lod12:
     ifc_class: IfcBuilding
     assignment_method: aggregate
@@ -148,7 +148,7 @@ layer_mappings:
       - h_dak_max
       - h_dak_min
       - h_maaiveld
-  
+
   bag3d_lod13:
     ifc_class: IfcBuilding
     assignment_method: aggregate
@@ -162,7 +162,7 @@ layer_mappings:
       - h_dak_max
       - h_dak_min
       - h_maaiveld
-  
+
   bag_pand:
     ifc_class: IfcGeographicElement  # 2D footprint, not a full building
     assignment_method: spatial
@@ -171,7 +171,7 @@ layer_mappings:
     pset_name: Pset_BAG_Pand
     properties:
       - identificatie
-  
+
   brk_perceel:
     ifc_class: IfcGeographicElement
     assignment_method: spatial

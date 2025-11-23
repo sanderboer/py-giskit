@@ -119,12 +119,12 @@ services:
     category: base_registers  # or: topography, statistics, etc.
     description: Detailed description
     keywords: [keyword1, keyword2]
-    
+
     # Optional overrides
     quirks: [pdok-ogc, custom-quirk]  # Override defaults
     timeout: 30.0  # Override default timeout
     format: cityjson  # Data format (adds format quirks)
-    
+
     # Metadata
     collections: 49  # Number of collections (auto-detected)
     last_checked: 2025-11-22  # Last health check
@@ -143,7 +143,7 @@ protocols:
     format_param_name: f
     format_param_value: json
     description: Some OGC servers require explicit format parameter
-    
+
 # Format quirks (CityJSON, GeoJSON, etc.)
 formats:
   cityjson-v2:
@@ -158,7 +158,7 @@ formats:
       Each pagination page has different scale/translate values.
     references:
       - https://www.cityjson.org/specs/2.0.0/#transform-object
-    
+
 # Provider quirks (PDOK, Kadaster, etc.)
 providers:
   pdok-trailing-slash:

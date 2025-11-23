@@ -13,13 +13,13 @@ services:
     title: Actueel Hoogtebestand Nederland (AHN)
     category: elevation
     description: |
-      AHN is de digitale hoogtekaart voor heel Nederland met gedetailleerde 
+      AHN is de digitale hoogtekaart voor heel Nederland met gedetailleerde
       en precieze hoogtegegevens (gemiddeld 10 hoogtemetingen per m²).
       Gemeten met laseraltimetrie vanaf vliegtuigen.
-      
+
       - DSM (Digital Surface Model): Ruw bestand met alle punten behalve water
       - DTM (Digital Terrain Model): Maaiveldbestand met alleen 'maaiveld' punten
-      
+
       Resolutie: 0.5m (herbemonsterd met Squared IDW methode)
       Versie: AHN4 (ingewonnen 2020-2022)
       Coördinatensysteem: EPSG:28992 (RD New)

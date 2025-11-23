@@ -84,16 +84,16 @@ exporter = IFCExporter()
 
 for gpkg_file in input_dir.glob('*.gpkg'):
     print(f"Processing {gpkg_file.name}...")
-    
+
     ifc_path = output_dir / f"{gpkg_file.stem}.ifc"
     glb_path = output_dir / f"{gpkg_file.stem}.glb"
-    
+
     # Export to IFC
     exporter.export(gpkg_file, ifc_path)
-    
+
     # Convert to GLB
     convert_ifc_to_glb(ifc_path, glb_path)
-    
+
     print(f"✓ {gpkg_file.name} complete")
 EOF
 
@@ -163,17 +163,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Build Docker image
         run: docker build -f giskit/Dockerfile.export -t giskit-export giskit/
-      
+
       - name: Run export pipeline
         run: |
           docker run -v $(pwd)/data:/data giskit-export \
             python /app/examples/export_pipeline.py \
             /data/input.gpkg \
             /data/output
-      
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:

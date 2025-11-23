@@ -12,7 +12,7 @@ PDOK_SERVICES = {
     "bgt": {"url": "...", "title": "...", ...},  # 48x herhalen
 }
 
-# giskit/protocols/quirks.py - 300+ lines  
+# giskit/protocols/quirks.py - 300+ lines
 KNOWN_QUIRKS = {
     "pdok": ProtocolQuirks(...),
     "cityjson": ProtocolQuirks(...),
@@ -36,7 +36,7 @@ provider:
   name: pdok
   title: PDOK
   country: NL
-  
+
 defaults:
   quirks: [pdok-ogc]
   timeout: 10.0
@@ -142,7 +142,7 @@ python -m giskit.indexer check-all --config ~/.giskit/services/my-provider.yml
 
 **Phase 3: Integration** (Prioriteit: Low)
 - [ ] Update providers to use loaders
-- [ ] Update monitor to use loaders  
+- [ ] Update monitor to use loaders
 - [ ] Backward compatibility tests
 
 **Phase 4: User Features** (Prioriteit: Low)
@@ -173,15 +173,15 @@ python -m giskit.indexer check-all --config ~/.giskit/services/my-provider.yml
 
 ## Conclusie
 
-**Nu**: Hardcoded werkt prima voor 48 PDOK services  
-**Toekomst**: Config-driven als we groeien  
+**Nu**: Hardcoded werkt prima voor 48 PDOK services
+**Toekomst**: Config-driven als we groeien
 **Strategie**: Documenteer visie, implementeer later indien nodig
 
 **Aanbeveling**: Laat huidige implementatie staan, dit document dient als blueprint voor toekomstige refactoring.
 
 ---
 
-**Status**: 📋 Ontwerp klaar, implementatie geparkeerd  
-**Priority**: Low (nice-to-have, niet kritisch)  
-**Effort**: ~2-3 dagen werk voor volledige migratie  
+**Status**: 📋 Ontwerp klaar, implementatie geparkeerd
+**Priority**: Low (nice-to-have, niet kritisch)
+**Effort**: ~2-3 dagen werk voor volledige migratie
 **Risk**: Low (backward compatibility mogelijk)

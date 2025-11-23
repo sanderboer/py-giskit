@@ -16,7 +16,7 @@ GISKit handles coordinate transformations automatically across different protoco
 
 ### OGC API Features
 
-**Input CRS**: `EPSG:4326` (required by OGC Features spec)  
+**Input CRS**: `EPSG:4326` (required by OGC Features spec)
 **Output CRS**: Configurable (auto-transforms)
 
 ```python
@@ -41,7 +41,7 @@ assert gdf.crs == "EPSG:28992"
 
 ### WMTS (Web Map Tile Service)
 
-**Input CRS**: Must match `TileMatrixSet` (usually `EPSG:28992`)  
+**Input CRS**: Must match `TileMatrixSet` (usually `EPSG:28992`)
 **Output CRS**: Same as input (no transformation)
 
 ```python
@@ -83,7 +83,7 @@ image = await protocol.get_coverage(bbox=bbox_rd, crs="EPSG:28992")
 
 ### WCS (Web Coverage Service)
 
-**Input CRS**: Flexible (auto-transforms internally)  
+**Input CRS**: Flexible (auto-transforms internally)
 **Output CRS**: Configurable
 
 ```python

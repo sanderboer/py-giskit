@@ -64,7 +64,7 @@ ProtocolQuirks(requires_trailing_slash=True)
 # Effect:
 "https://api.example.com/v1" → "https://api.example.com/v1/"
 
-# Why: Prevents urljoin() from removing "v1" 
+# Why: Prevents urljoin() from removing "v1"
 from urllib.parse import urljoin
 urljoin("https://api.com/v1", "collections")   # ❌ "https://api.com/collections"
 urljoin("https://api.com/v1/", "collections")  # ✅ "https://api.com/v1/collections"
@@ -258,10 +258,10 @@ from giskit.protocols.quirks import get_quirks
 class NewProvider(Provider):
     def __init__(self, **kwargs):
         super().__init__("new-provider", **kwargs)
-        
+
         # Get quirks
         quirks = get_quirks("new-provider", "ogc-features")
-        
+
         # Register protocol with quirks
         protocol = OGCFeaturesProtocol(
             base_url="https://new-api.com/v1/",
@@ -277,7 +277,7 @@ class NewProvider(Provider):
 
 def test_new_provider_quirks():
     quirks = get_quirks("new-provider", "ogc-features")
-    
+
     assert quirks.requires_trailing_slash is True
     assert quirks.require_format_param is True
     assert quirks.format_param_value == "application/json"
@@ -310,7 +310,7 @@ def test_new_provider_quirks():
    ```python
    # ✅ GOOD
    quirks = get_quirks("pdok", "ogc-features")
-   
+
    # ❌ BAD
    quirks = ProtocolQuirks(...)  # Hardcoded in code
    ```
@@ -330,7 +330,7 @@ def test_new_provider_quirks():
    ```python
    # ❌ BAD - in OGCFeaturesProtocol
    params["f"] = "json"  # PDOK-specific!
-   
+
    # ✅ GOOD - use quirks
    params = self.quirks.apply_to_params(params)
    ```
@@ -341,7 +341,7 @@ def test_new_provider_quirks():
    # pdok.py
    protocol = OGCFeaturesProtocol(...)
    protocol.add_param("f", "json")  # Hardcoded
-   
+
    # ✅ GOOD - quirk in registry
    quirks = get_quirks("pdok", "ogc-features")
    ```
@@ -353,7 +353,7 @@ def test_new_provider_quirks():
        async def download(self, ...):
            if self.name == "pdok":
                params["f"] = "json"  # Quirk in business logic!
-   
+
    # ✅ GOOD - quirk in protocol
    protocol = OGCFeaturesProtocol(quirks=pdok_quirks)
    ```
@@ -500,18 +500,18 @@ async with protocol:
 def test_my_provider_quirks():
     """Test custom provider quirks."""
     from giskit.protocols.quirks import get_quirks
-    
+
     quirks = get_quirks("my-provider", "ogc-features")
-    
+
     # Test URL fix
     url = quirks.apply_to_url("https://api.com/v2")
     assert url.endswith("/")
-    
+
     # Test params
     params = quirks.apply_to_params({"bbox": "1,2,3,4"})
     assert "f" in params
     assert params["f"] == "json"
-    
+
     # Test timeout
     timeout = quirks.get_timeout(30.0)
     assert timeout > 30.0  # Custom timeout
@@ -566,10 +566,10 @@ class QuirkUsage:
 
 The **Configuration-Driven Quirks System** provides:
 
-✅ **Scalability** - New providers easy to add  
-✅ **Maintainability** - Quirks gecentral iseerd, niet verspreid  
-✅ **Testability** - Quirks individually testable  
-✅ **Documentation** - Metadata explains why quirks are needed  
-✅ **Flexibility** - Custom quirks for edge cases  
+✅ **Scalability** - New providers easy to add
+✅ **Maintainability** - Quirks gecentral iseerd, niet verspreid
+✅ **Testability** - Quirks individually testable
+✅ **Documentation** - Metadata explains why quirks are needed
+✅ **Flexibility** - Custom quirks for edge cases
 
 This makes GISKit robust against API quirks without polluting the core code.

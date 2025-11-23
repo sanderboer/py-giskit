@@ -141,10 +141,10 @@ def cityjson_to_geodataframe(cityjson_data: dict, lod: str = "0"):
     page_transform = None
     if 'metadata' in cityjson_data and isinstance(cityjson_data['metadata'], dict):
         page_transform = cityjson_data['metadata'].get('transform')
-    
+
     for feature in features:
         vertices = feature.get("vertices", [])
-        
+
         # Apply transform to EACH vertex
         if transform and 'scale' in transform and 'translate' in transform:
             scale = transform['scale']
@@ -160,11 +160,11 @@ def cityjson_to_geodataframe(cityjson_data: dict, lod: str = "0"):
 while True:
     response = await client.get(next_url)
     geojson = response.json()  # Contains metadata.transform for THIS page
-    
+
     # Parse with THIS page's transform
     gdf = cityjson_to_geodataframe(geojson, lod=lod)
     all_gdfs.append(gdf)
-    
+
     # Next page will have DIFFERENT transform!
     next_url = get_next_link(geojson)
 ```
@@ -225,7 +225,7 @@ print(gdf.total_bounds)
 - **LOD 0**: 2D footprint (polygon)
   - Source: `Building` object
   - Geometry: MultiSurface with XY coordinates
-  
+
 - **LOD 1.2**: Simple 3D block with flat roof
   - Source: `BuildingPart` object
   - Geometry: Solid with XYZ coordinates

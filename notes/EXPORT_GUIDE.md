@@ -53,7 +53,7 @@ materials:
     concrete:
       color: [180, 180, 180]
       name: "Concrete"
-  
+
   buildings:
     roof:
       color: [139, 69, 19]
@@ -72,7 +72,7 @@ layer_mappings:
     ifc_entity: "IfcRoad"
     material: "roads.asphalt"
     layer_prefix: "wegdeel"
-  
+
   buildings:
     ifc_entity: "IfcBuilding"
     material: "buildings.wall"
@@ -399,7 +399,7 @@ class IFCExporter:
         colors_config: Optional[Path] = None,
         mappings_config: Optional[Path] = None
     )
-    
+
     def export(
         self,
         db_path: Path,
@@ -414,9 +414,9 @@ class IFCExporter:
 ```python
 class GLBExporter:
     def __init__(self)
-    
+
     def is_available(self) -> bool
-    
+
     def ifc_to_glb(
         self,
         ifc_path: Path,

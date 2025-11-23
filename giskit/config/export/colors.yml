@@ -13,14 +13,14 @@ bgt_wegdeel:
   "voetpad op trap": [0.3, 0.3, 0.3]
   inrit: [0.3, 0.3, 0.3]
   woonerf: [0.3, 0.3, 0.3]
-  
+
   # By fysiek_voorkomen (surface material)
   asfalt: [0.3, 0.3, 0.3]
   tegels: [0.65, 0.65, 0.65]  # Light gray tiles
   betonstraatstenen: [0.6, 0.6, 0.6]
   "gebakken klinkers": [0.7, 0.3, 0.25]  # Red brick
   "beton element": [0.55, 0.55, 0.55]
-  
+
   default: [0.4, 0.4, 0.4]  # Medium gray
 
 bgt_waterdeel:

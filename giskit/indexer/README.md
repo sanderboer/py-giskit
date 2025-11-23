@@ -4,12 +4,12 @@ Tool om de PDOK service index te onderhouden en monitoren.
 
 ## Features
 
-✅ **Health Checking** - Test of alle 40+ PDOK services nog werken  
-✅ **Deprecation Detection** - Detecteer services die niet meer bestaan (404)  
-✅ **Service Discovery** - Vind nieuwe PDOK services automatisch  
-✅ **Performance Monitoring** - Meet response times per service  
-✅ **Collection Counting** - Tel hoeveel layers elk service heeft  
-✅ **Version Detection** - Detecteer API versie upgrades (v1 → v2)  
+✅ **Health Checking** - Test of alle 40+ PDOK services nog werken
+✅ **Deprecation Detection** - Detecteer services die niet meer bestaan (404)
+✅ **Service Discovery** - Vind nieuwe PDOK services automatisch
+✅ **Performance Monitoring** - Meet response times per service
+✅ **Collection Counting** - Tel hoeveel layers elk service heeft
+✅ **Version Detection** - Detecteer API versie upgrades (v1 → v2)
 
 ## Gebruik
 

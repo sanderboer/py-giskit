@@ -89,7 +89,7 @@ De workflow in `.github/workflows/publish-pypi.yml` heeft:
 ```yaml
 permissions:
   id-token: write  # CRITICAL: Dit geeft toegang tot OIDC token
-  
+
 environment:
   name: pypi
   url: https://pypi.org/p/pygiskit

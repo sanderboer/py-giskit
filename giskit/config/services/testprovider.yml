@@ -15,7 +15,7 @@ services:
       - test
       - demo
       - example
-  
+
   test-service-2:
     url: https://api.example.com/service2
     title: Test Service 2

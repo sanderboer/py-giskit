@@ -80,16 +80,16 @@ See `GITHUB_PYPI_SETUP.md` for detailed setup instructions.
    # Create a test environment
    python -m venv test_env
    source test_env/bin/activate
-   
+
    # Install from TestPyPI
    pip install --index-url https://test.pypi.org/simple/ \
      --extra-index-url https://pypi.org/simple/ \
      giskit
-   
+
    # Test basic functionality
    giskit --version
    python -c "import giskit; print('GISKit imported successfully')"
-   
+
    # Test with IFC extra
    pip install --index-url https://test.pypi.org/simple/ \
      --extra-index-url https://pypi.org/simple/ \
@@ -112,10 +112,10 @@ See `GITHUB_PYPI_SETUP.md` for detailed setup instructions.
    ```bash
    # Update lock file
    poetry lock --no-update
-   
+
    # Run all tests
    poetry run pytest tests/
-   
+
    # Check code quality
    poetry run ruff check .
    poetry run ruff format --check .
@@ -148,7 +148,7 @@ See `GITHUB_PYPI_SETUP.md` for detailed setup instructions.
    # Test installation from PyPI
    pip install pygiskit
    giskit --version
-   
+
    # Test with IFC support
    pip install pygiskit[ifc]
    ```

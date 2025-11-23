@@ -84,7 +84,7 @@ All recipes follow this structure:
 ## Location Types
 
 1. **address**: Geocode address → buffer by radius
-2. **point**: [lon, lat] → buffer by radius  
+2. **point**: [lon, lat] → buffer by radius
 3. **bbox**: [minx, miny, maxx, maxy]
 4. **polygon**: [[lon, lat], ...]
 

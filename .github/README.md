@@ -25,7 +25,7 @@ Dit project gebruikt GitHub Actions voor Continuous Integration en Deployment.
 
 ### 2. Publish to PyPI (`publish-pypi.yml`)
 
-**Trigger**: 
+**Trigger**:
 - GitHub Release published
 - Manual trigger (workflow_dispatch)
 
@@ -66,7 +66,7 @@ Maak de volgende environments in GitHub Settings:
 
 #### `pypi`
 - **URL**: `https://pypi.org/p/giskit`
-- **Protection**: 
+- **Protection**:
   - Required reviewers (aanbevolen)
   - Deployment branches: `main` only
 

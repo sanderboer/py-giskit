@@ -29,7 +29,7 @@ services:
       2025_25cm: 2025_ortho25
       2024_8cm: 2024_orthoHR
       2024_25cm: 2024_ortho25
-    
+
   luchtfoto-ir:
     url: https://service.pdok.nl/hwh/luchtfotoinfrarood/wmts/v1_0
     title: Luchtfoto Infrarood
@@ -44,7 +44,7 @@ services:
     tile_matrix_set: EPSG:28992
     layers:
       actueel: Actueel_ortho25IR
-    
+
   satellite:
     url: https://service.pdok.nl/hwh/satellietbeeld/wmts/v1_0
     title: Satellietbeelden Nederland
@@ -58,7 +58,7 @@ services:
     tile_matrix_set: EPSG:28992
     layers:
       actueel: 2023_ortho25
-    
+
   brt-achtergrondkaart:
     url: https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0
     title: BRT Achtergrondkaart

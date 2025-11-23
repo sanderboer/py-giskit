@@ -12,47 +12,47 @@ jobs:
   build:
     name: Build distribution
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-    
+
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
         version: 1.7.1
         virtualenvs-create: true
         virtualenvs-in-project: true
-    
+
     - name: Load cached venv
       id: cached-poetry-dependencies
       uses: actions/cache@v3
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-    
+
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
-    
+
     - name: Install project
       run: poetry install --no-interaction
-    
+
     - name: Run tests
       run: |
         poetry run pytest tests/unit/ -k "not test_bag3d_inherits_cityjson_quirks" -v
-    
+
     - name: Run linter
       run: |
         poetry run ruff check .
-    
+
     - name: Build package
       run: poetry build
-    
+
     - name: Store the distribution packages
       uses: actions/upload-artifact@v4
       with:
@@ -64,21 +64,21 @@ jobs:
     needs:
     - build
     runs-on: ubuntu-latest
-    
+
     environment:
       name: pypi
       url: https://pypi.org/p/pygiskit
-    
+
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
-    
+
     steps:
     - name: Download all the dists
       uses: actions/download-artifact@v4
       with:
         name: python-package-distributions
         path: dist/
-    
+
     - name: Publish distribution to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
 
@@ -87,24 +87,24 @@ jobs:
     needs:
     - build
     runs-on: ubuntu-latest
-    
+
     # Only run on workflow_dispatch (manual trigger)
     if: github.event_name == 'workflow_dispatch'
-    
+
     environment:
       name: testpypi
       url: https://test.pypi.org/p/pygiskit
-    
+
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
-    
+
     steps:
     - name: Download all the dists
       uses: actions/download-artifact@v4
       with:
         name: python-package-distributions
         path: dist/
-    
+
     - name: Publish distribution to TestPyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:

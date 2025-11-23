@@ -2,10 +2,10 @@
 
 Complete catalog of all 40+ PDOK (Publieke Dienstverlening Op de Kaart) services available through giskit.
 
-**Total Services**: 40+  
-**Categories**: 6 (Base Registers, Topography, Statistics, Infrastructure, Environment, Administrative)  
-**Coverage**: Netherlands  
-**License**: CC0 1.0 (public domain)  
+**Total Services**: 40+
+**Categories**: 6 (Base Registers, Topography, Statistics, Infrastructure, Environment, Administrative)
+**Coverage**: Netherlands
+**License**: CC0 1.0 (public domain)
 **Homepage**: https://www.pdok.nl
 
 ---
@@ -177,7 +177,7 @@ print(f"Description: {info['description']}")
 ```python
 # List all categories
 categories = provider.list_categories()
-# Returns: ['administrative', 'aviation', 'base_registers', 'culture', 
+# Returns: ['administrative', 'aviation', 'base_registers', 'culture',
 #           'environment', 'infrastructure', 'statistics', 'topography']
 
 # Get service info
@@ -365,5 +365,5 @@ for page in all_pages:
 
 ---
 
-**Last Updated**: November 22, 2025  
+**Last Updated**: November 22, 2025
 **giskit Version**: 0.1.0
