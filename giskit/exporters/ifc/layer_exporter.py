@@ -229,9 +229,40 @@ class LayerExporter:
         # Create faces
         faces = []
         for poly in polygons:
-            if poly.is_valid and not poly.is_empty:
+            # Skip empty polygons
+            if poly.is_empty:
+                continue
+            
+            # For invalid polygons, check if they're vertical surfaces (walls)
+            # Vertical surfaces are invalid in 2D but valid in 3D
+            if not poly.is_valid:
+                # Check if this is a vertical surface by examining Z coordinates
+                coords = list(poly.exterior.coords)
+                if len(coords) >= 4:  # Need at least 3 unique points + closure
+                    z_values = [c[2] if len(c) > 2 else 0 for c in coords]
+                    z_range = max(z_values) - min(z_values)
+                    
+                    # If Z range is significant (>0.1m), it's likely a vertical surface
+                    # Don't try to "fix" it with buffer(0) as that will make it empty
+                    is_vertical = z_range > 0.1
+                    
+                    if not is_vertical:
+                        # Try to fix non-vertical invalid polygons
+                        try:
+                            poly = poly.buffer(0)
+                        except Exception:
+                            pass
+                        
+                        # Skip if fixing made it empty
+                        if poly.is_empty:
+                            continue
+            
+            try:
                 face = polygon_3d_to_ifc_face(ifc_file, poly)
                 faces.append(face)
+            except Exception as e:
+                # Skip faces that can't be converted, but log for debugging
+                print(f"Warning: Failed to create IFC face for polygon: {e}")
 
         if not faces:
             return
@@ -271,15 +302,45 @@ class LayerExporter:
         faces_by_type = {"ROOF": [], "WALL": [], "FLOOR": []}
 
         for poly in polygons:
-            if not poly.is_valid or poly.is_empty:
+            # Skip empty polygons
+            if poly.is_empty:
                 continue
-
-            surface_type = classify_surface(poly)
-            face = polygon_3d_to_ifc_face(ifc_file, poly)
-            faces_by_type[surface_type].append(face)
+            
+            # For invalid polygons, check if they're vertical surfaces (walls)
+            # Vertical surfaces are invalid in 2D but valid in 3D
+            if not poly.is_valid:
+                # Check if this is a vertical surface by examining Z coordinates
+                coords = list(poly.exterior.coords)
+                if len(coords) >= 4:  # Need at least 3 unique points + closure
+                    z_values = [c[2] if len(c) > 2 else 0 for c in coords]
+                    z_range = max(z_values) - min(z_values)
+                    
+                    # If Z range is significant (>0.1m), it's likely a vertical surface
+                    # Don't try to "fix" it with buffer(0) as that will make it empty
+                    is_vertical = z_range > 0.1
+                    
+                    if not is_vertical:
+                        # Try to fix non-vertical invalid polygons
+                        try:
+                            poly = poly.buffer(0)
+                        except Exception:
+                            pass
+                        
+                        # Skip if fixing made it empty
+                        if poly.is_empty:
+                            continue
+            
+            try:
+                surface_type = classify_surface(poly)
+                face = polygon_3d_to_ifc_face(ifc_file, poly)
+                faces_by_type[surface_type].append(face)
+            except Exception as e:
+                # Skip faces that can't be converted, but log for debugging
+                print(f"Warning: Failed to create IFC face for polygon: {e}")
 
         # Create separate representations for each surface type
         all_faces = []
+        all_representations = []
         for surface_type, faces in faces_by_type.items():
             if not faces:
                 continue
@@ -306,16 +367,15 @@ class LayerExporter:
             )
 
             all_faces.extend(faces)
+            all_representations.append(rep)
 
         # Combine all representations
-        if all_faces:
+        if all_representations:
             # Create product definition shape with all representations
             product_shape = ifc_file.createIfcProductDefinitionShape(
                 None,
                 None,
-                [rep for rep in entity.Representation.Representations if rep]
-                if hasattr(entity, "Representation") and entity.Representation
-                else [],
+                all_representations,
             )
             entity.Representation = product_shape
 
