@@ -90,6 +90,21 @@ layer_mappings:
       - functie
       - plus_fysiek_voorkomen
   
+  bgt_ondersteunendwaterdeel:
+    ifc_class: IfcGeographicElement
+    assignment_method: spatial
+    default_height: 0.1
+    name_attribute: lokaal_id
+    pset_name: Pset_BGT_OndersteunendWaterdeel
+    properties:
+      - gml_id
+      - lokaal_id
+      - type
+      - plus_type
+    color_attributes:
+      - type
+      - plus_type
+  
   bgt_kunstwerkdeel:
     ifc_class: IfcCivilElement
     assignment_method: spatial
