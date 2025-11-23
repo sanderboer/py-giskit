@@ -338,7 +338,17 @@ class OGCFeaturesProtocol(Protocol):
             temporal = "latest"
 
         if temporal == "latest":
-            # Keep newest version per feature based on registration timestamp
+            # First, filter out terminated features (with eind_registratie)
+            # These are historical versions that have been replaced, even if they have different IDs
+            if "eind_registratie" in gdf.columns:
+                # Remove features that have been terminated
+                before_count = len(gdf)
+                gdf = gdf[gdf["eind_registratie"].isna() | (gdf["eind_registratie"] == "")]
+                after_count = len(gdf)
+                if before_count != after_count:
+                    print(f"  Filtered out {before_count - after_count} terminated features (eind_registratie)")
+            
+            # Then, keep newest version per feature ID (for true duplicates with same ID)
             if "tijdstip_registratie" in gdf.columns:
                 # Sort by timestamp descending, keep first (newest) per ID
                 gdf = gdf.sort_values("tijdstip_registratie", ascending=False)
