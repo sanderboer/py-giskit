@@ -42,13 +42,8 @@ jobs:
     - name: Install project
       run: poetry install --no-interaction
 
-    - name: Run tests
-      run: |
-        poetry run pytest tests/unit/ -k "not test_bag3d_inherits_cityjson_quirks" -v
-
-    - name: Run linter
-      run: |
-        poetry run ruff check .
+    - name: Run pre-commit checks
+      run: poetry run pre-commit run --all-files
 
     - name: Build package
       run: poetry build
