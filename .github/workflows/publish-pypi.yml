@@ -1,16 +1,55 @@
-name: Publish to PyPI
+name: Publish to PyPI on Version Change
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:  # Allows manual trigger
+  push:
+    branches: [ main ]
+    paths:
+      - 'pyproject.toml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version-changed: ${{ steps.check.outputs.changed }}
+      new-version: ${{ steps.check.outputs.version }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+
+    - name: Check if version changed
+      id: check
+      run: |
+        # Get current version from pyproject.toml
+        CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+        echo "Current version: $CURRENT_VERSION"
+
+        # Check if pyproject.toml was changed in the last commit
+        if git diff HEAD~1 HEAD --name-only | grep -q pyproject.toml; then
+          # Get previous version
+          PREV_VERSION=$(git show HEAD~1:pyproject.toml | grep '^version = ' | sed 's/version = "\(.*\)"/\1/')
+          echo "Previous version: $PREV_VERSION"
+
+          if [ "$CURRENT_VERSION" != "$PREV_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "Version changed from $PREV_VERSION to $CURRENT_VERSION"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Version did not change"
+          fi
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "pyproject.toml was not modified"
+        fi
+
   build:
-    name: Build distribution
+    needs: check-version
+    if: needs.check-version.outputs.version-changed == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -28,18 +67,7 @@ jobs:
         virtualenvs-create: true
         virtualenvs-in-project: true
 
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v3
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-
     - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
-
-    - name: Install project
       run: poetry install --no-interaction
 
     - name: Run pre-commit checks
@@ -57,7 +85,9 @@ jobs:
   publish-to-pypi:
     name: Publish to PyPI
     needs:
+    - check-version
     - build
+    if: needs.check-version.outputs.version-changed == 'true'
     runs-on: ubuntu-latest
 
     environment:
@@ -77,30 +107,33 @@ jobs:
     - name: Publish distribution to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
 
-  publish-to-testpypi:
-    name: Publish to TestPyPI
+  create-github-release:
+    name: Create GitHub Release
     needs:
-    - build
+    - check-version
+    - publish-to-pypi
     runs-on: ubuntu-latest
 
-    # Only run on workflow_dispatch (manual trigger)
-    if: github.event_name == 'workflow_dispatch'
-
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/p/pygiskit
-
     permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+      contents: write
 
     steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v4
-      with:
-        name: python-package-distributions
-        path: dist/
+    - uses: actions/checkout@v4
 
-    - name: Publish distribution to TestPyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
+    - name: Create git tag
+      run: |
+        VERSION="${{ needs.check-version.outputs.new-version }}"
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a "v${VERSION}" -m "Release v${VERSION}"
+        git push origin "v${VERSION}"
+
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        VERSION="${{ needs.check-version.outputs.new-version }}"
+        gh release create "v${VERSION}" \
+          --title "v${VERSION}" \
+          --notes "Automated release for version ${VERSION}. See [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details." \
+          --generate-notes

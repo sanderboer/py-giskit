@@ -7,11 +7,11 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.1.15
     hooks:
-      # Run the linter
-      - id: ruff
-        args: [--fix]
-      # Run the formatter
+      # First, run Ruff formatter to enforce consistent formatting
       - id: ruff-format
+      # Then, run the Ruff linter with autofix; fail if fixes were applied
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
 
   # Pytest - Run unit tests before commit (fast, no external API calls)
   - repo: local

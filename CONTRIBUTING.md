@@ -39,10 +39,12 @@ git checkout -b feature/jouw-feature-naam
 
 ### Wat wordt er automatisch gecontroleerd bij elke commit?
 
-- ✨ **Ruff linter** - Auto-fix van code issues (ongebruikte imports, syntax errors)
-- 🎨 **Ruff formatter** - Consistente code formatting
+- ✨ **Ruff formatter** - Consistente code formatting (draait eerst)
+- 🔍 **Ruff linter** - Auto-fix van code issues met `--exit-non-zero-on-fix`
 - 🧪 **Unit tests** - Alleen `tests/unit/` (snel, geen externe APIs)
 - 📝 **File checks** - Trailing whitespace, end-of-file, YAML/TOML syntax
+
+**Let op:** De linter faalt als er auto-fixes worden toegepast. Dit zorgt ervoor dat je de fixes kunt reviewen voordat je committed.
 
 ### Installatie
 
@@ -192,6 +194,43 @@ Je PR wordt beoordeeld op:
 - ✅ Documentatie bijgewerkt (indien nodig)
 - ✅ Commit messages volgen conventie
 - ✅ Code is leesbaar en goed gedocumenteerd
+
+## 🚀 Releases & Publishing
+
+**Voor maintainers:**
+
+py-giskit gebruikt **automatische publishing** naar PyPI bij elke versie bump.
+
+### Hoe een nieuwe versie releasen?
+
+1. **Bump de versie** in `pyproject.toml`:
+   ```toml
+   version = "0.2.0"  # Was 0.1.0
+   ```
+
+2. **Commit en push naar main**:
+   ```bash
+   git add pyproject.toml
+   git commit -m "chore: bump version to 0.2.0"
+   git push origin main
+   ```
+
+3. **Automatische workflow triggert**:
+   - ✅ Detecteert versie change
+   - ✅ Draait pre-commit checks (linting, formatting, unit tests)
+   - ✅ Bouwt package met poetry
+   - ✅ Publiceert naar PyPI
+   - ✅ Maakt automatisch een GitHub release met tag `v0.2.0`
+
+**Dat's alles!** Binnen enkele minuten is de nieuwe versie live op PyPI.
+
+### Versie Nummering
+
+Volg [Semantic Versioning](https://semver.org/):
+- `MAJOR.MINOR.PATCH` (bijv. `1.2.3`)
+- **MAJOR**: Breaking changes
+- **MINOR**: Nieuwe features (backward compatible)
+- **PATCH**: Bug fixes
 
 ## 🆘 Hulp Nodig?
 
