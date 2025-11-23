@@ -7,8 +7,8 @@ that can be run inside a Docker container.
 
 REQUIREMENTS:
     This example requires ifcopenshell to be installed:
-    - conda install -c conda-forge ifcopenshell
-    - or download from https://github.com/IfcOpenShell/IfcOpenShell
+    - pip install giskit[ifc]
+    - or: pip install ifcopenshell
 
 Usage (inside Docker):
     python /data/export_pipeline.py /data/input.gpkg /data/output
@@ -26,11 +26,11 @@ try:
 except ImportError as e:
     print("ERROR: This example requires ifcopenshell to be installed")
     print()
-    print("Install using conda:")
-    print("  conda install -c conda-forge ifcopenshell")
+    print("Install using pip:")
+    print("  pip install giskit[ifc]")
     print()
-    print("Or download from:")
-    print("  https://github.com/IfcOpenShell/IfcOpenShell")
+    print("Or install ifcopenshell separately:")
+    print("  pip install ifcopenshell")
     print()
     print(f"Import error: {e}")
     sys.exit(1)

@@ -8,13 +8,11 @@ REQUIREMENTS:
     the IfcConvert binary for IFC → GLB conversion.
 
 Installation:
-    # Recommended: Install via conda
-    conda install -c conda-forge ifcopenshell
+    # Install giskit with IFC support
+    pip install giskit[ifc]
 
-    # Alternative: Download from GitHub
-    # https://github.com/IfcOpenShell/IfcOpenShell
-
-Note: IfcOpenShell is NOT available via PyPI. You must install it separately.
+    # Or install ifcopenshell separately
+    pip install ifcopenshell
 """
 
 import platform as platform_module
@@ -90,13 +88,11 @@ class GLBExporter:
         instructions = [
             "IfcConvert not found. Install ifcopenshell to get IfcConvert:",
             "",
-            "Recommended: Install via conda",
-            "  conda install -c conda-forge ifcopenshell",
+            "Install giskit with IFC support:",
+            "  pip install giskit[ifc]",
             "",
-            "Alternative: Download from GitHub",
-            "  https://github.com/IfcOpenShell/IfcOpenShell",
-            "",
-            "Note: IfcOpenShell is NOT available via PyPI",
+            "Or install ifcopenshell separately:",
+            "  pip install ifcopenshell",
         ]
 
         return "\n".join(instructions)

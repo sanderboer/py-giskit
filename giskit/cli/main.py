@@ -607,11 +607,11 @@ def export_ifc(
         from giskit.exporters.ifc import IFCExporter
     except ImportError:
         console.print("[bold red]Error:[/bold red] IfcOpenShell not installed")
-        console.print("\nIFC export requires ifcopenshell, which is not available via PyPI.")
-        console.print("\nInstall using conda:")
-        console.print("  [bold]conda install -c conda-forge ifcopenshell[/bold]")
-        console.print("\nOr download from:")
-        console.print("  https://github.com/IfcOpenShell/IfcOpenShell")
+        console.print("\nIFC export requires ifcopenshell.")
+        console.print("\nInstall using pip:")
+        console.print("  [bold]pip install giskit[ifc][/bold]")
+        console.print("\nOr separately:")
+        console.print("  [bold]pip install ifcopenshell[/bold]")
         raise typer.Exit(1)
 
     # Convert flags
