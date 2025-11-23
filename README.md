@@ -3,7 +3,7 @@
 **Recipe-driven spatial data downloader for any location, any provider, anywhere**
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-orange.svg)](https://github.com/a190/giskit)
+[![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-orange.svg)](https://github.com/sanderboer/py-giskit)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
@@ -32,16 +32,25 @@ GISKit is a **protocol-agnostic spatial data downloader** that uses JSON "recipe
 # From PyPI (when published)
 pip install giskit
 
-# With IFC export support
-pip install giskit[ifc]
-
 # Development installation from source
-git clone https://github.com/a190/giskit.git
-cd giskit
+git clone https://github.com/sanderboer/py-giskit.git
+cd py-giskit
 pip install -e .
 
 # Or using poetry
 poetry install
+```
+
+### Optional: IFC Export Support
+
+IfcOpenShell is not available via PyPI. If you need IFC export functionality:
+
+```bash
+# Using conda (recommended)
+conda install -c conda-forge ifcopenshell
+
+# Or download from
+# https://github.com/IfcOpenShell/IfcOpenShell
 ```
 
 ### IfcConvert for GLB Export

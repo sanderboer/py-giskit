@@ -5,8 +5,8 @@ description = "Recipe-driven spatial data downloader for any location, any provi
 authors = ["A190 <info@a190.nl>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/a190/giskit"
-repository = "https://github.com/a190/giskit"
+homepage = "https://github.com/sanderboer/py-giskit"
+repository = "https://github.com/sanderboer/py-giskit"
 keywords = ["gis", "spatial", "ogc", "wfs", "wmts", "geodata", "recipe", "openstreetmap", "pdok"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -30,11 +30,14 @@ typer = {extras = ["all"], version = "^0.9.0"}
 rich = "^13.7.0"
 jsonschema = "^4.20.0"
 fiona = "^1.9.0"
-ifcopenshell = {version = "^0.8.0", optional = true}
+
+# Note: ifcopenshell is not available via PyPI
+# Users who need IFC export should install it manually:
+# conda install -c conda-forge ifcopenshell
+# or download from: https://github.com/IfcOpenShell/IfcOpenShell
 
 [tool.poetry.extras]
-ifc = ["ifcopenshell"]
-all = ["ifcopenshell"]
+# ifc export requires manual ifcopenshell installation
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
