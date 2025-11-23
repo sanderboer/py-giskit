@@ -99,6 +99,7 @@ select = [
 ignore = [
     "E501",  # line too long (handled by black)
     "B008",  # do not perform function calls in argument defaults
+    "B904",  # raise ... from err (not critical for this codebase)
     "C901",  # too complex
     "E402",  # module level import not at top of file (needed for lazy loading)
     "E722",  # bare except (sometimes needed for backwards compat)
@@ -106,7 +107,7 @@ ignore = [
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
-"giskit/protocols/quirks.py" = ["E402"]
+"giskit/protocols/quirks.py" = ["E402", "F811"]  # lazy import, duplicate import
 "giskit/providers/pdok.py" = ["E402"]
 "giskit/indexer/monitor.py" = ["F821"]  # requests/httpx issue
 "giskit/core/spatial.py" = ["F821"]  # TYPE_CHECKING forward ref
