@@ -124,6 +124,10 @@ class GLBExporter:
         print(f"Converting IFC to GLB: {ifc_path} → {glb_path}")
         print(f"  Using IfcConvert: {self.ifcconvert_path}")
 
+        # Remove existing GLB file to avoid interactive prompt from IfcConvert
+        if glb_path.exists():
+            glb_path.unlink()
+
         # Build IfcConvert command
         cmd = [
             str(self.ifcconvert_path),
