@@ -44,6 +44,12 @@
     "format": "gpkg",
     "crs": "EPSG:28992",
     "overwrite": true,
-    "layer_prefix": ""
+    "layer_prefix": "",
+    "ifc_export": {
+      "path": "site_underlegger.ifc",
+      "ifc_version": "IFC4X3_ADD2",
+      "relative": true,
+      "normalize_z": true
+    }
   }
 }

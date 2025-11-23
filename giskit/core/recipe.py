@@ -155,6 +155,32 @@ class OutputFormat(str, Enum):
     FLATGEOBUF = "fgb"
 
 
+class IFCExportConfig(BaseModel):
+    """IFC export configuration.
+    
+    Examples:
+        Export to IFC with defaults (relative coords, normalized Z):
+            {"path": "output.ifc"}
+        
+        Export with absolute coordinates and NAP elevations:
+            {"path": "output.ifc", "relative": false, "normalize_z": false}
+    """
+    
+    path: Path = Field(..., description="Output IFC file path")
+    ifc_version: str = Field("IFC4X3_ADD2", description="IFC schema version (IFC4X3_ADD2, IFC4, IFC2X3)")
+    site_name: Optional[str] = Field(None, description="Name for the IFC site (default: use address)")
+    relative: bool = Field(True, description="Use relative coordinates (True) or absolute RD (False)")
+    normalize_z: bool = Field(True, description="Normalize Z to ground level (True) or keep NAP elevations (False)")
+    
+    @field_validator("path")
+    @classmethod
+    def validate_ifc_path(cls, v: Path) -> Path:
+        """Ensure path has .ifc extension."""
+        if v.suffix.lower() != ".ifc":
+            v = v.with_suffix(".ifc")
+        return Path(v)
+
+
 class Output(BaseModel):
     """Output specification for downloaded data.
 
@@ -164,6 +190,18 @@ class Output(BaseModel):
 
         GeoJSON (always WGS84):
             {"path": "./data.geojson", "format": "geojson"}
+        
+        GeoPackage with IFC export:
+            {
+                "path": "./data.gpkg", 
+                "format": "gpkg", 
+                "crs": "EPSG:28992",
+                "ifc_export": {
+                    "path": "output.ifc",
+                    "relative": true,
+                    "normalize_z": true
+                }
+            }
     """
 
     path: Path = Field(..., description="Output file path")
@@ -172,6 +210,9 @@ class Output(BaseModel):
     overwrite: bool = Field(False, description="Overwrite existing file")
     layer_prefix: Optional[str] = Field(
         None, description="Prefix for layer names (e.g., 'amsterdam_')"
+    )
+    ifc_export: Optional[IFCExportConfig] = Field(
+        None, description="Optional IFC export configuration (auto-export after GPKG creation)"
     )
 
     @field_validator("path")

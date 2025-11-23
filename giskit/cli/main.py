@@ -324,6 +324,50 @@ def run(
                         console.print(
                             f"\n[bold green]✓[/bold green] Successfully saved {total_features} features in {len(layers)} layers to {output_path}"
                         )
+                        
+                        # Auto-export to IFC if configured
+                        if recipe.output.ifc_export:
+                            console.print(f"\n[bold]Auto-exporting to IFC:[/bold] {recipe.output.ifc_export.path}")
+                            try:
+                                from giskit.exporters.ifc import IFCExporter
+                                
+                                # Create exporter
+                                exporter = IFCExporter(
+                                    ifc_version=recipe.output.ifc_export.ifc_version,
+                                    author="GISKit",
+                                    organization="A190"
+                                )
+                                
+                                # Determine site name
+                                site_name = recipe.output.ifc_export.site_name
+                                if site_name is None and recipe.location.type.value == "address":
+                                    if isinstance(recipe.location.value, str):
+                                        site_name = recipe.location.value
+                                if site_name is None:
+                                    site_name = "Site"
+                                
+                                # Export (without console.status to avoid Rich LiveError)
+                                exporter.export(
+                                    db_path=output_path,
+                                    output_path=recipe.output.ifc_export.path,
+                                    layers=None,
+                                    relative=recipe.output.ifc_export.relative,
+                                    normalize_z=recipe.output.ifc_export.normalize_z,
+                                    site_name=site_name,
+                                )
+                                
+                                # Show file size
+                                if recipe.output.ifc_export.path.exists():
+                                    size_mb = recipe.output.ifc_export.path.stat().st_size / (1024 * 1024)
+                                    console.print(f"  [bold green]✓[/bold green] IFC export complete: {recipe.output.ifc_export.path} ({size_mb:.1f} MB)")
+                            
+                            except ImportError:
+                                console.print("  [yellow]⚠[/yellow] IFC export skipped: ifcopenshell not installed")
+                                console.print("    Install with: pip install giskit[ifc]")
+                            except Exception as ifc_error:
+                                console.print(f"  [red]✗[/red] IFC export failed: {ifc_error}")
+                                if verbose:
+                                    console.print_exception()
                     elif output_format == "geojson":
                         # GeoJSON doesn't support layers - combine all
                         import geopandas as gpd
