@@ -103,13 +103,20 @@ def polygon_to_ifc_face(ifc_file, polygon: Polygon, z: float = 0.0) -> object:
     ifc_points = [create_ifc_point(ifc_file, *pt) for pt in points_3d]
     poly_loop = ifc_file.createIfcPolyLoop(ifc_points)
 
-    # Create face bound
-    face_bound = ifc_file.createIfcFaceOuterBound(poly_loop, True)
+    # Create outer face bound
+    face_bounds = [ifc_file.createIfcFaceOuterBound(poly_loop, True)]
 
-    # TODO: Handle interior rings (holes) if needed
+    # Handle interior rings (holes)
+    for interior in polygon.interiors:
+        interior_coords = list(interior.coords)
+        interior_points_3d = [(x, y, z) for x, y in interior_coords]
+        interior_ifc_points = [create_ifc_point(ifc_file, *pt) for pt in interior_points_3d]
+        interior_poly_loop = ifc_file.createIfcPolyLoop(interior_ifc_points)
+        # Interior bounds are holes, so orientation is False
+        face_bounds.append(ifc_file.createIfcFaceBound(interior_poly_loop, False))
 
-    # Create face
-    return ifc_file.createIfcFace([face_bound])
+    # Create face with all bounds
+    return ifc_file.createIfcFace(face_bounds)
 
 
 def polygon_3d_to_ifc_face(ifc_file, polygon: Polygon) -> object:
@@ -129,11 +136,19 @@ def polygon_3d_to_ifc_face(ifc_file, polygon: Polygon) -> object:
     ifc_points = [create_ifc_point(ifc_file, *pt) for pt in coords]
     poly_loop = ifc_file.createIfcPolyLoop(ifc_points)
 
-    # Create face bound
-    face_bound = ifc_file.createIfcFaceOuterBound(poly_loop, True)
+    # Create outer face bound
+    face_bounds = [ifc_file.createIfcFaceOuterBound(poly_loop, True)]
 
-    # Create face
-    return ifc_file.createIfcFace([face_bound])
+    # Handle interior rings (holes)
+    for interior in polygon.interiors:
+        interior_coords = list(interior.coords)
+        interior_ifc_points = [create_ifc_point(ifc_file, *pt) for pt in interior_coords]
+        interior_poly_loop = ifc_file.createIfcPolyLoop(interior_ifc_points)
+        # Interior bounds are holes, so orientation is False
+        face_bounds.append(ifc_file.createIfcFaceBound(interior_poly_loop, False))
+
+    # Create face with all bounds
+    return ifc_file.createIfcFace(face_bounds)
 
 
 def create_extruded_area_solid(ifc_file, polygon: Polygon, height: float, position=None) -> object:
@@ -156,8 +171,25 @@ def create_extruded_area_solid(ifc_file, polygon: Polygon, height: float, positi
     ifc_points = [ifc_file.createIfcCartesianPoint((x, y)) for x, y in points_2d]
     polyline = ifc_file.createIfcPolyline(ifc_points)
 
-    # Create closed profile
-    profile = ifc_file.createIfcArbitraryClosedProfileDef("AREA", None, polyline)
+    # Create profile - with or without voids depending on interior rings
+    if len(polygon.interiors) > 0:
+        # Create outer curve
+        outer_curve = ifc_file.createIfcArbitraryClosedProfileDef("AREA", None, polyline)
+        
+        # Create inner curves (holes)
+        inner_curves = []
+        for interior in polygon.interiors:
+            interior_coords = list(interior.coords)
+            interior_points_2d = list(interior_coords[:-1])  # Remove duplicate last point
+            interior_ifc_points = [ifc_file.createIfcCartesianPoint((x, y)) for x, y in interior_points_2d]
+            interior_polyline = ifc_file.createIfcPolyline(interior_ifc_points)
+            inner_curves.append(interior_polyline)
+        
+        # Create profile with voids
+        profile = ifc_file.createIfcArbitraryProfileDefWithVoids("AREA", None, polyline, inner_curves)
+    else:
+        # Simple closed profile without holes
+        profile = ifc_file.createIfcArbitraryClosedProfileDef("AREA", None, polyline)
 
     # Default position at origin
     if position is None:
