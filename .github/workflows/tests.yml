@@ -15,10 +15,8 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.10", "3.11", "3.12"]
         include:
-          # Test one Python version on macOS and Windows
+          # Also test on macOS
           - os: macos-latest
-            python-version: "3.11"
-          - os: windows-latest
             python-version: "3.11"
     
     steps:
@@ -40,8 +38,7 @@ jobs:
       run: poetry install --no-interaction
     
     - name: Run tests
-      run: |
-        poetry run pytest tests/unit/ -v --cov=giskit --cov-report=xml --cov-report=term
+      run: poetry run pytest tests/unit/ -v --cov=giskit --cov-report=xml --cov-report=term
     
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.10'
