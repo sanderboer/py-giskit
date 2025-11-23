@@ -118,7 +118,7 @@ layer_mappings:
       - h_maaiveld
       - opp_grond
       - dak_type
-    surface_classification: true  # Enable roof/wall detection
+    surface_classification: false  # All faces in one B-rep (simpler, always works)
   
   bag3d_lod12:
     ifc_class: IfcBuilding
