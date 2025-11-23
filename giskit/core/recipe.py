@@ -158,18 +158,24 @@ class OutputFormat(str, Enum):
 class IFCExportConfig(BaseModel):
     """IFC export configuration.
     
+    IFC Coordinate System (IFC4+ Compliant):
+        - Site placement is always at (0, 0, 0) - IFC best practice
+        - Vertex coordinates are always relative to site (small local numbers)
+        - IfcMapConversion (IFC4+) provides proper georeferencing to RD (EPSG:28992)
+        - RD reference point also stored in properties for backward compatibility
+        - BIM tools (Blender/Bonsai) can use IfcMapConversion to position model correctly
+    
     Examples:
-        Export to IFC with defaults (relative coords, normalized Z):
+        Export to IFC with defaults (site at origin, normalized Z):
             {"path": "output.ifc"}
         
-        Export with absolute coordinates and NAP elevations:
-            {"path": "output.ifc", "relative": false, "normalize_z": false}
+        Export with absolute NAP elevations:
+            {"path": "output.ifc", "normalize_z": false}
     """
     
     path: Path = Field(..., description="Output IFC file path")
     ifc_version: str = Field("IFC4X3_ADD2", description="IFC schema version (IFC4X3_ADD2, IFC4, IFC2X3)")
     site_name: Optional[str] = Field(None, description="Name for the IFC site (default: use address)")
-    relative: bool = Field(True, description="Use relative coordinates (True) or absolute RD (False)")
     normalize_z: bool = Field(True, description="Normalize Z to ground level (True) or keep NAP elevations (False)")
     
     @field_validator("path")

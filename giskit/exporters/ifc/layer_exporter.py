@@ -45,7 +45,6 @@ class LayerExporter:
         db_path: str,
         ref_x: float,
         ref_y: float,
-        relative: bool,
         normalize_z: bool = True,
     ) -> Dict[str, int]:
         """Export layer to IFC.
@@ -57,8 +56,7 @@ class LayerExporter:
             context: IfcGeometricRepresentationContext
             schema_adapter: Schema adapter for version-specific logic
             db_path: Path to GeoPackage
-            ref_x, ref_y: Reference point for coordinate transformation
-            relative: Use relative coordinates
+            ref_x, ref_y: Reference point - geometry is always transformed relative to this
             normalize_z: Normalize 3D building Z coordinates to ground level
 
         Returns:
@@ -87,9 +85,10 @@ class LayerExporter:
             # Convert row to dict for materials manager
             feature_data = row.to_dict()
 
-            # Transform geometry if needed
-            if relative:
-                geom = transform_to_relative(geom, ref_x, ref_y)
+            # Transform geometry to be relative to reference point
+            # NOTE: Vertex coordinates are ALWAYS relative to ref_x, ref_y
+            # The 'relative' parameter only affects Site placement (0,0,0 vs RD coords)
+            geom = transform_to_relative(geom, ref_x, ref_y)
 
             if is_3d and normalize_z:
                 geom = normalize_z_to_ground(geom)

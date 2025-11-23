@@ -351,7 +351,6 @@ def run(
                                     db_path=output_path,
                                     output_path=recipe.output.ifc_export.path,
                                     layers=None,
-                                    relative=recipe.output.ifc_export.relative,
                                     normalize_z=recipe.output.ifc_export.normalize_z,
                                     site_name=site_name,
                                 )
@@ -625,9 +624,6 @@ def export_ifc(
         "IFC4X3_ADD2", "--version", "-v", help="IFC schema version (IFC4X3_ADD2, IFC4, IFC2X3)"
     ),
     site_name: str = typer.Option("Site", "--site-name", "-s", help="Name for the IFC site"),
-    absolute: bool = typer.Option(
-        False, "--absolute", help="Use absolute RD coordinates (default: relative)"
-    ),
     absolute_z: bool = typer.Option(
         False, "--absolute-z", help="Keep absolute NAP elevations (default: normalize to ground)"
     ),
@@ -639,12 +635,17 @@ def export_ifc(
     ),
 ) -> None:
     """Export GeoPackage to IFC format.
+    
+    IFC Georeferencing:
+        - Site is always placed at (0,0,0) per IFC best practices
+        - IfcMapConversion (IFC4+) provides proper georeferencing to RD (EPSG:28992)
+        - BIM tools like Blender/Bonsai can use IfcMapConversion to position model
 
     Examples:
         giskit export ifc input.gpkg output.ifc
         giskit export ifc --version IFC4 input.gpkg output.ifc
         giskit export ifc --site-name "Amsterdam Dam" input.gpkg output.ifc
-        giskit export ifc --absolute --absolute-z input.gpkg output.ifc
+        giskit export ifc --absolute-z input.gpkg output.ifc
     """
     try:
         from giskit.exporters.ifc import IFCExporter
@@ -658,7 +659,6 @@ def export_ifc(
         raise typer.Exit(1)
 
     # Convert flags
-    relative = not absolute
     normalize_z = not absolute_z
 
     try:
@@ -666,7 +666,7 @@ def export_ifc(
         console.print(f"  Input: {input_path}")
         console.print(f"  IFC Version: {ifc_version}")
         console.print(f"  Site Name: {site_name}")
-        console.print(f"  Coordinate Mode: {'relative' if relative else 'absolute'}")
+        console.print(f"  Site Placement: (0, 0, 0) + IfcMapConversion to RD")
         console.print(f"  Z-Normalization: {'enabled' if normalize_z else 'disabled'}")
         console.print()
 
@@ -679,7 +679,6 @@ def export_ifc(
                 db_path=input_path,
                 output_path=output_path,
                 layers=None,  # Export all supported layers
-                relative=relative,
                 normalize_z=normalize_z,
                 site_name=site_name,
                 ref_x=ref_x,
