@@ -1,27 +1,27 @@
 # API Quirks System Documentation
 
-## Overzicht
+## Overview
 
-GISKit gebruikt een **configuration-driven quirks system** om af te wijken van standaard API gedrag per provider. Dit maakt het mogelijk om provider-specifieke eigenaardigheden te handlen zonder de core protocol code te vervuilen.
+GISKit uses a **configuration-driven quirks system** to deviate from standard API behavior per provider. This makes it possible to handle provider-specific quirks without polluting the core protocol code.
 
-## Waarom Quirks Nodig Zijn
+## Why Quirks Are Needed
 
-Externe APIs volgen niet altijd de specificatie perfect. Voorbeelden:
+Externe APIs volgen niet altijd de specificatie perfect. Examples:
 
-### 1. **PDOK OGC API** - Meerdere Quirks
-- ❌ **Probleem**: Vereist `?f=json` parameter (niet standaard OGC)
-- ❌ **Probleem**: Gebruikt `v1_0` versienummering (underscore, niet punt)
-- ❌ **Probleem**: Base URLs hebben trailing slash nodig voor `urljoin()`
+### 1. **PDOK OGC API** - Multiple Quirks
+- ❌ **Problem**: Requires `?f=json` parameter (not standard OGC)
+- ❌ **Problem**: Usaget `v1_0` versienummering (underscore, not dot)
+- ❌ **Problem**: Base URLs need trailing slash for `urljoin()`
 
-### 2. **Andere Providers** (voorbeelden)
-- API negeert `limit` parameter en returnt altijd max 5000 features
-- API vereist custom `User-Agent` header
-- API heeft langere timeouts nodig (>30s)
-- API returnt 404 in plaats van lege collectie
+### 2. **Other Providers** (examples)
+- API ignores `limit` parameter en always returns max 5000 features
+- API requires custom `User-Agent` header
+- API needs longer timeouts (>30s)
+- API returns 404 instead of empty collection
 
 ---
 
-## Architectuur
+## Architecture
 
 ```
 Provider Config
@@ -33,27 +33,27 @@ Provider Config
   HTTP Request
 ```
 
-### Componenten
+### Components
 
 **1. `ProtocolQuirks` Model** (`giskit/protocols/quirks.py`)
-- Pydantic model met alle mogelijke quirks
-- Methodes om quirks toe te passen op URLs, params, headers
+- Pydantic model with all possible quirks
+- Methods to apply quirks to URLs, params, headers
 
 **2. `KNOWN_QUIRKS` Registry**
-- Centraal register van bekende provider quirks
+- Central registry of known provider quirks
 - Per provider, per protocol
 
 **3. `get_quirks()` Function**
-- Helper om quirks op te halen voor provider/protocol combinatie
-- Retourneert default quirks voor onbekende providers
+- Helper to retrieve quirks for provider/protocol combination
+- Returns default quirks for unknown providers
 
 **4. Protocol Integration**
-- `OGCFeaturesProtocol` accepteert `quirks` parameter
-- Past quirks automatisch toe bij requests
+- `OGCFeaturesProtocol` accepts `quirks` parameter
+- Applies quirks automatically on requests
 
 ---
 
-## Beschikbare Quirks
+## Available Quirks
 
 ### URL Quirks
 
@@ -64,7 +64,7 @@ ProtocolQuirks(requires_trailing_slash=True)
 # Effect:
 "https://api.example.com/v1" → "https://api.example.com/v1/"
 
-# Waarom: Voorkomt urljoin() van "v1" te verwijderen
+# Why: Prevents urljoin() from removing "v1" 
 from urllib.parse import urljoin
 urljoin("https://api.com/v1", "collections")   # ❌ "https://api.com/collections"
 urljoin("https://api.com/v1/", "collections")  # ✅ "https://api.com/v1/collections"
@@ -80,16 +80,16 @@ ProtocolQuirks(
     format_param_value="json"
 )
 
-# Effect: Voegt ?f=json toe aan alle requests
+# Effect: Adds ?f=json to all requests
 ```
 
 #### `max_features_limit` (int)
 ```python
 ProtocolQuirks(max_features_limit=5000)
 
-# Effect: Capt limit parameter
+# Effect: Caps limit parameter
 {"limit": 10000} → {"limit": 5000}
-{"limit": 1000}  → {"limit": 1000}  # Blijft ongewijzigd
+{"limit": 1000}  → {"limit": 1000}  # Remains unchanged
 ```
 
 ### Timeout Quirks
@@ -98,7 +98,7 @@ ProtocolQuirks(max_features_limit=5000)
 ```python
 ProtocolQuirks(custom_timeout=60.0)
 
-# Effect: Override default timeout (meestal 30s)
+# Effect: Override default timeout (usually 30s)
 ```
 
 ### Header Quirks
@@ -110,7 +110,7 @@ ProtocolQuirks(custom_headers={
     "X-API-Key": "secret123"
 })
 
-# Effect: Voegt headers toe aan alle requests
+# Effect: Adds headers to all requests
 ```
 
 ### Response Quirks
@@ -119,7 +119,7 @@ ProtocolQuirks(custom_headers={
 ```python
 ProtocolQuirks(empty_collections_return_404=True)
 
-# Effect: 404 wordt behandeld als lege response (niet error)
+# Effect: 404 is treated as empty response (not error)
 ```
 
 ### Metadata Quirks
@@ -132,32 +132,32 @@ ProtocolQuirks(
     workaround_date="2024-11-22"
 )
 
-# Documentatie van waarom quirk nodig is
+# Documentation of why quirk is needed
 ```
 
 ---
 
-## Gebruik
+## Usage
 
-### 1. Gebruik Bekende Quirks (AANBEVOLEN)
+### 1. Usage Bekende Quirks (RECOMMENDED)
 
 ```python
 from giskit.protocols.quirks import get_quirks
 from giskit.protocols.ogc_features import OGCFeaturesProtocol
 
-# Haal PDOK quirks op
+# Get PDOK quirks
 quirks = get_quirks("pdok", "ogc-features")
 
-# Maak protocol met quirks
+# Create protocol with quirks
 protocol = OGCFeaturesProtocol(
     base_url="https://api.pdok.nl/lv/bgt/ogc/v1_0/",
     quirks=quirks
 )
 
-# Quirks worden automatisch toegepast!
+# Quirks are applied automatically!
 ```
 
-### 2. Custom Quirks Definieren
+### 2. Define Custom Quirks
 
 ```python
 from giskit.protocols.quirks import ProtocolQuirks
@@ -177,7 +177,7 @@ protocol = OGCFeaturesProtocol(
 )
 ```
 
-### 3. Quirks Manueel Toepassen
+### 3. Manually Apply Quirks
 
 ```python
 from giskit.protocols.quirks import ProtocolQuirks
@@ -186,7 +186,7 @@ quirks = ProtocolQuirks(require_format_param=True)
 
 # URL
 url = quirks.apply_to_url("https://api.com/v1")
-# → "https://api.com/v1" (geen trailing slash quirk)
+# → "https://api.com/v1" (no trailing slash quirk)
 
 # Parameters
 params = quirks.apply_to_params({"bbox": "1,2,3,4"})
@@ -198,41 +198,41 @@ headers = quirks.apply_to_headers({"Accept": "application/json"})
 
 # Timeout
 timeout = quirks.get_timeout(30.0)
-# → 30.0 (geen custom timeout)
+# → 30.0 (no custom timeout)
 ```
 
 ---
 
-## Nieuwe Provider Toevoegen
+## Adding New Provider
 
-### Stap 1: Quirks Identificeren
+### Step 1: Identify Quirks
 
-Test de API en identificeer afwijkingen:
+Test the API and identify deviations:
 
 ```bash
-# Test zonder parameters
+# Test without parameters
 curl "https://new-api.com/collections"
-# → 404? Misschien format param nodig
+# → 404? Maybe format param needed
 
-# Test met f=json
+# Test with f=json
 curl "https://new-api.com/collections?f=json"
-# → 200 OK? Dan is quirk nodig!
+# → 200 OK? Then quirk is needed!
 
-# Test urljoin gedrag
+# Test urljoin behavior
 python3 -c "
 from urllib.parse import urljoin
 print(urljoin('https://new-api.com/v1', 'collections'))
 "
-# → Verdwijnt 'v1'? Trailing slash nodig!
+# → Disappears 'v1'? Trailing slash needed!
 ```
 
-### Stap 2: Quirks Toevoegen aan Registry
+### Step 2: Add Quirks to Registry
 
 ```python
 # giskit/protocols/quirks.py
 
 KNOWN_QUIRKS = {
-    "pdok": { ... },  # Bestaande
+    "pdok": { ... },  # Existing
     "new-provider": {
         "ogc-features": ProtocolQuirks(
             requires_trailing_slash=True,
@@ -248,7 +248,7 @@ KNOWN_QUIRKS = {
 }
 ```
 
-### Stap 3: Provider Implementeren
+### Step 3: Implement Provider
 
 ```python
 # giskit/providers/new_provider.py
@@ -259,10 +259,10 @@ class NewProvider(Provider):
     def __init__(self, **kwargs):
         super().__init__("new-provider", **kwargs)
         
-        # Haal quirks op
+        # Get quirks
         quirks = get_quirks("new-provider", "ogc-features")
         
-        # Registreer protocol met quirks
+        # Register protocol with quirks
         protocol = OGCFeaturesProtocol(
             base_url="https://new-api.com/v1/",
             quirks=quirks
@@ -270,7 +270,7 @@ class NewProvider(Provider):
         self.register_protocol("ogc-features", protocol)
 ```
 
-### Stap 4: Tests Schrijven
+### Step 4: Write Tests
 
 ```python
 # tests/unit/test_new_provider_quirks.py
@@ -289,16 +289,16 @@ def test_new_provider_quirks():
 
 ### ✅ DO
 
-1. **Documenteer quirks met metadata**
+1. **Document quirks with metadata**
    ```python
    ProtocolQuirks(
-       description="Waarom deze quirk nodig is",
-       issue_url="Link naar bug report/docs",
+       description="Why this quirk is needed",
+       issue_url="Link to bug report/docs",
        workaround_date="2024-11-22"
    )
    ```
 
-2. **Test quirks expliciet**
+2. **Test quirks explicitly**
    ```python
    def test_quirk_applied():
        quirks = get_quirks("provider", "protocol")
@@ -306,16 +306,16 @@ def test_new_provider_quirks():
        assert params["f"] == "json"
    ```
 
-3. **Gebruik centrale registry**
+3. **Usage centrale registry**
    ```python
-   # ✅ GOED
+   # ✅ GOOD
    quirks = get_quirks("pdok", "ogc-features")
    
-   # ❌ SLECHT
+   # ❌ BAD
    quirks = ProtocolQuirks(...)  # Hardcoded in code
    ```
 
-4. **Test met echte API**
+4. **Test with echte API**
    ```python
    # Integration test
    async def test_with_real_api():
@@ -326,35 +326,35 @@ def test_new_provider_quirks():
 
 ### ❌ DON'T
 
-1. **Niet quirks hardcoden in protocol**
+1. **Don't hardcode quirks in protocol**
    ```python
-   # ❌ SLECHT - in OGCFeaturesProtocol
+   # ❌ BAD - in OGCFeaturesProtocol
    params["f"] = "json"  # PDOK-specific!
    
-   # ✅ GOED - gebruik quirks
+   # ✅ GOOD - use quirks
    params = self.quirks.apply_to_params(params)
    ```
 
-2. **Niet quirks dupliceren**
+2. **Don't duplicate quirks**
    ```python
-   # ❌ SLECHT - quirk op 2 plekken
+   # ❌ BAD - quirk in 2 places
    # pdok.py
    protocol = OGCFeaturesProtocol(...)
    protocol.add_param("f", "json")  # Hardcoded
    
-   # ✅ GOED - quirk in registry
+   # ✅ GOOD - quirk in registry
    quirks = get_quirks("pdok", "ogc-features")
    ```
 
-3. **Niet quirks in provider logica**
+3. **Don't put quirks in provider logic**
    ```python
-   # ❌ SLECHT
+   # ❌ BAD
    class PDOKProvider:
        async def download(self, ...):
            if self.name == "pdok":
                params["f"] = "json"  # Quirk in business logic!
    
-   # ✅ GOED - quirk in protocol
+   # ✅ GOOD - quirk in protocol
    protocol = OGCFeaturesProtocol(quirks=pdok_quirks)
    ```
 
@@ -365,17 +365,17 @@ def test_new_provider_quirks():
 ### Unit Tests
 
 ```bash
-# Test alleen quirks
+# Test quirks only
 poetry run pytest tests/unit/test_quirks.py -v
 
-# Test specifieke quirk
+# Test specific quirk
 poetry run pytest tests/unit/test_quirks.py::TestProtocolQuirks::test_format_param_quirk -v
 ```
 
 ### Integration Tests
 
 ```bash
-# Test PDOK met quirks
+# Test PDOK with quirks
 poetry run pytest tests/integration/test_sitedb_use_case.py::TestSitedbUseCase::test_download_bgt_pand_curieweg -v
 ```
 
@@ -390,53 +390,53 @@ poetry run pytest tests/ --cov=giskit.protocols.quirks --cov-report=html
 
 ## Troubleshooting
 
-### Probleem: Quirk wordt niet toegepast
+### Problem: Quirk wordt niet toegepast
 
-**Symptoom**: API call faalt nog steeds
+**Symptoom**: API call still fails
 
 **Check**:
-1. Is quirk geregistreerd in `KNOWN_QUIRKS`?
+1. Is quirk registered in `KNOWN_QUIRKS`?
    ```python
    from giskit.protocols.quirks import KNOWN_QUIRKS
    print(KNOWN_QUIRKS["pdok"]["ogc-features"])
    ```
 
-2. Wordt quirk correct opgehaald?
+2. Is quirk retrieved correctly?
    ```python
    quirks = get_quirks("pdok", "ogc-features")
    print(quirks.require_format_param)  # True?
    ```
 
-3. Wordt protocol met quirks gemaakt?
+3. Is protocol created with quirks?
    ```python
    protocol = OGCFeaturesProtocol(..., quirks=quirks)
    print(protocol.quirks.require_format_param)  # True?
    ```
 
-### Probleem: Quirk te breed toegepast
+### Problem: Quirk applied too broadly
 
-**Symptoom**: Andere providers krijgen PDOK quirks
+**Symptoom**: Other providers get PDOK quirks
 
 **Oplossing**: Check provider-specific quirks:
 ```python
-# ❌ FOUT
+# ❌ WRONG
 all_providers_use_quirks = ProtocolQuirks(...)
 
-# ✅ GOED
-quirks = get_quirks("pdok", "ogc-features")  # Alleen PDOK
+# ✅ GOOD
+quirks = get_quirks("pdok", "ogc-features")  # PDOK only
 ```
 
-### Probleem: URL nog steeds fout
+### Problem: URL still wrong
 
-**Symptoom**: `urljoin()` verwijdert nog steeds versie
+**Symptoom**: `urljoin()` still removes version
 
 **Check**:
-1. Heeft base URL trailing slash?
+1. Does base URL have trailing slash?
    ```python
-   print(protocol.base_url)  # Moet eindigen met /
+   print(protocol.base_url)  # Must end with /
    ```
 
-2. Is quirk toegepast tijdens init?
+2. Is quirk applied during init?
    ```python
    quirks = ProtocolQuirks(requires_trailing_slash=True)
    url = "https://api.com/v1"
@@ -446,15 +446,15 @@ quirks = get_quirks("pdok", "ogc-features")  # Alleen PDOK
 
 ---
 
-## Voorbeelden
+## Examples
 
-### Voorbeeld 1: PDOK BGT Download
+### Example 1: PDOK BGT Download
 
 ```python
 from giskit.providers.base import get_provider
 from giskit.core.recipe import Dataset, Location, LocationType
 
-# Provider heeft al PDOK quirks geladen
+# Provider already has PDOK quirks loaded
 provider = get_provider("pdok")
 
 dataset = Dataset(provider="pdok", service="bgt", layers=["pand"])
@@ -463,23 +463,23 @@ location = Location(
     value=[4.32, 51.83, 4.34, 51.85]
 )
 
-# Quirks worden automatisch toegepast:
-# - Base URL krijgt trailing slash
-# - Alle requests krijgen ?f=json
+# Quirks are applied automatically:
+# - Base URL gets trailing slash
+# - All requests get ?f=json
 gdf = await provider.download_dataset(dataset, location, ...)
 ```
 
-### Voorbeeld 2: Custom Provider met Quirks
+### Example 2: Custom Provider met Quirks
 
 ```python
 from giskit.protocols.quirks import ProtocolQuirks
 from giskit.protocols.ogc_features import OGCFeaturesProtocol
 
-# Custom quirks voor langzame API
+# Custom quirks for slow API
 custom_quirks = ProtocolQuirks(
     requires_trailing_slash=True,
-    custom_timeout=120.0,  # 2 minuten
-    max_features_limit=1000,  # API kan niet meer aan
+    custom_timeout=120.0,  # 2 minutes
+    max_features_limit=1000,  # API cannot handle more
     custom_headers={"X-Client": "GISKit"},
     description="Slow API with strict limits"
 )
@@ -489,12 +489,12 @@ protocol = OGCFeaturesProtocol(
     quirks=custom_quirks
 )
 
-# Protocol past alle quirks toe
+# Protocol applies all quirks
 async with protocol:
     gdf = await protocol.get_features(bbox=..., layers=...)
 ```
 
-### Voorbeeld 3: Quirks Testen
+### Example 3: Test Quirks
 
 ```python
 def test_my_provider_quirks():
@@ -519,9 +519,9 @@ def test_my_provider_quirks():
 
 ---
 
-## Toekomstige Uitbreidingen
+## Future Extensions
 
-### 1. Auto-Detection (Optioneel)
+### 1. Auto-Detection (Optional)
 ```python
 class OGCFeaturesProtocol(Protocol):
     async def _detect_quirks(self):
@@ -536,7 +536,7 @@ class OGCFeaturesProtocol(Protocol):
                 self.quirks.require_format_param = True
 ```
 
-### 2. Quirks van File Laden
+### 2. Load Quirks from File
 ```python
 # config/quirks.yaml
 providers:
@@ -557,19 +557,19 @@ class QuirkUsage:
     applied_count: int
     last_applied: datetime
 
-# Track welke quirks het meest gebruikt worden
+# Track which quirks are used most
 ```
 
 ---
 
-## Conclusie
+## Conclusion
 
-Het **Configuration-Driven Quirks System** biedt:
+The **Configuration-Driven Quirks System** provides:
 
-✅ **Schaalbaarheid** - Nieuwe providers gemakkelijk toe te voegen  
-✅ **Onderhoudbaarheid** - Quirks gecentral iseerd, niet verspreid  
-✅ **Testbaarheid** - Quirks individueel testbaar  
-✅ **Documentatie** - Metadata legt uit waarom quirks nodig zijn  
-✅ **Flexibiliteit** - Custom quirks voor edge cases  
+✅ **Scalability** - New providers easy to add  
+✅ **Maintainability** - Quirks gecentral iseerd, niet verspreid  
+✅ **Testability** - Quirks individually testable  
+✅ **Documentation** - Metadata explains why quirks are needed  
+✅ **Flexibility** - Custom quirks for edge cases  
 
-Dit maakt GISKit robuust tegen API eigenaardigheden zonder de core code te vervuilen.
+This makes GISKit robust against API quirks without polluting the core code.
