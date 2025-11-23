@@ -34,10 +34,10 @@ GISKit is a Python tool for downloading Dutch spatial data using simple JSON "re
 
 **From PyPI (recommended):**
 ```bash
-pip install giskit
+pip install pygiskit
 
 # With IFC export support (Python 3.10-3.12 only)
-pip install giskit[ifc]
+pip install pygiskit[ifc]
 ```
 
 **From source:**

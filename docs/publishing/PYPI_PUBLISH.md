@@ -73,7 +73,7 @@ See `GITHUB_PYPI_SETUP.md` for detailed setup instructions.
 
 3. **Monitor the deployment:**
    - Check the Actions tab for progress
-   - Package will be published to https://test.pypi.org/project/giskit/
+   - Package will be published to https://test.pypi.org/project/pygiskit/
 
 4. **Test the installation:**
    ```bash
@@ -146,11 +146,11 @@ See `GITHUB_PYPI_SETUP.md` for detailed setup instructions.
 6. **Verify publication:**
    ```bash
    # Test installation from PyPI
-   pip install giskit
+   pip install pygiskit
    giskit --version
    
    # Test with IFC support
-   pip install giskit[ifc]
+   pip install pygiskit[ifc]
    ```
 
 **Release Notes Template:**
@@ -162,14 +162,14 @@ See `GITHUB_PYPI_SETUP.md` for detailed setup instructions.
 - Support for PDOK WFS, OGC API Features, WMTS protocols
 - OpenStreetMap Overpass API integration
 - Export to GeoPackage, GeoJSON, Shapefile, GML, CityJSON
-- Optional IFC export support (via `pip install giskit[ifc]`)
+- Optional IFC export support (via `pip install pygiskit[ifc]`)
 
 ### Installation
 ```bash
-pip install giskit
+pip install pygiskit
 
 # With IFC support
-pip install giskit[ifc]
+pip install pygiskit[ifc]
 ```
 
 ### Documentation
@@ -202,8 +202,8 @@ Before publishing, ensure:
 - CLI tool: `giskit`
 
 **Package URLs:**
-- PyPI: https://pypi.org/project/giskit/
-- TestPyPI: https://test.pypi.org/project/giskit/
+- PyPI: https://pypi.org/project/pygiskit/
+- TestPyPI: https://test.pypi.org/project/pygiskit/
 - Repository: https://github.com/sanderboer/py-giskit
 
 ## Manual Publishing (Fallback)

@@ -40,7 +40,7 @@ twine upload --repository testpypi dist/* \
 1. Ga naar [PyPI Publishing](https://pypi.org/manage/account/publishing/)
 2. Klik "Add a new pending publisher"
 3. Vul in:
-   - **PyPI Project Name**: `giskit`
+   - **PyPI Project Name: `pygiskit`
    - **Owner**: `a190` (je GitHub username/org)
    - **Repository name**: `giskit`
    - **Workflow name**: `publish-pypi.yml`
@@ -49,7 +49,7 @@ twine upload --repository testpypi dist/* \
 
 #### Voor BESTAANDE projecten (al op PyPI):
 
-1. Ga naar je project: https://pypi.org/manage/project/giskit/settings/
+1. Ga naar je project: https://pypi.org/manage/project/pygiskit/settings/
 2. Scroll naar "Publishing"
 3. Klik "Add a new publisher"
 4. Vul in:
@@ -92,7 +92,7 @@ permissions:
   
 environment:
   name: pypi
-  url: https://pypi.org/p/giskit
+  url: https://pypi.org/p/pygiskit
 ```
 
 ### Stap 5: Test de Workflow
