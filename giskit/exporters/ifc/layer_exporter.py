@@ -231,7 +231,7 @@ class LayerExporter:
             # Skip empty polygons
             if poly.is_empty:
                 continue
-            
+
             # For invalid polygons, check if they're vertical surfaces (walls)
             # Vertical surfaces are invalid in 2D but valid in 3D
             if not poly.is_valid:
@@ -240,22 +240,22 @@ class LayerExporter:
                 if len(coords) >= 4:  # Need at least 3 unique points + closure
                     z_values = [c[2] if len(c) > 2 else 0 for c in coords]
                     z_range = max(z_values) - min(z_values)
-                    
+
                     # If Z range is significant (>0.1m), it's likely a vertical surface
                     # Don't try to "fix" it with buffer(0) as that will make it empty
                     is_vertical = z_range > 0.1
-                    
+
                     if not is_vertical:
                         # Try to fix non-vertical invalid polygons
                         try:
                             poly = poly.buffer(0)
                         except Exception:
                             pass
-                        
+
                         # Skip if fixing made it empty
                         if poly.is_empty:
                             continue
-            
+
             try:
                 face = polygon_3d_to_ifc_face(ifc_file, poly)
                 faces.append(face)
@@ -304,7 +304,7 @@ class LayerExporter:
             # Skip empty polygons
             if poly.is_empty:
                 continue
-            
+
             # For invalid polygons, check if they're vertical surfaces (walls)
             # Vertical surfaces are invalid in 2D but valid in 3D
             if not poly.is_valid:
@@ -313,22 +313,22 @@ class LayerExporter:
                 if len(coords) >= 4:  # Need at least 3 unique points + closure
                     z_values = [c[2] if len(c) > 2 else 0 for c in coords]
                     z_range = max(z_values) - min(z_values)
-                    
+
                     # If Z range is significant (>0.1m), it's likely a vertical surface
                     # Don't try to "fix" it with buffer(0) as that will make it empty
                     is_vertical = z_range > 0.1
-                    
+
                     if not is_vertical:
                         # Try to fix non-vertical invalid polygons
                         try:
                             poly = poly.buffer(0)
                         except Exception:
                             pass
-                        
+
                         # Skip if fixing made it empty
                         if poly.is_empty:
                             continue
-            
+
             try:
                 surface_type = classify_surface(poly)
                 face = polygon_3d_to_ifc_face(ifc_file, poly)

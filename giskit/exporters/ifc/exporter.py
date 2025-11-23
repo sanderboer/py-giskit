@@ -69,7 +69,7 @@ class IFCExporter:
         ref_y: Optional[float] = None,
     ) -> None:
         """Export GeoPackage to IFC file.
-        
+
         IFC Coordinate System:
             - Site placement is always at (0, 0, 0) - IFC best practice
             - Vertex coordinates are relative to site (small local coordinates)
@@ -203,7 +203,7 @@ class IFCExporter:
             ),
             None,
         )
-        
+
         # Add georeferencing (IFC4+ IfcMapConversion + IfcProjectedCRS)
         # This is the proper way to define coordinate system transformations
         self._add_georeferencing()
@@ -223,7 +223,7 @@ class IFCExporter:
 
     def _create_site(self, site_name: str) -> None:
         """Create IFC Site with geo-referencing.
-        
+
         Site is always placed at (0, 0, 0) per IFC best practices.
         IfcMapConversion provides the transformation to RD coordinates.
         """
@@ -268,7 +268,7 @@ class IFCExporter:
         ifcopenshell.api.run(
             "aggregate.assign_object", self.ifc, relating_object=self.project, products=[self.site]
         )
-        
+
         # Store RD reference point in site properties (for GIS tools)
         # This allows reconstruction of absolute coordinates even in relative mode
         self._add_rd_reference_property()
@@ -301,7 +301,11 @@ class IFCExporter:
         # First try to read from _metadata table (created by giskit)
         try:
             metadata_gdf = gpd.read_file(str(db_path), layer="_metadata")
-            if len(metadata_gdf) > 0 and "x" in metadata_gdf.columns and "y" in metadata_gdf.columns:
+            if (
+                len(metadata_gdf) > 0
+                and "x" in metadata_gdf.columns
+                and "y" in metadata_gdf.columns
+            ):
                 ref_x = float(metadata_gdf["x"].iloc[0])
                 ref_y = float(metadata_gdf["y"].iloc[0])
                 print(f"  Using reference point from _metadata: ({ref_x:.2f}, {ref_y:.2f})")
@@ -328,7 +332,7 @@ class IFCExporter:
 
     def _add_rd_reference_property(self) -> None:
         """Add RD reference point as property to the site.
-        
+
         This allows GIS tools to reconstruct absolute RD coordinates
         even when using relative coordinate mode.
         """
@@ -338,30 +342,30 @@ class IFCExporter:
                 "RD_Reference_X",
                 "Reference point X coordinate (EPSG:28992)",
                 self.ifc.create_entity("IfcReal", self.ref_x),
-                None
+                None,
             ),
             self.ifc.createIfcPropertySingleValue(
                 "RD_Reference_Y",
                 "Reference point Y coordinate (EPSG:28992)",
                 self.ifc.create_entity("IfcReal", self.ref_y),
-                None
+                None,
             ),
             self.ifc.createIfcPropertySingleValue(
                 "CRS",
                 "Coordinate Reference System",
                 self.ifc.create_entity("IfcLabel", "EPSG:28992"),
-                None
+                None,
             ),
         ]
-        
+
         property_set = self.ifc.createIfcPropertySet(
             ifcopenshell.guid.new(),
             None,  # OwnerHistory
             "RD_Georeference",
             "Rijksdriehoek (Amersfoort RD New) reference point",
-            property_values
+            property_values,
         )
-        
+
         # Attach to site
         self.ifc.createIfcRelDefinesByProperties(
             ifcopenshell.guid.new(),
@@ -369,18 +373,18 @@ class IFCExporter:
             "RD Reference",
             None,  # Description
             [self.site],
-            property_set
+            property_set,
         )
 
     def _add_georeferencing(self) -> None:
         """Add IFC4+ georeferencing using IfcMapConversion and IfcProjectedCRS.
-        
+
         This is the proper way according to IFC4+ specification to define
         the transformation between the IFC coordinate system and a projected CRS.
-        
+
         The context's coordinate system is always local (origin at 0,0,0).
         The MapConversion defines how to transform to the projected CRS (RD).
-        
+
         With IfcMapConversion:
         - IFC local coords (0,0,0) represents (ref_x, ref_y, 0) in RD
         - To get RD: add (Eastings, Northings, OrthogonalHeight) to IFC coords
@@ -388,43 +392,42 @@ class IFCExporter:
         """
         # Only add for IFC4+
         schema_version = self.ifc.schema
-        if schema_version not in ['IFC4', 'IFC4X3', 'IFC4X3_ADD2']:
+        if schema_version not in ["IFC4", "IFC4X3", "IFC4X3_ADD2"]:
             # IFC2X3 doesn't support IfcMapConversion
             return
-        
+
         # Create IfcProjectedCRS for Amersfoort RD New (EPSG:28992)
         try:
             projected_crs = self.ifc.create_entity(
-                'IfcProjectedCRS',
-                Name='EPSG:28992',
-                Description='Amersfoort / RD New',
-                GeodeticDatum='Amersfoort',
-                VerticalDatum='NAP',
-                MapProjection='Oblique Stereographic',
+                "IfcProjectedCRS",
+                Name="EPSG:28992",
+                Description="Amersfoort / RD New",
+                GeodeticDatum="Amersfoort",
+                VerticalDatum="NAP",
+                MapProjection="Oblique Stereographic",
                 MapZone=None,
-                MapUnit=self.ifc.createIfcSIUnit(None, 'LENGTHUNIT', None, 'METRE')
+                MapUnit=self.ifc.createIfcSIUnit(None, "LENGTHUNIT", None, "METRE"),
             )
-            
+
             # Create IfcMapConversion
             # This defines the transformation from IFC local coords to RD coords
             # Eastings/Northings = offset to add to IFC coords to get RD coords
-            map_conversion = self.ifc.create_entity(
-                'IfcMapConversion',
+            self.ifc.create_entity(
+                "IfcMapConversion",
                 SourceCRS=self.context,  # IFC local coordinate system
                 TargetCRS=projected_crs,  # RD coordinate system
-                Eastings=self.ref_x,      # RD X offset
-                Northings=self.ref_y,     # RD Y offset
-                OrthogonalHeight=0.0,     # RD Z offset (NAP)
-                XAxisAbscissa=1.0,        # No rotation
+                Eastings=self.ref_x,  # RD X offset
+                Northings=self.ref_y,  # RD Y offset
+                OrthogonalHeight=0.0,  # RD Z offset (NAP)
+                XAxisAbscissa=1.0,  # No rotation
                 XAxisOrdinate=0.0,
-                Scale=1.0                 # No scale
+                Scale=1.0,  # No scale
             )
-            
+
             # Note: HasCoordinateOperation is an inverse attribute
             # It's automatically set when we create the IfcMapConversion with SourceCRS
-            
+
         except Exception as e:
             # If georeferencing fails, continue without it
             # (Some IFC versions might not support all attributes)
             print(f"  Warning: Could not add IfcMapConversion: {e}")
-

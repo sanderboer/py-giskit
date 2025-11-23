@@ -302,7 +302,7 @@ class OGCFeaturesProtocol(Protocol):
             gdf: GeoDataFrame with potentially duplicate historical features
             temporal: Temporal filter strategy:
                 - 'latest': Keep newest version per feature (default)
-                - 'active': Only currently valid/active features  
+                - 'active': Only currently valid/active features
                 - 'all': Keep all historical versions (no filtering)
                 - ISO date (e.g. '2024-01-01'): Features valid at that date
 
@@ -346,8 +346,10 @@ class OGCFeaturesProtocol(Protocol):
                 gdf = gdf[gdf["eind_registratie"].isna() | (gdf["eind_registratie"] == "")]
                 after_count = len(gdf)
                 if before_count != after_count:
-                    print(f"  Filtered out {before_count - after_count} terminated features (eind_registratie)")
-            
+                    print(
+                        f"  Filtered out {before_count - after_count} terminated features (eind_registratie)"
+                    )
+
             # Then, keep newest version per feature ID (for true duplicates with same ID)
             if "tijdstip_registratie" in gdf.columns:
                 # Sort by timestamp descending, keep first (newest) per ID

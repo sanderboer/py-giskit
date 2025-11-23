@@ -174,19 +174,23 @@ def create_extruded_area_solid(ifc_file, polygon: Polygon, height: float, positi
     # Create profile - with or without voids depending on interior rings
     if len(polygon.interiors) > 0:
         # Create outer curve
-        outer_curve = ifc_file.createIfcArbitraryClosedProfileDef("AREA", None, polyline)
-        
+        ifc_file.createIfcArbitraryClosedProfileDef("AREA", None, polyline)
+
         # Create inner curves (holes)
         inner_curves = []
         for interior in polygon.interiors:
             interior_coords = list(interior.coords)
             interior_points_2d = list(interior_coords[:-1])  # Remove duplicate last point
-            interior_ifc_points = [ifc_file.createIfcCartesianPoint((x, y)) for x, y in interior_points_2d]
+            interior_ifc_points = [
+                ifc_file.createIfcCartesianPoint((x, y)) for x, y in interior_points_2d
+            ]
             interior_polyline = ifc_file.createIfcPolyline(interior_ifc_points)
             inner_curves.append(interior_polyline)
-        
+
         # Create profile with voids
-        profile = ifc_file.createIfcArbitraryProfileDefWithVoids("AREA", None, polyline, inner_curves)
+        profile = ifc_file.createIfcArbitraryProfileDefWithVoids(
+            "AREA", None, polyline, inner_curves
+        )
     else:
         # Simple closed profile without holes
         profile = ifc_file.createIfcArbitraryClosedProfileDef("AREA", None, polyline)

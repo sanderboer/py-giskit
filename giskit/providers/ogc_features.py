@@ -165,7 +165,9 @@ class OGCFeaturesProvider(Provider):
         bbox = location.to_bbox()
 
         # Get temporal filter from dataset (default to 'latest')
-        temporal = dataset.temporal if hasattr(dataset, "temporal") and dataset.temporal else "latest"
+        temporal = (
+            dataset.temporal if hasattr(dataset, "temporal") and dataset.temporal else "latest"
+        )
 
         # Download features using OGC API
         async with protocol:
