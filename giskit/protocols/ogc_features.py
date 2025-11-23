@@ -273,6 +273,25 @@ class OGCFeaturesProtocol(Protocol):
 
             combined = gpd.GeoDataFrame(gpd.pd.concat(all_gdfs, ignore_index=True))
 
+            # Deduplicate features based on lokaal_id (BGT) or identificatie (BAG/BRK)
+            # Keep the latest version based on tijdstip_registratie or version timestamp
+            if "lokaal_id" in combined.columns:
+                # BGT data - deduplicate on lokaal_id
+                if "tijdstip_registratie" in combined.columns:
+                    # Sort by timestamp descending, keep first (newest)
+                    combined = combined.sort_values("tijdstip_registratie", ascending=False)
+                    combined = combined.drop_duplicates(subset="lokaal_id", keep="first")
+                elif "version" in combined.columns:
+                    # Fallback to version field
+                    combined = combined.sort_values("version", ascending=False)
+                    combined = combined.drop_duplicates(subset="lokaal_id", keep="first")
+                else:
+                    # No timestamp - just keep first occurrence
+                    combined = combined.drop_duplicates(subset="lokaal_id", keep="first")
+            elif "identificatie" in combined.columns:
+                # BAG/BRK data - deduplicate on identificatie
+                combined = combined.drop_duplicates(subset="identificatie", keep="first")
+
             # Apply limit if specified
             if limit and len(combined) > limit:
                 combined = combined.iloc[:limit]
