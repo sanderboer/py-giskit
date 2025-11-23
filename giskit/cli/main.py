@@ -359,6 +359,33 @@ def run(
                                 if recipe.output.ifc_export.path.exists():
                                     size_mb = recipe.output.ifc_export.path.stat().st_size / (1024 * 1024)
                                     console.print(f"  [bold green]✓[/bold green] IFC export complete: {recipe.output.ifc_export.path} ({size_mb:.1f} MB)")
+                                
+                                # Auto-export to GLB if configured
+                                if recipe.output.ifc_export.glb_path:
+                                    console.print(f"\n[bold]Auto-exporting to GLB:[/bold] {recipe.output.ifc_export.glb_path}")
+                                    try:
+                                        from giskit.exporters.glb_exporter import GLBExporter
+                                        
+                                        glb_exporter = GLBExporter()
+                                        if not glb_exporter.is_available():
+                                            console.print("  [yellow]⚠[/yellow] GLB export skipped: IfcConvert not found")
+                                            console.print("    Install with: pip install ifcopenshell")
+                                        else:
+                                            glb_exporter.ifc_to_glb(
+                                                ifc_path=recipe.output.ifc_export.path,
+                                                glb_path=recipe.output.ifc_export.glb_path,
+                                                use_world_coords=recipe.output.ifc_export.glb_use_world_coords,
+                                                center_model=recipe.output.ifc_export.glb_center_model,
+                                            )
+                                            
+                                            if recipe.output.ifc_export.glb_path.exists():
+                                                glb_mb = recipe.output.ifc_export.glb_path.stat().st_size / (1024 * 1024)
+                                                console.print(f"  [bold green]✓[/bold green] GLB export complete: {recipe.output.ifc_export.glb_path} ({glb_mb:.1f} MB)")
+                                    
+                                    except Exception as glb_error:
+                                        console.print(f"  [red]✗[/red] GLB export failed: {glb_error}")
+                                        if verbose:
+                                            console.print_exception()
                             
                             except ImportError:
                                 console.print("  [yellow]⚠[/yellow] IFC export skipped: ifcopenshell not installed")

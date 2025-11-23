@@ -165,9 +165,17 @@ class IFCExportConfig(BaseModel):
         - RD reference point also stored in properties for backward compatibility
         - BIM tools (Blender/Bonsai) can use IfcMapConversion to position model correctly
     
+    GLB Export (Optional):
+        - If glb_path is specified, will also export to GLB after IFC creation
+        - GLB is created from IFC using IfcConvert (requires ifcopenshell)
+        - GLB is ideal for web viewers (Three.js, Cesium, etc.)
+    
     Examples:
-        Export to IFC with defaults (site at origin, normalized Z):
+        Export to IFC only:
             {"path": "output.ifc"}
+        
+        Export to both IFC and GLB:
+            {"path": "output.ifc", "glb_path": "output.glb"}
         
         Export with absolute NAP elevations:
             {"path": "output.ifc", "normalize_z": false}
@@ -177,6 +185,9 @@ class IFCExportConfig(BaseModel):
     ifc_version: str = Field("IFC4X3_ADD2", description="IFC schema version (IFC4X3_ADD2, IFC4, IFC2X3)")
     site_name: Optional[str] = Field(None, description="Name for the IFC site (default: use address)")
     normalize_z: bool = Field(True, description="Normalize Z to ground level (True) or keep NAP elevations (False)")
+    glb_path: Optional[Path] = Field(None, description="Optional GLB export path (creates GLB from IFC)")
+    glb_use_world_coords: bool = Field(True, description="Use world coordinates in GLB (preserves geo-location)")
+    glb_center_model: bool = Field(False, description="Center GLB model at origin (useful for web viewers)")
     
     @field_validator("path")
     @classmethod

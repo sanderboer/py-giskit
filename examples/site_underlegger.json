@@ -48,7 +48,10 @@
     "ifc_export": {
       "path": "site_underlegger.ifc",
       "ifc_version": "IFC4X3_ADD2",
-      "normalize_z": true
+      "normalize_z": true,
+      "glb_path": "site_underlegger.glb",
+      "glb_use_world_coords": true,
+      "glb_center_model": false
     }
   }
 }
