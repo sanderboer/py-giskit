@@ -5,6 +5,11 @@ Sample export pipeline for Docker deployment.
 This script demonstrates a complete GeoPackage → IFC → GLB pipeline
 that can be run inside a Docker container.
 
+REQUIREMENTS:
+    This example requires ifcopenshell to be installed:
+    - conda install -c conda-forge ifcopenshell
+    - or download from https://github.com/IfcOpenShell/IfcOpenShell
+
 Usage (inside Docker):
     python /data/export_pipeline.py /data/input.gpkg /data/output
 
@@ -15,8 +20,20 @@ Usage (local):
 import sys
 from pathlib import Path
 
-from giskit.exporters.glb_exporter import check_ifcconvert_installation, convert_ifc_to_glb
-from giskit.exporters.ifc import IFCExporter
+try:
+    from giskit.exporters.glb_exporter import check_ifcconvert_installation, convert_ifc_to_glb
+    from giskit.exporters.ifc import IFCExporter
+except ImportError as e:
+    print("ERROR: This example requires ifcopenshell to be installed")
+    print()
+    print("Install using conda:")
+    print("  conda install -c conda-forge ifcopenshell")
+    print()
+    print("Or download from:")
+    print("  https://github.com/IfcOpenShell/IfcOpenShell")
+    print()
+    print(f"Import error: {e}")
+    sys.exit(1)
 
 
 def export_pipeline(input_gpkg: Path, output_dir: Path):
@@ -68,7 +85,6 @@ def export_pipeline(input_gpkg: Path, output_dir: Path):
     exporter.export(
         db_path=input_gpkg,
         output_path=ifc_path,
-        project_name=f"Export: {stem}",
         site_name=stem
     )
 

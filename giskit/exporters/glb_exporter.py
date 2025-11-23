@@ -3,16 +3,18 @@
 Converts IFC to GLB (glTF binary) format for web viewers.
 Uses IfcConvert command-line tool for best BAG3D quality.
 
+REQUIREMENTS:
+    This module requires IfcOpenShell to be installed, which provides
+    the IfcConvert binary for IFC → GLB conversion.
+
 Installation:
-    # Option 1: Auto-install (recommended)
-    python bin/install_ifcconvert.py
+    # Recommended: Install via conda
+    conda install -c conda-forge ifcopenshell
 
-    # Option 2: Manual conda/pip install
-    conda install -c ifcopenshell ifcopenshell
-    # or
-    pip install ifcopenshell
+    # Alternative: Download from GitHub
+    # https://github.com/IfcOpenShell/IfcOpenShell
 
-IfcConvert should be available in PATH after installation.
+Note: IfcOpenShell is NOT available via PyPI. You must install it separately.
 """
 
 import platform as platform_module
@@ -85,49 +87,17 @@ class GLBExporter:
 
     def get_install_instructions(self) -> str:
         """Get installation instructions for current platform."""
-        system = platform_module.system()
-
         instructions = [
-            "IfcConvert not found. Install using one of these methods:",
+            "IfcConvert not found. Install ifcopenshell to get IfcConvert:",
             "",
-            "Option 1: Auto-install (recommended)",
-            "  python bin/install_ifcconvert.py",
+            "Recommended: Install via conda",
+            "  conda install -c conda-forge ifcopenshell",
             "",
-            "Option 2: Manual installation",
+            "Alternative: Download from GitHub",
+            "  https://github.com/IfcOpenShell/IfcOpenShell",
+            "",
+            "Note: IfcOpenShell is NOT available via PyPI",
         ]
-
-        if system == "Linux":
-            instructions.extend([
-                "  # Download from GitHub releases:",
-                "  wget https://github.com/IfcOpenShell/IfcOpenShell/releases/download/ifcconvert-0.8.4/ifcconvert-0.8.4-linux64.zip",
-                "  unzip ifcconvert-0.8.4-linux64.zip -d bin/",
-            ])
-        elif system == "Darwin":  # macOS
-            arch = platform_module.machine()
-            if arch == "arm64":
-                url = "ifcconvert-0.8.4-macosm164.zip"
-            else:
-                url = "ifcconvert-0.8.4-macos64.zip"
-
-            instructions.extend([
-                "  # Download from GitHub releases:",
-                f"  curl -L -o /tmp/{url} https://github.com/IfcOpenShell/IfcOpenShell/releases/download/ifcconvert-0.8.4/{url}",
-                f"  unzip /tmp/{url} -d bin/",
-            ])
-        elif system == "Windows":
-            instructions.extend([
-                "  # Download from GitHub releases:",
-                "  https://github.com/IfcOpenShell/IfcOpenShell/releases/download/ifcconvert-0.8.4/ifcconvert-0.8.4-win64.zip",
-                "  Extract to bin/ directory",
-            ])
-
-        instructions.extend([
-            "",
-            "Option 3: Install via conda/pip",
-            "  conda install -c ifcopenshell ifcopenshell",
-            "  # or",
-            "  pip install ifcopenshell",
-        ])
 
         return "\n".join(instructions)
 

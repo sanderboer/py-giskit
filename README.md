@@ -41,9 +41,11 @@ pip install -e .
 poetry install
 ```
 
-### Optional: IFC Export Support
+### Optional: IFC/GLB Export Support
 
-IfcOpenShell is not available via PyPI. If you need IFC export functionality:
+**Both IFC and GLB export** require IfcOpenShell, which is not available via PyPI.
+
+If you need IFC export (GeoPackage → IFC) or GLB export (IFC → GLB for web viewers):
 
 ```bash
 # Using conda (recommended)
@@ -53,20 +55,12 @@ conda install -c conda-forge ifcopenshell
 # https://github.com/IfcOpenShell/IfcOpenShell
 ```
 
-### IfcConvert for GLB Export
+**What you get with IfcOpenShell:**
+- `giskit export ifc` - Export GeoPackage to IFC format
+- `IfcConvert` binary - Convert IFC to GLB for web viewers
+- Python library for IFC file manipulation
 
-For GLB export functionality, you need IfcConvert. See [EXPORT_GUIDE.md](EXPORT_GUIDE.md) for details.
-
-```bash
-# Option 1: Install via conda (recommended)
-conda install -c ifcopenshell ifcopenshell
-
-# Option 2: Install via pip
-pip install ifcopenshell
-
-# Option 3: Manual binary download
-# See EXPORT_GUIDE.md for platform-specific instructions
-```
+See [EXPORT_GUIDE.md](EXPORT_GUIDE.md) for detailed export instructions.
 
 ### Your First Recipe
 
