@@ -1574,5 +1574,5 @@ ifc = ["ifcopenshell"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "aa62cccb5cd220d13a655eed5db617b278164e12939236e07fc1d74993a99176"
+python-versions = ">=3.10,<3.13"
+content-hash = "6056bdec1838634013543f0c04ac0c02658b8ddf7396d11954c9b9b3c7166505"

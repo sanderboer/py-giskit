@@ -1,229 +1,263 @@
-# PyPI Publicatie Instructies voor GISKit
+# PyPI Publication Instructions for GISKit
 
-Dit document beschrijft hoe je GISKit publiceert op PyPI.
+This document describes how to publish GISKit to PyPI using GitHub Actions with Trusted Publishing (OIDC).
 
-## Voorbereiding
+## Overview
 
-### 1. Vereisten
+GISKit is configured for automated publishing to PyPI via GitHub Actions. The workflow supports:
+- **Automatic publishing** to PyPI when creating a GitHub Release
+- **Manual publishing** to TestPyPI for testing
+- **Trusted Publishing (OIDC)** - no API tokens needed!
 
+
+## Prerequisites (One-Time Setup)
+
+### 1. Configure PyPI Trusted Publishing
+
+**For PyPI (production):**
+1. Go to https://pypi.org/manage/account/publishing/
+2. Add a "pending publisher" with these details:
+   - PyPI Project Name: `giskit`
+   - Owner: `sanderboer`
+   - Repository name: `py-giskit`
+   - Workflow name: `publish-pypi.yml`
+   - Environment name: `pypi`
+
+**For TestPyPI (testing):**
+1. Go to https://test.pypi.org/manage/account/publishing/
+2. Add the same pending publisher configuration
+3. Environment name: `testpypi`
+
+See `GITHUB_PYPI_SETUP.md` for detailed setup instructions.
+
+### 2. Configure GitHub Environments
+
+1. Go to https://github.com/sanderboer/py-giskit/settings/environments
+2. Create two environments:
+
+**Environment: `pypi`**
+- Required reviewers: Add yourself (recommended for production safety)
+- No other restrictions needed
+
+**Environment: `testpypi`**
+- No restrictions (for quick testing)
+
+## Current Package Configuration
+
+- **Package name:** `giskit`
+- **Python support:** 3.10, 3.11, 3.12 (limited to <3.13 for ifcopenshell compatibility)
+- **Current version:** `0.1.0-dev`
+- **Optional extras:**
+  - `giskit[ifc]` - Includes ifcopenshell for IFC export
+  - `giskit[all]` - All optional dependencies
+
+## Publishing Workflow
+
+### Option 1: Publish to TestPyPI (Recommended First)
+
+
+**Steps:**
+
+1. **Ensure tests pass:**
+   ```bash
+   poetry run pytest tests/
+   poetry run ruff check .
+   poetry run ruff format --check .
+   ```
+
+2. **Trigger the manual workflow:**
+   - Go to https://github.com/sanderboer/py-giskit/actions/workflows/publish-pypi.yml
+   - Click "Run workflow"
+   - Select branch: `main`
+   - Click "Run workflow"
+
+3. **Monitor the deployment:**
+   - Check the Actions tab for progress
+   - Package will be published to https://test.pypi.org/project/giskit/
+
+4. **Test the installation:**
+   ```bash
+   # Create a test environment
+   python -m venv test_env
+   source test_env/bin/activate
+   
+   # Install from TestPyPI
+   pip install --index-url https://test.pypi.org/simple/ \
+     --extra-index-url https://pypi.org/simple/ \
+     giskit
+   
+   # Test basic functionality
+   giskit --version
+   python -c "import giskit; print('GISKit imported successfully')"
+   
+   # Test with IFC extra
+   pip install --index-url https://test.pypi.org/simple/ \
+     --extra-index-url https://pypi.org/simple/ \
+     giskit[ifc]
+   ```
+
+### Option 2: Publish to PyPI (Production)
+
+
+**Steps:**
+
+1. **Update version number:**
+   ```bash
+   # In pyproject.toml, change:
+   version = "0.1.0-dev"  # to
+   version = "0.1.0"      # or your target version
+   ```
+
+2. **Run final checks:**
+   ```bash
+   # Update lock file
+   poetry lock --no-update
+   
+   # Run all tests
+   poetry run pytest tests/
+   
+   # Check code quality
+   poetry run ruff check .
+   poetry run ruff format --check .
+   ```
+
+3. **Commit the version bump:**
+   ```bash
+   git add pyproject.toml poetry.lock
+   git commit -m "Bump version to 0.1.0"
+   git push origin main
+   ```
+
+4. **Create a GitHub Release:**
+   - Go to https://github.com/sanderboer/py-giskit/releases
+   - Click "Create a new release"
+   - Click "Choose a tag" and create new tag: `v0.1.0`
+   - Target: `main`
+   - Release title: `v0.1.0`
+   - Description: Add release notes (see template below)
+   - Click "Publish release"
+
+5. **Automated publishing:**
+   - GitHub Actions will automatically trigger
+   - The `pypi` environment requires approval (check your email)
+   - Approve the deployment
+   - Monitor at https://github.com/sanderboer/py-giskit/actions
+
+6. **Verify publication:**
+   ```bash
+   # Test installation from PyPI
+   pip install giskit
+   giskit --version
+   
+   # Test with IFC support
+   pip install giskit[ifc]
+   ```
+
+**Release Notes Template:**
+```markdown
+## GISKit v0.1.0
+
+### Features
+- Recipe-driven spatial data downloader for any location
+- Support for PDOK WFS, OGC API Features, WMTS protocols
+- OpenStreetMap Overpass API integration
+- Export to GeoPackage, GeoJSON, Shapefile, GML, CityJSON
+- Optional IFC export support (via `pip install giskit[ifc]`)
+
+### Installation
 ```bash
-# Installeer publicatie tools
-pip install twine
-
-# Zorg dat je een PyPI account hebt
-# https://pypi.org/account/register/
-
-# Maak een API token aan
-# https://pypi.org/manage/account/token/
-```
-
-### 2. Test de build
-
-```bash
-# Maak een nieuwe build
-poetry build
-
-# Check de build
-twine check dist/*
-```
-
-## Publicatie naar Test PyPI (Aanbevolen eerst)
-
-### 1. Upload naar Test PyPI
-
-```bash
-# Upload naar test.pypi.org
-twine upload --repository testpypi dist/*
-
-# Of met API token
-twine upload --repository testpypi dist/* \
-  --username __token__ \
-  --password <your-test-pypi-token>
-```
-
-### 2. Test de installatie
-
-```bash
-# Maak een nieuwe virtual environment
-python -m venv test_env
-source test_env/bin/activate  # of test_env\Scripts\activate op Windows
-
-# Installeer van Test PyPI
-pip install --index-url https://test.pypi.org/simple/ \
-  --extra-index-url https://pypi.org/simple/ \
-  giskit
-
-# Test het package
-giskit --version
-python -c "import giskit; print(giskit.__version__)"
-```
-
-## Publicatie naar PyPI (Productie)
-
-### 1. Update versie nummer
-
-```bash
-# In pyproject.toml, verander:
-version = "0.1.0-dev"  # naar
-version = "0.1.0"      # of een specifieke versie
-
-# Update ook __version__ in giskit/__init__.py
-```
-
-### 2. Maak een nieuwe build
-
-```bash
-# Clean oude builds
-rm -rf dist/
-
-# Nieuwe build
-poetry build
-
-# Check opnieuw
-twine check dist/*
-```
-
-### 3. Upload naar PyPI
-
-```bash
-# Upload naar pypi.org
-twine upload dist/*
-
-# Of met API token
-twine upload dist/* \
-  --username __token__ \
-  --password <your-pypi-token>
-```
-
-### 4. Verificatie
-
-```bash
-# Test installatie
 pip install giskit
 
-# Met IFC support
+# With IFC support
 pip install giskit[ifc]
-
-# Check versie
-giskit --version
 ```
 
-## Git Tags en Releases
+### Documentation
+- GitHub: https://github.com/sanderboer/py-giskit
+- Issues: https://github.com/sanderboer/py-giskit/issues
+```
 
-### 1. Maak een git tag
+
+## Pre-Release Checklist
+
+Before publishing, ensure:
+
+- [ ] All tests pass: `poetry run pytest tests/`
+- [ ] Code is formatted: `poetry run ruff format --check .`
+- [ ] No linting errors: `poetry run ruff check .`
+- [ ] Version number updated in `pyproject.toml`
+- [ ] `poetry.lock` is up to date
+- [ ] README.md is accurate and complete
+- [ ] LICENSE file is present
+- [ ] For PyPI: Tested on TestPyPI first
+- [ ] Git changes committed and pushed
+- [ ] Release notes prepared
+
+## Package Information
+
+**Supported Features:**
+- Python 3.10, 3.11, 3.12
+- Core dependencies: geopandas, shapely, httpx, pydantic, typer
+- Optional: ifcopenshell (Python <3.13 only)
+- CLI tool: `giskit`
+
+**Package URLs:**
+- PyPI: https://pypi.org/project/giskit/
+- TestPyPI: https://test.pypi.org/project/giskit/
+- Repository: https://github.com/sanderboer/py-giskit
+
+## Manual Publishing (Fallback)
+
+If GitHub Actions are unavailable, you can publish manually:
+
 
 ```bash
-# Tag de release
-git tag -a v0.1.0 -m "Release version 0.1.0"
+# Install publishing tools
+pip install twine
 
-# Push de tag
-git push origin v0.1.0
+# Build the package
+poetry build
+
+# Check the build
+twine check dist/*
+
+# Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# Upload to PyPI
+twine upload dist/*
 ```
 
-### 2. Maak een GitHub Release
+**Note:** With Trusted Publishing configured, you'll need PyPI API tokens for manual uploads.
+Create tokens at:
+- PyPI: https://pypi.org/manage/account/token/
+- TestPyPI: https://test.pypi.org/manage/account/token/
 
-1. Ga naar https://github.com/a190/giskit/releases
-2. Klik "Create a new release"
-3. Selecteer de tag (v0.1.0)
-4. Voeg release notes toe (kopieer van CHANGELOG.md)
-5. Upload de dist/ bestanden (optioneel)
-6. Publiceer
-
-## Configuratie Bestanden
-
-### ~/.pypirc (Optioneel)
-
-Maak dit bestand voor gemakkelijkere uploads:
-
-```ini
-[distutils]
-index-servers =
-    pypi
-    testpypi
-
-[pypi]
-username = __token__
-password = <your-pypi-token>
-
-[testpypi]
-repository = https://test.pypi.org/legacy/
-username = __token__
-password = <your-test-pypi-token>
-```
-
-Dan kun je uploaden met:
-
-```bash
-twine upload dist/*  # Gebruikt automatisch [pypi] config
-twine upload --repository testpypi dist/*  # Voor test
-```
-
-## Checklist voor Publicatie
-
-- [ ] Alle tests slagen (`pytest`)
-- [ ] Ruff linting is schoon (`ruff check .`)
-- [ ] Versie nummer is updated in pyproject.toml en __init__.py
-- [ ] CHANGELOG.md is updated
-- [ ] README.md is accuraat
-- [ ] LICENSE bestand is aanwezig
-- [ ] Build is successful (`poetry build`)
-- [ ] Twine check passed (`twine check dist/*`)
-- [ ] Getest op Test PyPI
-- [ ] Git commit en tag gemaakt
-- [ ] Upload naar PyPI
-- [ ] GitHub release gemaakt
-- [ ] Installatie getest
-
-## Automatische Publicatie (Optioneel)
-
-Je kunt GitHub Actions gebruiken voor automatische publicatie:
-
-```yaml
-# .github/workflows/publish.yml
-name: Publish to PyPI
-
-on:
-  release:
-    types: [published]
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install poetry
-        run: pip install poetry
-      - name: Build
-        run: poetry build
-      - name: Publish
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          pip install twine
-          twine upload dist/*
-```
 
 ## Troubleshooting
 
-### Upload faalt met "File already exists"
+### "File already exists" error
+PyPI doesn't allow re-uploading the same version. Increment the version number in `pyproject.toml` and rebuild.
 
-PyPI staat geen re-uploads toe van dezelfde versie. Bump het versie nummer en rebuild.
+### Missing dependencies after install
+Verify all dependencies are correctly listed in `pyproject.toml` under `[tool.poetry.dependencies]`.
 
-### Missing dependencies in install
+### Import errors after installation
+Check that the package structure is correct and config files (YAML) are included in the build.
 
-Check of alle dependencies correct zijn in `pyproject.toml` en dat `MANIFEST.in` alle benodigde bestanden include.
+### GitHub Actions workflow fails
+1. Check that Trusted Publishing is configured on PyPI/TestPyPI
+2. Verify GitHub environments (`pypi`, `testpypi`) are created
+3. Check workflow logs for specific errors
+4. Ensure `poetry.lock` is committed
 
-### Import errors na installatie
+### Python version compatibility issues
+GISKit requires Python 3.10-3.12 (not 3.13+) due to ifcopenshell dependency.
+Users on Python 3.13+ should use a compatible Python version.
 
-Zorg dat de package structuur correct is en dat config bestanden worden meegenomen in de build.
+## More Information
 
-## Meer Informatie
-
-- [Python Packaging Guide](https://packaging.python.org/)
+- [Trusted Publishing Guide](https://docs.pypi.org/trusted-publishers/)
 - [Poetry Documentation](https://python-poetry.org/docs/)
-- [Twine Documentation](https://twine.readthedocs.io/)
+- [GitHub Actions Publishing](https://docs.github.com/en/actions/publishing-packages/publishing-packages-with-github-actions)
 - [PyPI Help](https://pypi.org/help/)
