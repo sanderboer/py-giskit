@@ -101,6 +101,14 @@ class Dataset(BaseModel):
         PDOK BGT buildings:
             {"provider": "pdok", "service": "bgt", "layers": ["pand"]}
 
+        PDOK BGT with temporal filter (only active features):
+            {"provider": "pdok", "service": "bgt", "layers": ["wegdeel"], 
+             "temporal": "active"}
+
+        PDOK BGT at specific date:
+            {"provider": "pdok", "service": "bgt", "layers": ["wegdeel"],
+             "temporal": "2024-01-01"}
+
         OSM Overpass query:
             {"provider": "osm", "query": "amenity=restaurant"}
 
@@ -117,6 +125,15 @@ class Dataset(BaseModel):
     product: Optional[str] = Field(None, description="Product name (for raster providers)")
     resolution: Optional[int] = Field(
         None, description="Resolution in meters (for raster)", ge=1, le=1000
+    )
+    temporal: Optional[str] = Field(
+        "latest",
+        description=(
+            "Temporal filter: 'latest' (newest version per feature), "
+            "'active' (only currently valid features), "
+            "'all' (all historical versions), "
+            "or ISO date like '2024-01-01'"
+        ),
     )
     extra: dict[str, Any] = Field(default_factory=dict, description="Provider-specific parameters")
 

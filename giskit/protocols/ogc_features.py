@@ -99,6 +99,7 @@ class OGCFeaturesProtocol(Protocol):
         layers: Optional[list[str]] = None,
         crs: str = "EPSG:4326",
         limit: Optional[int] = None,
+        temporal: str = "latest",
         **kwargs: Any,
     ) -> gpd.GeoDataFrame:
         """Download vector features within bounding box.
@@ -108,6 +109,11 @@ class OGCFeaturesProtocol(Protocol):
             layers: Collection IDs to download (None = all)
             crs: Target CRS (output will be reprojected)
             limit: Maximum features per collection
+            temporal: Temporal filter strategy:
+                - 'latest': Keep newest version per feature (default)
+                - 'active': Only currently valid/active features
+                - 'all': All historical versions
+                - ISO date (e.g. '2024-01-01'): Features valid at that date
             **kwargs: Additional query parameters
 
         Returns:
@@ -142,7 +148,7 @@ class OGCFeaturesProtocol(Protocol):
         for collection_id in layers:
             try:
                 gdf = await self._download_collection(
-                    client, collection_id, request_bbox, limit, **kwargs
+                    client, collection_id, request_bbox, limit, temporal, **kwargs
                 )
                 if not gdf.empty:
                     # Add source collection column
@@ -171,6 +177,7 @@ class OGCFeaturesProtocol(Protocol):
         collection_id: str,
         bbox: tuple[float, float, float, float],
         limit: Optional[int],
+        temporal: str = "latest",
         **kwargs: Any,
     ) -> gpd.GeoDataFrame:
         """Download a single collection with pagination support.
@@ -180,6 +187,7 @@ class OGCFeaturesProtocol(Protocol):
             collection_id: Collection ID (may include LOD prefix like "lod22")
             bbox: Bounding box
             limit: Feature limit (total, not per page)
+            temporal: Temporal filter strategy ('latest', 'active', 'all', or ISO date)
             **kwargs: Additional parameters
 
         Returns:
@@ -273,24 +281,8 @@ class OGCFeaturesProtocol(Protocol):
 
             combined = gpd.GeoDataFrame(gpd.pd.concat(all_gdfs, ignore_index=True))
 
-            # Deduplicate features based on lokaal_id (BGT) or identificatie (BAG/BRK)
-            # Keep the latest version based on tijdstip_registratie or version timestamp
-            if "lokaal_id" in combined.columns:
-                # BGT data - deduplicate on lokaal_id
-                if "tijdstip_registratie" in combined.columns:
-                    # Sort by timestamp descending, keep first (newest)
-                    combined = combined.sort_values("tijdstip_registratie", ascending=False)
-                    combined = combined.drop_duplicates(subset="lokaal_id", keep="first")
-                elif "version" in combined.columns:
-                    # Fallback to version field
-                    combined = combined.sort_values("version", ascending=False)
-                    combined = combined.drop_duplicates(subset="lokaal_id", keep="first")
-                else:
-                    # No timestamp - just keep first occurrence
-                    combined = combined.drop_duplicates(subset="lokaal_id", keep="first")
-            elif "identificatie" in combined.columns:
-                # BAG/BRK data - deduplicate on identificatie
-                combined = combined.drop_duplicates(subset="identificatie", keep="first")
+            # Apply temporal filtering based on strategy
+            combined = self._apply_temporal_filter(combined, temporal)
 
             # Apply limit if specified
             if limit and len(combined) > limit:
@@ -300,6 +292,97 @@ class OGCFeaturesProtocol(Protocol):
 
         except httpx.HTTPError as e:
             raise OGCFeaturesError(f"Failed to download collection {collection_id}: {e}") from e
+
+    def _apply_temporal_filter(
+        self, gdf: gpd.GeoDataFrame, temporal: str = "latest"
+    ) -> gpd.GeoDataFrame:
+        """Apply temporal filtering to remove historical duplicates.
+
+        Args:
+            gdf: GeoDataFrame with potentially duplicate historical features
+            temporal: Temporal filter strategy:
+                - 'latest': Keep newest version per feature (default)
+                - 'active': Only currently valid/active features  
+                - 'all': Keep all historical versions (no filtering)
+                - ISO date (e.g. '2024-01-01'): Features valid at that date
+
+        Returns:
+            Filtered GeoDataFrame
+        """
+        if temporal == "all" or gdf.empty:
+            return gdf
+
+        # Determine ID field for deduplication
+        id_field = None
+        if "lokaal_id" in gdf.columns:
+            id_field = "lokaal_id"  # BGT data
+        elif "identificatie" in gdf.columns:
+            id_field = "identificatie"  # BAG/BRK data
+        else:
+            # No known ID field - return as-is
+            return gdf
+
+        if temporal == "active":
+            # Filter to only active/valid features (no termination date or future termination)
+            if "termination_date" in gdf.columns:
+                # Keep features where termination_date is null or in the future
+                from datetime import datetime
+
+                now = datetime.now().isoformat() + "Z"
+                gdf = gdf[
+                    (gdf["termination_date"].isna())
+                    | (gdf["termination_date"] == "")
+                    | (gdf["termination_date"] > now)
+                ]
+            # If no termination_date field, fall back to 'latest' behavior
+            temporal = "latest"
+
+        if temporal == "latest":
+            # Keep newest version per feature based on registration timestamp
+            if "tijdstip_registratie" in gdf.columns:
+                # Sort by timestamp descending, keep first (newest) per ID
+                gdf = gdf.sort_values("tijdstip_registratie", ascending=False)
+                gdf = gdf.drop_duplicates(subset=id_field, keep="first")
+            elif "version" in gdf.columns:
+                # Fallback to version field
+                gdf = gdf.sort_values("version", ascending=False)
+                gdf = gdf.drop_duplicates(subset=id_field, keep="first")
+            else:
+                # No timestamp - just keep first occurrence
+                gdf = gdf.drop_duplicates(subset=id_field, keep="first")
+
+        elif temporal.count("-") == 2:  # Looks like ISO date (YYYY-MM-DD)
+            # Filter to features valid at specific date
+            try:
+                from datetime import datetime
+
+                target_date = datetime.fromisoformat(temporal.replace("Z", ""))
+                target_iso = target_date.isoformat() + "Z"
+
+                # Keep features where:
+                # - tijdstip_registratie <= target_date
+                # - AND (termination_date is null OR termination_date > target_date)
+                if "tijdstip_registratie" in gdf.columns:
+                    gdf = gdf[gdf["tijdstip_registratie"] <= target_iso]
+
+                if "termination_date" in gdf.columns:
+                    gdf = gdf[
+                        (gdf["termination_date"].isna())
+                        | (gdf["termination_date"] == "")
+                        | (gdf["termination_date"] > target_iso)
+                    ]
+
+                # Then keep only the latest version per ID before or at target date
+                if "tijdstip_registratie" in gdf.columns:
+                    gdf = gdf.sort_values("tijdstip_registratie", ascending=False)
+                    gdf = gdf.drop_duplicates(subset=id_field, keep="first")
+
+            except (ValueError, AttributeError):
+                # Invalid date format - fall back to 'latest'
+                print(f"Warning: Invalid temporal date '{temporal}', using 'latest' instead")
+                return self._apply_temporal_filter(gdf, "latest")
+
+        return gdf
 
     async def get_coverage(
         self,
