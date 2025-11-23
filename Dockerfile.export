@@ -1,0 +1,78 @@
+# GISKit Export - Docker Sample
+#
+# This Dockerfile demonstrates how to build a container with GISKit
+# and IfcConvert pre-installed for IFC/GLB export workflows.
+#
+# Build:
+#   docker build -f Dockerfile.export -t giskit-export .
+#
+# Run:
+#   docker run -v $(pwd)/data:/data giskit-export python export_script.py
+
+FROM python:3.11-slim
+
+LABEL maintainer="GISKit"
+LABEL description="GISKit with IFC/GLB export support"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    libsqlite3-mod-spatialite \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY giskit/ /app/giskit/
+COPY pyproject.toml /app/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -e .
+
+# Download and install IfcConvert (Linux x86_64)
+ENV IFCCONVERT_VERSION=0.8.4
+ENV IFCCONVERT_PLATFORM=linux64
+
+RUN mkdir -p /app/bin && \
+    wget -q https://github.com/IfcOpenShell/IfcOpenShell/releases/download/ifcconvert-${IFCCONVERT_VERSION}/ifcconvert-${IFCCONVERT_VERSION}-${IFCCONVERT_PLATFORM}.zip -O /tmp/ifcconvert.zip && \
+    unzip -q /tmp/ifcconvert.zip -d /tmp/ifcconvert && \
+    find /tmp/ifcconvert -name "IfcConvert" -type f -exec mv {} /app/bin/ \; && \
+    chmod +x /app/bin/IfcConvert && \
+    rm -rf /tmp/ifcconvert.zip /tmp/ifcconvert
+
+# Add IfcConvert to PATH
+ENV PATH="/app/bin:${PATH}"
+
+# Verify installation
+RUN /app/bin/IfcConvert --version
+
+# Create data directory
+RUN mkdir -p /data
+
+# Set volume for data
+VOLUME ["/data"]
+
+# Default command (can be overridden)
+CMD ["python", "--version"]
+
+# Example usage commands (as comments for reference):
+#
+# Export GeoPackage to IFC:
+#   docker run -v $(pwd)/data:/data giskit-export python -c "
+#   from pathlib import Path
+#   from giskit.exporters.ifc import IFCExporter
+#   exporter = IFCExporter()
+#   exporter.export(Path('/data/input.gpkg'), Path('/data/output.ifc'))
+#   "
+#
+# Convert IFC to GLB:
+#   docker run -v $(pwd)/data:/data giskit-export python -c "
+#   from pathlib import Path
+#   from giskit.exporters.glb_exporter import convert_ifc_to_glb
+#   convert_ifc_to_glb(Path('/data/input.ifc'), Path('/data/output.glb'))
+#   "
+#
+# Complete pipeline:
+#   docker run -v $(pwd)/data:/data giskit-export python /data/export_pipeline.py

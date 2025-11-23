@@ -1,0 +1,26 @@
+provider:
+  name: testprovider
+  title: Test Provider for Demo
+  country: NL
+  homepage: https://example.com
+  license: MIT
+
+services:
+  test-service-1:
+    url: https://api.example.com/service1
+    title: Test Service 1
+    category: test_category
+    description: A test service for demonstration
+    keywords:
+      - test
+      - demo
+      - example
+  
+  test-service-2:
+    url: https://api.example.com/service2
+    title: Test Service 2
+    category: test_category
+    description: Another test service
+    keywords:
+      - test
+      - demo

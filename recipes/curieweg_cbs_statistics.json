@@ -1,0 +1,48 @@
+{
+  "name": "Curieweg CBS Statistics",
+  "description": "Download CBS demographic and statistical data for Curieweg area",
+  "location": {
+    "type": "address",
+    "value": "Curieweg 7a, Spijkenisse, Netherlands",
+    "radius": 2000,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "cbs-wijken-buurten-2024",
+      "layers": [
+        "buurten",
+        "wijken"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "cbs-vierkant-100m",
+      "layers": [
+        "vierkant100m"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "cbs-postcode4",
+      "layers": [
+        "postcode4"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "cbs-bevolkingskernen-2021",
+      "layers": [
+        "bevolkingskernen"
+      ]
+    }
+  ],
+  "output": {
+    "path": "data/curieweg_cbs_stats.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "cbs_"
+  }
+}

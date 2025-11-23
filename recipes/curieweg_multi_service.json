@@ -1,0 +1,58 @@
+{
+  "name": "Curieweg Multi-Service Complete",
+  "description": "Comprehensive dataset combining multiple PDOK services: base registers, statistics, infrastructure, and environment",
+  "location": {
+    "type": "address",
+    "value": "Curieweg 7a, Spijkenisse, Netherlands",
+    "radius": 1000,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "bgt",
+      "layers": [
+        "pand",
+        "wegdeel",
+        "waterdeel"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "bag",
+      "layers": [
+        "pand",
+        "verblijfsobject"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "cbs-wijken-buurten-2024",
+      "layers": [
+        "buurten",
+        "wijken"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "nwb-wegen",
+      "layers": [
+        "wegvakken"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "bestuurlijkegebieden",
+      "layers": [
+        "gemeenten",
+        "waterschappen"
+      ]
+    }
+  ],
+  "output": {
+    "path": "data/curieweg_multi_service.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true
+  }
+}

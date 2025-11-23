@@ -1,0 +1,17 @@
+provider:
+  country: NL
+  name: test-wms
+  title: Test WMS Provider
+services:
+  luchtfoto:
+    category: imagery
+    description: Aerial imagery of the Netherlands
+    format: image/png
+    keywords:
+    - luchtfoto
+    - aerial
+    - imagery
+    - orthophoto
+    protocol: wmts
+    title: Luchtfoto Beeldmateriaal Nederland
+    url: https://service.pdok.nl/hwh/luchtfoto/wmts/v1_0

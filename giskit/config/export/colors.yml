@@ -1,0 +1,67 @@
+# RGB colors (0-1 range) for Dutch infrastructure layers
+# Colors are realistic representations of Dutch built environment
+
+bgt_pand:
+  default: [0.85, 0.85, 0.85]  # Light gray
+
+bgt_wegdeel:
+  # By functie (function)
+  rijbaan: [0.3, 0.3, 0.3]  # Dark gray (asphalt)
+  "rijbaan lokale weg": [0.3, 0.3, 0.3]
+  fietspad: [0.3, 0.3, 0.3]
+  voetpad: [0.3, 0.3, 0.3]
+  "voetpad op trap": [0.3, 0.3, 0.3]
+  inrit: [0.3, 0.3, 0.3]
+  woonerf: [0.3, 0.3, 0.3]
+  
+  # By fysiek_voorkomen (surface material)
+  asfalt: [0.3, 0.3, 0.3]
+  tegels: [0.65, 0.65, 0.65]  # Light gray tiles
+  betonstraatstenen: [0.6, 0.6, 0.6]
+  "gebakken klinkers": [0.7, 0.3, 0.25]  # Red brick
+  "beton element": [0.55, 0.55, 0.55]
+  
+  default: [0.4, 0.4, 0.4]  # Medium gray
+
+bgt_waterdeel:
+  sloot: [0.15, 0.35, 0.65]  # Dark blue (ditch)
+  vijver: [0.2, 0.45, 0.75]  # Medium blue (pond)
+  waterloop: [0.18, 0.4, 0.7]  # Blue (stream)
+  default: [0.2, 0.4, 0.7]  # Blue
+
+bgt_begroeidterreindeel:
+  "gras- en kruidachtigen": [0.3, 0.6, 0.3]  # Green
+  groenvoorziening: [0.35, 0.65, 0.35]
+  heesters: [0.25, 0.5, 0.25]  # Darker green
+  bosplantsoen: [0.15, 0.4, 0.15]  # Dark green
+  planten: [0.35, 0.65, 0.35]
+  bodembedekkers: [0.28, 0.55, 0.28]
+  default: [0.4, 0.6, 0.3]
+
+bgt_onbegroeidterreindeel:
+  erf: [0.75, 0.65, 0.55]  # Light brown
+  "gesloten verharding": [0.5, 0.5, 0.5]
+  "open verharding": [0.65, 0.6, 0.55]
+  onverhard: [0.7, 0.6, 0.5]
+  zand: [0.85, 0.75, 0.6]
+  default: [0.7, 0.6, 0.5]
+
+bgt_ondersteunendwegdeel:
+  berm: [0.4, 0.55, 0.35]  # Greenish
+  verkeerseiland: [0.45, 0.45, 0.45]
+  default: [0.5, 0.5, 0.5]
+
+bgt_kunstwerkdeel:
+  default: [0.6, 0.6, 0.6]  # Concrete gray
+
+bag3d:
+  # Surface type-based colors
+  roof: [0.6, 0.3, 0.2]  # Red/brown roof tiles
+  wall: [0.85, 0.75, 0.65]  # Beige brick
+  default: [0.8, 0.75, 0.7]
+
+brk_perceel:
+  default: [0.9, 0.9, 0.85, 0.3]  # Very light beige with transparency
+
+bag_pand:
+  default: [0.85, 0.85, 0.85]  # Light gray

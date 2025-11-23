@@ -1,0 +1,292 @@
+"""WMTS Provider - Config-driven provider for raster tile services.
+
+This provider supports WMTS (Web Map Tile Service) for downloading
+pre-rendered raster tiles like:
+- Aerial imagery (orthophotos/luchtfoto's)
+- Satellite imagery
+- Background maps
+- Other pre-rendered tile layers
+
+For other protocols, use:
+- OGCFeaturesProvider for vector data (OGC API Features)
+- WCSProvider for coverage/elevation data
+- WMSProvider for dynamic map rendering (not yet implemented)
+
+Examples:
+    >>> # Use with PDOK luchtfoto
+    >>> provider = WMTSProvider("pdok-wmts")
+    >>> services = provider.get_supported_services()
+    >>>
+    >>> # Use with custom WMTS service
+    >>> # Just create config/services/my-wmts.yml
+    >>> provider = WMTSProvider("my-wmts")
+    >>> services = provider.get_supported_services()
+"""
+
+from pathlib import Path
+from typing import Any
+
+import geopandas as gpd
+
+from giskit.config import load_services
+from giskit.core.recipe import Dataset, Location
+from giskit.protocols.wmts import WMTSProtocol
+from giskit.providers.base import Provider, register_provider
+
+
+class WMTSProvider(Provider):
+    """WMTS provider for raster tile services.
+
+    Loads services from YAML config files, making it work with any provider
+    that offers WMTS endpoints (pre-rendered tiles).
+
+    Supports:
+    - WMTS (Web Map Tile Service)
+    - Aerial imagery
+    - Satellite imagery
+    - Background maps
+    - Pre-rendered tile pyramids
+
+    Does NOT support:
+    - Vector data (use OGCFeaturesProvider instead)
+    - Coverage/elevation data (use WCSProvider instead)
+    - Dynamic WMS rendering (use WMSProvider if needed)
+    """
+
+    def __init__(self, name: str, **kwargs: Any):
+        """Initialize WMTS provider.
+
+        Args:
+            name: Provider identifier (e.g., "pdok-wmts", "my-wmts")
+                  Must have corresponding config/services/{name}.yml
+            **kwargs: Additional configuration
+
+        Raises:
+            FileNotFoundError: If config file not found and no fallback provided
+            ValueError: If config is invalid
+        """
+        super().__init__(name, **kwargs)
+
+        # Load services from config
+        fallback = kwargs.get("fallback_services", None)
+        self.services = load_services(name, fallback=fallback)
+
+        if not self.services:
+            raise ValueError(
+                f"No services found for provider '{name}'. "
+                f"Check config/services/{name}.yml exists and is valid."
+            )
+
+        # Register WMTS protocols for each service
+        self.protocols: dict[str, WMTSProtocol] = {}
+        for service_name, service_config in self.services.items():
+            if isinstance(service_config, dict):
+                # Extract WMTS configuration
+                url = service_config.get("url", "")
+                layers = service_config.get("layers", {})
+
+                # Register protocol for each layer
+                for layer_key, layer_name in layers.items():
+                    protocol_key = f"{service_name}.{layer_key}"
+                    self.protocols[protocol_key] = WMTSProtocol(
+                        base_url=url,
+                        layer=layer_name,
+                        tile_matrix_set=service_config.get("tile_matrix_set", "EPSG:28992"),
+                        tile_format=service_config.get("tile_format", "jpeg"),
+                    )
+
+    async def get_metadata(self) -> dict[str, Any]:
+        """Get provider metadata.
+
+        Returns:
+            Dictionary with provider information
+        """
+        # Count services by category
+        categories: dict[str, int] = {}
+        for service_config in self.services.values():
+            if isinstance(service_config, dict):
+                category = service_config.get("category", "other")
+                categories[category] = categories.get(category, 0) + 1
+
+        return {
+            "name": self.name,
+            "description": f"WMTS provider: {self.name}",
+            "protocol": "wmts",
+            "total_services": len(self.services),
+            "categories": categories,
+            "services": list(self.services.keys()),
+        }
+
+    async def download_dataset(
+        self,
+        dataset: Dataset,
+        location: Location,
+        output_path: Path,
+        output_crs: str = "EPSG:28992",
+        **kwargs: Any,
+    ) -> gpd.GeoDataFrame:
+        """Download a dataset (imagery) for a specific location.
+
+        Args:
+            dataset: Dataset specification from recipe
+            location: Location specification from recipe
+            output_path: Where to save downloaded data (image file)
+            output_crs: Output coordinate reference system (default: EPSG:28992)
+            **kwargs: Additional download options:
+                - zoom: Explicit zoom level (optional)
+                - resolution: Target resolution in meters/pixel (optional)
+                - layer: Specific layer name like "actueel_25cm" (optional)
+                - progress_callback: Callback function for progress updates
+
+        Returns:
+            Empty GeoDataFrame (WMTS returns images, not vector data)
+
+        Raises:
+            ValueError: If service or layer not found
+        """
+        # Validate service format
+        if not dataset.service:
+            raise ValueError("Dataset.service is required for WMTS provider")
+
+        service_parts = dataset.service.split(".", 1)
+        if len(service_parts) != 2:
+            raise ValueError(
+                f"WMTS service must be specified as 'service.layer' (e.g., 'luchtfoto.actueel_25cm'), "
+                f"got: {dataset.service}"
+            )
+
+        service_name, layer_key = service_parts
+        protocol_key = f"{service_name}.{layer_key}"
+
+        if protocol_key not in self.protocols:
+            available = list(self.protocols.keys())
+            raise ValueError(
+                f"Service layer '{protocol_key}' not found. "
+                f"Available: {', '.join(available)}"
+            )
+
+        protocol = self.protocols[protocol_key]
+
+        # Convert location to bbox in output CRS
+        # For now, assume location is already a bbox in the correct CRS
+        # TODO: Add proper location conversion
+        if location.type.value != "bbox":
+            raise NotImplementedError(
+                f"Location type '{location.type.value}' not yet supported for WMTS. "
+                "Use bbox for now."
+            )
+
+        if not isinstance(location.value, list) or len(location.value) != 4:
+            raise ValueError("Location value must be [minx, miny, maxx, maxy] for bbox")
+
+        bbox = tuple(location.value)  # type: ignore
+
+        # Extract WMTS-specific parameters
+        zoom = kwargs.get("zoom")
+        resolution = kwargs.get("resolution", dataset.resolution if dataset.resolution else None)
+        progress_callback = kwargs.get("progress_callback")
+
+        # Download imagery using WMTS protocol
+        async with protocol:
+            image = await protocol.get_coverage(
+                bbox=bbox,  # type: ignore
+                product=layer_key,
+                resolution=resolution or 0.25,  # Default to 25cm
+                crs=output_crs,
+                zoom=zoom,
+                progress_callback=progress_callback,
+            )
+
+        # Save if output path provided
+        if output_path:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            image.save(output_path, quality=90, optimize=True)
+
+        # WMTS returns images, not vector data
+        # Return empty GeoDataFrame for now
+        return gpd.GeoDataFrame()
+
+    def get_supported_services(self) -> list[str]:
+        """Get list of supported services.
+
+        Returns:
+            List of service names
+        """
+        return list(self.services.keys())
+
+    def get_supported_protocols(self) -> list[str]:
+        """Get list of supported protocols.
+
+        Returns:
+            List of protocol names
+        """
+        return ["wmts"]
+
+    def get_services_by_category(self, category: str) -> list[str]:
+        """Get list of services in a specific category.
+
+        Args:
+            category: Category name (e.g., 'imagery', 'topography')
+
+        Returns:
+            List of service names in this category
+        """
+        services = []
+        for service_name, service_config in self.services.items():
+            if isinstance(service_config, dict):
+                if service_config.get("category") == category:
+                    services.append(service_name)
+        return services
+
+    def get_service_info(self, service: str) -> dict[str, Any]:
+        """Get detailed information about a specific service.
+
+        Args:
+            service: Service name
+
+        Returns:
+            Dictionary with service metadata
+
+        Raises:
+            ValueError: If service not found
+        """
+        if service not in self.services:
+            raise ValueError(
+                f"Service '{service}' not found. "
+                f"Available: {', '.join(self.services.keys())}"
+            )
+
+        service_config = self.services[service]
+        if isinstance(service_config, str):
+            # Old format - just URL
+            return {
+                "name": service,
+                "url": service_config,
+                "title": service.upper(),
+                "category": "unknown",
+                "description": "",
+                "keywords": [],
+            }
+        else:
+            # New format - full metadata
+            return {
+                "name": service,
+                **service_config
+            }
+
+    def list_categories(self) -> list[str]:
+        """Get list of all service categories.
+
+        Returns:
+            List of category names
+        """
+        categories = set()
+        for service_config in self.services.values():
+            if isinstance(service_config, dict):
+                category = service_config.get("category", "other")
+                categories.add(category)
+        return sorted(categories)
+
+
+# Register WMTS provider globally
+register_provider("wmts", WMTSProvider)

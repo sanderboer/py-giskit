@@ -1,0 +1,50 @@
+provider:
+  name: pdok-wcs
+  title: PDOK WCS Services (Coverage/Elevation Data)
+  country: NL
+  homepage: https://www.pdok.nl
+  license: CC0-1.0
+  defaults:
+    protocol: wcs
+
+services:
+  ahn:
+    url: https://service.pdok.nl/rws/ahn/wcs/v1_0
+    title: Actueel Hoogtebestand Nederland (AHN)
+    category: elevation
+    description: |
+      AHN is de digitale hoogtekaart voor heel Nederland met gedetailleerde 
+      en precieze hoogtegegevens (gemiddeld 10 hoogtemetingen per m²).
+      Gemeten met laseraltimetrie vanaf vliegtuigen.
+      
+      - DSM (Digital Surface Model): Ruw bestand met alle punten behalve water
+      - DTM (Digital Terrain Model): Maaiveldbestand met alleen 'maaiveld' punten
+      
+      Resolutie: 0.5m (herbemonsterd met Squared IDW methode)
+      Versie: AHN4 (ingewonnen 2020-2022)
+      Coördinatensysteem: EPSG:28992 (RD New)
+      Verticaal referentiesysteem: NAP (Normaal Amsterdams Peil)
+    keywords:
+      - ahn
+      - ahn4
+      - elevation
+      - hoogte
+      - lidar
+      - laseraltimetrie
+      - terrain
+      - surface
+      - dtm
+      - dsm
+      - water
+      - dijken
+    coverages:
+      dsm: dsm_05m  # Digital Surface Model (0.5m resolutie)
+      dtm: dtm_05m  # Digital Terrain Model (0.5m resolutie)
+    format: image/tiff
+    native_resolution: 0.5  # meters
+    native_crs: EPSG:28992
+    bbox: [10000, 306250, 280000, 618750]  # RD New extent (heel Nederland)
+    vertical_datum: NAP
+    unit: meters
+    homepage: https://www.ahn.nl
+    metadata_url: https://www.nationaalgeoregister.nl/geonetwork/srv/dut/catalog.search#/metadata/41daef8b-155e-4608-b49c-c87ea45d931c

@@ -1,0 +1,9 @@
+services:
+  bag3d:
+    ogc-features:
+      name: bag3d-cityjson
+      description: BAG3D requires bbox in EPSG:28992 (RD) and returns CityJSON format
+      bbox_crs: EPSG:28992
+      require_format_param: false  # Override PDOK default - BAG3D doesn't need f=json
+      issue_url: https://api.3dbag.nl/collections/pand
+      workaround_date: '2024-11-22'

@@ -1,0 +1,71 @@
+{
+  "name": "Curieweg BGT Complete",
+  "description": "Download complete BGT dataset for Curieweg 7a, Spijkenisse - matching Sitedb configuration",
+  "location": {
+    "type": "address",
+    "value": "Curieweg 7a, Spijkenisse, Netherlands",
+    "radius": 500,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "bgt",
+      "layers": [
+        "pand",
+        "wegdeel",
+        "waterdeel",
+        "begroeidterreindeel",
+        "onbegroeidterreindeel",
+        "ondersteunendwegdeel",
+        "ondersteunendwaterdeel",
+        "overbruggingsdeel",
+        "tunneldeel",
+        "kunstwerkdeel_lijn",
+        "kunstwerkdeel_punt",
+        "kunstwerkdeel_vlak",
+        "scheiding_lijn",
+        "scheiding_vlak",
+        "overigbouwwerk",
+        "gebouwinstallatie",
+        "paal",
+        "put",
+        "bord",
+        "straatmeubilair",
+        "bak",
+        "kast",
+        "mast",
+        "vegetatieobject_punt",
+        "vegetatieobject_lijn",
+        "vegetatieobject_vlak",
+        "weginrichtingselement_punt",
+        "weginrichtingselement_lijn",
+        "weginrichtingselement_vlak",
+        "sensor_punt",
+        "sensor_lijn",
+        "installatie",
+        "openbareruimte",
+        "openbareruimtelabel",
+        "buurt",
+        "wijk",
+        "stadsdeel",
+        "waterschap",
+        "functioneelgebied",
+        "ongeclassificeerdobject",
+        "begroeidterreindeel_kruinlijn",
+        "onbegroeidterreindeel_kruinlijn",
+        "ondersteunendwegdeel_kruinlijn",
+        "wegdeel_kruinlijn",
+        "pand_nummeraanduiding",
+        "overigescheiding"
+      ]
+    }
+  ],
+  "output": {
+    "path": "data/curieweg_bgt_complete.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "bgt_"
+  }
+}

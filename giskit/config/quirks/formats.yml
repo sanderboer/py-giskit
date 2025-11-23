@@ -1,0 +1,18 @@
+formats:
+  cityjson-format:
+    name: cityjson-format
+    description: 'CityJSON 2.0 format uses per-page transforms for vertex compression.
+      CRITICAL: Each pagination page has its own transform (scale/translate). Vertices
+      are integers that must be scaled: real_coord = vertex * scale + translate. Applying
+      wrong transform to features causes coordinate errors! This affects: BAG3D, 3D-basisvoorziening,
+      and other 3D services.'
+    custom_timeout: 60.0
+    format_is_cityjson: true
+    cityjson_version: '2.0'
+    has_per_page_transform: true
+    transform_applies_to_vertices: true
+    vertices_are_integers: true
+    has_lod_hierarchy: true
+    geometry_in_city_objects: true
+    issue_url: https://www.cityjson.org/specs/2.0.0/#transform-object
+    workaround_date: '2024-11-22'

@@ -1,0 +1,27 @@
+{
+  "name": "Point with radius example",
+  "description": "Download data around a specific coordinate with radius",
+  "location": {
+    "type": "point",
+    "value": [4.9041, 52.3676],
+    "radius": 1000,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "bag",
+      "layers": ["pand"]
+    },
+    {
+      "provider": "pdok",
+      "service": "bgt",
+      "layers": ["wegdeel"]
+    }
+  ],
+  "output": {
+    "path": "./point_data.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992"
+  }
+}

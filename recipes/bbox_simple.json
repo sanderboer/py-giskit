@@ -1,0 +1,22 @@
+{
+  "name": "Simple bounding box example",
+  "description": "Download data using a direct bounding box (WGS84)",
+  "location": {
+    "type": "bbox",
+    "value": [4.88, 52.36, 4.92, 52.38],
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "bgt",
+      "layers": ["pand", "wegdeel", "waterdeel"]
+    }
+  ],
+  "output": {
+    "path": "./bbox_output.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:4326",
+    "overwrite": false
+  }
+}

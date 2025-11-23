@@ -1,0 +1,78 @@
+provider:
+  name: pdok-wmts
+  title: PDOK WMTS Services (Imagery & Maps)
+  country: NL
+  homepage: https://www.pdok.nl
+  license: CC0-1.0
+  defaults:
+    protocol: wmts
+
+services:
+  luchtfoto:
+    url: https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0
+    title: Luchtfoto Beeldmateriaal Nederland
+    category: imagery
+    description: Aerial imagery of the Netherlands (RGB orthophotos)
+    keywords:
+      - luchtfoto
+      - aerial
+      - imagery
+      - orthophoto
+      - rgb
+    tile_format: jpeg
+    tile_matrix_set: EPSG:28992
+    resolutions: [3440.64, 1720.32, 860.16, 430.08, 215.04, 107.52, 53.76, 26.88, 13.44, 6.72, 3.36, 1.68, 0.84, 0.42, 0.21]
+    layers:
+      actueel_8cm: Actueel_orthoHR
+      actueel_25cm: Actueel_ortho25
+      2025_8cm: 2025_orthoHR
+      2025_25cm: 2025_ortho25
+      2024_8cm: 2024_orthoHR
+      2024_25cm: 2024_ortho25
+    
+  luchtfoto-ir:
+    url: https://service.pdok.nl/hwh/luchtfotoinfrarood/wmts/v1_0
+    title: Luchtfoto Infrarood
+    category: imagery
+    description: Aerial imagery infrared (false color)
+    keywords:
+      - luchtfoto
+      - infrared
+      - cir
+      - false-color
+    tile_format: jpeg
+    tile_matrix_set: EPSG:28992
+    layers:
+      actueel: Actueel_ortho25IR
+    
+  satellite:
+    url: https://service.pdok.nl/hwh/satellietbeeld/wmts/v1_0
+    title: Satellietbeelden Nederland
+    category: imagery
+    description: Satellite imagery (Sentinel-2)
+    keywords:
+      - satellite
+      - sentinel
+      - imagery
+    tile_format: png
+    tile_matrix_set: EPSG:28992
+    layers:
+      actueel: 2023_ortho25
+    
+  brt-achtergrondkaart:
+    url: https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0
+    title: BRT Achtergrondkaart
+    category: maps
+    description: Background map derived from TOP10NL
+    keywords:
+      - brt
+      - topography
+      - background
+      - basemap
+    tile_format: png
+    tile_matrix_set: EPSG:28992
+    layers:
+      standaard: standaard
+      grijs: grijs
+      pastel: pastel
+      water: water

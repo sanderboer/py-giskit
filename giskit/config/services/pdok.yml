@@ -1,0 +1,540 @@
+provider:
+  name: pdok
+  title: PDOK - Publieke Dienstverlening Op de Kaart
+  country: NL
+  homepage: https://www.pdok.nl
+  license: CC0-1.0
+  defaults: {}
+services:
+  bgt:
+    url: https://api.pdok.nl/lv/bgt/ogc/v1_0/
+    title: Basisregistratie Grootschalige Topografie
+    category: base_registers
+    description: Large-scale topography base register with detailed object information
+    keywords:
+    - bgt
+    - topografie
+    - gebouwen
+    - wegen
+    - water
+    quirks: []
+  bag:
+    url: https://api.pdok.nl/lv/bag/ogc/v1_0/
+    title: Basisregistratie Adressen en Gebouwen
+    category: base_registers
+    description: National address and building register
+    keywords:
+    - bag
+    - adressen
+    - gebouwen
+    - panden
+    - verblijfsobjecten
+    quirks: []
+  brk:
+    url: https://api.pdok.nl/lv/brk/ogc/v1_0/
+    title: Basisregistratie Kadaster - Kadastrale Kaart
+    category: base_registers
+    description: Cadastral map with parcel boundaries
+    keywords:
+    - brk
+    - kadaster
+    - percelen
+    - eigendom
+    quirks: []
+  3d-basisvoorziening:
+    url: https://api.pdok.nl/kadaster/3d-basisvoorziening/ogc/v1
+    title: 3D Basisvoorziening
+    category: topography
+    description: 3D base map with height information from BGT, BAG, and AHN4
+    keywords:
+    - 3d
+    - hoogte
+    - dtm
+    - dsm
+    - ahn4
+    quirks: []
+    format: cityjson
+  3d-geluid:
+    url: https://api.pdok.nl/kadaster/3d-geluid/ogc/v1
+    title: 3D Geluid
+    category: topography
+    description: 3D environment model for noise calculations
+    keywords:
+    - 3d
+    - geluid
+    - akoestiek
+    - geluidsberekening
+    quirks: []
+    format: cityjson
+  brt-achtergrondkaart:
+    url: https://api.pdok.nl/kadaster/brt-achtergrondkaart/ogc/v1
+    title: BRT Achtergrondkaart
+    category: topography
+    description: Background map derived from TOP10NL
+    keywords:
+    - brt
+    - achtergrondkaart
+    - kaart
+    quirks: []
+  top10nl:
+    url: https://api.pdok.nl/brt/top10nl/ogc/v1/
+    title: BRT TOP10NL
+    category: topography
+    description: Topographic map at 1:10,000 scale
+    keywords:
+    - brt
+    - top10nl
+    - topografie
+    - kaart
+    quirks: []
+  brt-bodemgebruik:
+    url: https://api.pdok.nl/kadaster/brt-bodemgebruik/ogc/v1
+    title: Bodemgebruik - Land Cover (INSPIRE)
+    category: topography
+    description: Land cover classification (INSPIRE harmonized)
+    keywords:
+    - bodemgebruik
+    - landcover
+    - grondgebruik
+    - inspire
+    quirks: []
+  brt-geografische-namen:
+    url: https://api.pdok.nl/kadaster/brt-geografische-namen/ogc/v1
+    title: Geografische Namen (INSPIRE)
+    category: topography
+    description: Geographic place names (INSPIRE harmonized)
+    keywords:
+    - namen
+    - plaatsnamen
+    - toponiemen
+    - inspire
+    quirks: []
+  brt-hydrografie:
+    url: https://api.pdok.nl/kadaster/brt-hydrografie/ogc/v1
+    title: Hydrografie (INSPIRE)
+    category: topography
+    description: Water features and hydrography (INSPIRE harmonized)
+    keywords:
+    - hydrografie
+    - water
+    - rivieren
+    - meren
+    - inspire
+    quirks: []
+  brt-vervoersnetwerken:
+    url: https://api.pdok.nl/kadaster/brt-vervoersnetwerken/ogc/v1
+    title: Vervoersnetwerken (INSPIRE)
+    category: topography
+    description: Transport networks (INSPIRE harmonized)
+    keywords:
+    - transport
+    - wegen
+    - spoor
+    - vaarwegen
+    - inspire
+    quirks: []
+  brt-zeegebieden:
+    url: https://api.pdok.nl/kadaster/brt-zeegebieden/ogc/v1
+    title: Zeegebieden (INSPIRE)
+    category: topography
+    description: Sea areas (INSPIRE harmonized)
+    keywords:
+    - zee
+    - noordzee
+    - kustwater
+    - inspire
+    quirks: []
+  cbs-wijken-buurten-2024:
+    url: https://api.pdok.nl/cbs/wijken-en-buurten-2024/ogc/v1
+    title: CBS Wijken en Buurten 2024
+    category: statistics
+    description: Neighborhoods and districts with demographic statistics for 2024
+    keywords:
+    - cbs
+    - wijken
+    - buurten
+    - demografie
+    - statistiek
+    quirks: []
+  cbs-wijken-buurten-2023:
+    url: https://api.pdok.nl/cbs/wijken-en-buurten-2023/ogc/v1
+    title: CBS Wijken en Buurten 2023
+    category: statistics
+    description: Neighborhoods and districts with demographic statistics for 2023
+    keywords:
+    - cbs
+    - wijken
+    - buurten
+    - demografie
+    - statistiek
+    quirks: []
+  cbs-wijken-buurten-2022:
+    url: https://api.pdok.nl/cbs/wijken-en-buurten-2022/ogc/v1
+    title: CBS Wijken en Buurten 2022
+    category: statistics
+    description: Neighborhoods and districts with demographic statistics for 2022
+    keywords:
+    - cbs
+    - wijken
+    - buurten
+    - demografie
+    - statistiek
+    quirks: []
+  cbs-gebiedsindelingen:
+    url: https://api.pdok.nl/cbs/gebiedsindelingen/ogc/v1
+    title: CBS Gebiedsindelingen 2016-heden
+    category: statistics
+    description: Current administrative area divisions
+    keywords:
+    - cbs
+    - gebieden
+    - gemeenten
+    - provincies
+    quirks: []
+  cbs-gebiedsindelingen-historisch:
+    url: https://api.pdok.nl/cbs/gebiedsindelingen-historisch/ogc/v1
+    title: CBS Gebiedsindelingen 1995-2015
+    category: statistics
+    description: Historical administrative area divisions (1995-2015)
+    keywords:
+    - cbs
+    - gebieden
+    - historisch
+    - gemeenten
+    quirks: []
+  cbs-vierkant-100m:
+    url: https://api.pdok.nl/cbs/vierkantstatistieken100m/ogc/v1
+    title: CBS Vierkantstatistieken 100m
+    category: statistics
+    description: 100m grid statistics
+    keywords:
+    - cbs
+    - grid
+    - statistiek
+    - vierkant
+    quirks: []
+  cbs-vierkant-500m:
+    url: https://api.pdok.nl/cbs/vierkantstatistieken500m/ogc/v1
+    title: CBS Vierkantstatistieken 500m
+    category: statistics
+    description: 500m grid statistics
+    keywords:
+    - cbs
+    - grid
+    - statistiek
+    - vierkant
+    quirks: []
+  cbs-postcode4:
+    url: https://api.pdok.nl/cbs/postcode4/ogc/v1
+    title: CBS Postcode4 statistieken
+    category: statistics
+    description: 4-digit postcode area statistics
+    keywords:
+    - cbs
+    - postcode
+    - statistiek
+    quirks: []
+  cbs-postcode6:
+    url: https://api.pdok.nl/cbs/postcode6/ogc/v1
+    title: CBS Postcode6 statistieken
+    category: statistics
+    description: 6-digit postcode area statistics
+    keywords:
+    - cbs
+    - postcode
+    - statistiek
+    quirks: []
+  cbs-bevolkingskernen-2021:
+    url: https://api.pdok.nl/cbs/bevolkingskernen-2021/ogc/v1
+    title: CBS Bevolkingskernen 2021
+    category: statistics
+    description: Population centers 2021
+    keywords:
+    - cbs
+    - bevolking
+    - kernen
+    - steden
+    quirks: []
+  cbs-bevolkingskernen-2011:
+    url: https://api.pdok.nl/cbs/bevolkingskernen-2011/ogc/v1
+    title: CBS Bevolkingskernen 2011
+    category: statistics
+    description: Population centers 2011
+    keywords:
+    - cbs
+    - bevolking
+    - kernen
+    - steden
+    quirks: []
+  cbs-bodemgebruik-2017:
+    url: https://api.pdok.nl/cbs/bestand-bodemgebruik-2017/ogc/v1
+    title: CBS Bestand Bodemgebruik 2017
+    category: statistics
+    description: Land use statistics 2017
+    keywords:
+    - cbs
+    - bodemgebruik
+    - landgebruik
+    quirks: []
+  cbs-bodemgebruik-2015:
+    url: https://api.pdok.nl/cbs/bestand-bodemgebruik-2015/ogc/v1
+    title: CBS Bestand Bodemgebruik 2015
+    category: statistics
+    description: Land use statistics 2015
+    keywords:
+    - cbs
+    - bodemgebruik
+    - landgebruik
+    quirks: []
+  cbs-bodemgebruik-2010:
+    url: https://api.pdok.nl/cbs/bestand-bodemgebruik-2010/ogc/v1
+    title: CBS Bestand Bodemgebruik 2010
+    category: statistics
+    description: Land use statistics 2010
+    keywords:
+    - cbs
+    - bodemgebruik
+    - landgebruik
+    quirks: []
+  cbs-landuse:
+    url: https://api.pdok.nl/cbs/landuse/ogc/v1/
+    title: CBS Existing Land Use (INSPIRE)
+    category: statistics
+    description: Land use (INSPIRE harmonized)
+    keywords:
+    - cbs
+    - landuse
+    - grondgebruik
+    - inspire
+    quirks: []
+  cbs-population-distribution:
+    url: https://api.pdok.nl/cbs/population-distribution/ogc/v1
+    title: CBS Population Distribution (INSPIRE)
+    category: statistics
+    description: Population distribution (INSPIRE harmonized)
+    keywords:
+    - cbs
+    - bevolking
+    - demografie
+    - inspire
+    quirks: []
+  cbs-human-health:
+    url: https://api.pdok.nl/cbs/human-health-statistics/ogc/v1
+    title: CBS Human Health Statistics (INSPIRE)
+    category: statistics
+    description: Health statistics (INSPIRE harmonized)
+    keywords:
+    - cbs
+    - gezondheid
+    - health
+    - inspire
+    quirks: []
+  nwb-wegen:
+    url: https://api.pdok.nl/rws/nationaal-wegenbestand-wegen/ogc/v1/
+    title: Nationaal Wegenbestand - Wegen
+    category: infrastructure
+    description: National road network
+    keywords:
+    - nwb
+    - wegen
+    - verkeer
+    - infrastructuur
+    quirks: []
+  nwb-vaarwegen:
+    url: https://api.pdok.nl/rws/nationaal-wegenbestand-vaarwegen/ogc/v1
+    title: Nationaal Wegenbestand - Vaarwegen
+    category: infrastructure
+    description: National waterway network
+    keywords:
+    - nwb
+    - vaarwegen
+    - scheepvaart
+    - waterwegen
+    quirks: []
+  spoorwegen:
+    url: https://api.pdok.nl/prorail/spoorwegen/ogc/v1
+    title: Spoorwegen
+    category: infrastructure
+    description: Railway network
+    keywords:
+    - spoor
+    - trein
+    - rail
+    - prorail
+    quirks: []
+  weggegevens:
+    url: https://api.pdok.nl/rws/weggegevens/ogc/v1
+    title: Weggegevens
+    category: infrastructure
+    description: Road data and attributes
+    keywords:
+    - wegen
+    - verkeer
+    - rijkswegen
+    quirks: []
+  vaarwegmarkeringen:
+    url: https://api.pdok.nl/rws/vaarwegmarkeringen-nederland/ogc/v1
+    title: Vaarwegmarkeringen Nederland
+    category: infrastructure
+    description: Waterway markings and navigation aids
+    keywords:
+    - vaarweg
+    - markering
+    - scheepvaart
+    - navigatie
+    quirks: []
+  natura2000:
+    url: https://api.pdok.nl/rvo/natura2000/ogc/v1
+    title: Natura 2000
+    category: environment
+    description: EU protected nature areas
+    keywords:
+    - natura2000
+    - natuur
+    - beschermd
+    - eu
+    quirks: []
+  natura2000-inspire:
+    url: https://api.pdok.nl/rvo/natura2000-geharmoniseerd/ogc/v1
+    title: Natura 2000 (INSPIRE)
+    category: environment
+    description: EU protected nature areas (INSPIRE harmonized)
+    keywords:
+    - natura2000
+    - natuur
+    - beschermd
+    - inspire
+    quirks: []
+  nationale-parken:
+    url: https://api.pdok.nl/rvo/nationale-parken/ogc/v1/
+    title: Nationale Parken
+    category: environment
+    description: Dutch national parks
+    keywords:
+    - natuur
+    - park
+    - nationaalpark
+    - natuurgebied
+    quirks: []
+  nationale-parken-inspire:
+    url: https://api.pdok.nl/rvo/nationale-parken-geharmoniseerd/ogc/v1/
+    title: Nationale Parken (INSPIRE)
+    category: environment
+    description: Dutch national parks (INSPIRE harmonized)
+    keywords:
+    - natuur
+    - park
+    - nationaalpark
+    - inspire
+    quirks: []
+  gewaspercelen:
+    url: https://api.pdok.nl/rvo/gewaspercelen/ogc/v1/
+    title: Basisregistratie Gewaspercelen (BRP)
+    category: environment
+    description: Agricultural crop parcels
+    keywords:
+    - landbouw
+    - gewas
+    - perceel
+    - brp
+    quirks: []
+  habitatrichtlijn-typen:
+    url: https://api.pdok.nl/rvo/habitatrichtlijn-verspreiding-typen/ogc/v1
+    title: Habitatrichtlijn - Verspreiding Habitattypen
+    category: environment
+    description: Habitat types distribution (Habitat Directive)
+    keywords:
+    - habitat
+    - natuur
+    - biodiversiteit
+    - eu
+    quirks: []
+  habitatrichtlijn-soorten:
+    url: https://api.pdok.nl/rvo/habitatrichtlijn-verspreiding-soorten/ogc/v1
+    title: Habitatrichtlijn - Verspreiding Soorten
+    category: environment
+    description: Species distribution (Habitat Directive)
+    keywords:
+    - soorten
+    - fauna
+    - flora
+    - biodiversiteit
+    quirks: []
+  vogelrichtlijn-soorten:
+    url: https://api.pdok.nl/rvo/vogelrichtlijn-verspreiding-soorten/ogc/v1
+    title: Vogelrichtlijn - Verspreiding Soorten
+    category: environment
+    description: Bird species distribution (Birds Directive)
+    keywords:
+    - vogels
+    - avifauna
+    - biodiversiteit
+    - eu
+    quirks: []
+  wetlands:
+    url: https://api.pdok.nl/rvo/wetlands/ogc/v1
+    title: Wetlands
+    category: environment
+    description: Wetland areas
+    keywords:
+    - wetland
+    - moeras
+    - natuur
+    - water
+    quirks: []
+  wetlands-inspire:
+    url: https://api.pdok.nl/rvo/wetlands-geharmoniseerd/ogc/v1
+    title: Wetlands (INSPIRE)
+    category: environment
+    description: Wetland areas (INSPIRE harmonized)
+    keywords:
+    - wetland
+    - moeras
+    - natuur
+    - inspire
+    quirks: []
+  bestuurlijkegebieden:
+    url: https://api.pdok.nl/kadaster/bestuurlijkegebieden/ogc/v1/
+    title: Bestuurlijke Gebieden
+    category: administrative
+    description: Administrative boundaries (municipalities, provinces, water boards)
+    keywords:
+    - bestuur
+    - gemeenten
+    - provincies
+    - waterschappen
+    quirks: []
+  cultureel-erfgoed:
+    url: https://api.pdok.nl/rce/beschermde-gebieden-cultuurhistorie/ogc/v1/
+    title: Beschermde Gebieden - Cultuurhistorie (INSPIRE)
+    category: culture
+    description: Cultural heritage protected areas (INSPIRE harmonized)
+    keywords:
+    - cultuur
+    - erfgoed
+    - monumenten
+    - unesco
+    quirks: []
+  drone-nofly:
+    url: https://api.pdok.nl/lvnl/drone-no-flyzones/ogc/v1/
+    title: Drone No-Fly Zones
+    category: aviation
+    description: Restricted airspace for drones
+    keywords:
+    - drone
+    - luchtruim
+    - vliegverbod
+    quirks: []
+  bag3d:
+    url: https://api.3dbag.nl
+    title: 3D BAG
+    category: base_registers
+    description: 3D building models with LOD support (hosted externally)
+    keywords:
+    - 3d
+    - gebouwen
+    - bag
+    - lod
+    quirks: []
+    format: cityjson
+    special: external_host

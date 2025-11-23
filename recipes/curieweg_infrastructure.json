@@ -1,0 +1,41 @@
+{
+  "name": "Curieweg Infrastructure",
+  "description": "Download infrastructure data (roads, waterways, railways) for Curieweg area",
+  "location": {
+    "type": "address",
+    "value": "Curieweg 7a, Spijkenisse, Netherlands",
+    "radius": 1000,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "nwb-wegen",
+      "layers": [
+        "wegvakken",
+        "hectopunten"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "nwb-vaarwegen",
+      "layers": [
+        "vaarwegvakken"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "weggegevens",
+      "layers": [
+        "wegvakken"
+      ]
+    }
+  ],
+  "output": {
+    "path": "data/curieweg_infrastructure.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "infra_"
+  }
+}

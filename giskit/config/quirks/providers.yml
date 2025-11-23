@@ -1,0 +1,8 @@
+providers:
+  pdok-ogc-features:
+    name: pdok-ogc-features
+    description: PDOK OGC API requires ?f=json and trailing slash in base URL
+    requires_trailing_slash: true
+    require_format_param: true
+    issue_url: https://github.com/PDOK/issues/ogc-features-format-param
+    workaround_date: '2024-11-22'

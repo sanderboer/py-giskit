@@ -1,0 +1,42 @@
+{
+  "name": "Sitedb Use Case - Curieweg Spijkenisse",
+  "description": "Download BGT, BAG, BAG3D, BRK data for Curieweg 7a Spijkenisse (200m radius) - mirrors Sitedb functionality",
+  "location": {
+    "type": "address",
+    "value": "Curieweg 7a, Spijkenisse, Netherlands",
+    "radius": 200,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "bgt",
+      "layers": [
+        "pand",
+        "wegdeel",
+        "ondersteunendwegdeel",
+        "waterdeel",
+        "ondersteunendwaterdeel",
+        "onbegroeidterreindeel",
+        "begroeidterreindeel"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "bag",
+      "layers": ["pand", "verblijfsobject"]
+    }
+  ],
+  "output": {
+    "path": "./test_curieweg_giskit.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "curieweg_"
+  },
+  "metadata": {
+    "test_case": "sitedb_curieweg",
+    "original_sitedb_db": "data/curieweg-7a-spijkenisse.gpkg",
+    "comparison": "Should match Sitedb BGT + BAG downloads"
+  }
+}

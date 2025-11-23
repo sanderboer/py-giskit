@@ -1,0 +1,32 @@
+{
+  "name": "Amsterdam Dam Square - Buildings and Restaurants",
+  "description": "Download building footprints and restaurants near Dam Square, Amsterdam",
+  "location": {
+    "type": "address",
+    "value": "Dam 1, Amsterdam, Netherlands",
+    "radius": 500,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "bgt",
+      "layers": ["pand"]
+    },
+    {
+      "provider": "osm",
+      "query": "amenity=restaurant"
+    }
+  ],
+  "output": {
+    "path": "./amsterdam_dam.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "dam_"
+  },
+  "metadata": {
+    "author": "GISKit Example",
+    "created": "2025-01-22"
+  }
+}

@@ -1,0 +1,171 @@
+# Layer mappings: GeoPackage layer → IFC entity configuration
+
+layer_mappings:
+  bgt_pand:
+    ifc_class: IfcBuilding
+    assignment_method: aggregate
+    default_height: 8.0
+    name_attribute: bag_pand_id
+    pset_name: Pset_BGT
+    properties:
+      - gml_id
+      - lokaal_id
+      - bag_pand_id
+      - bgt_status
+      - bronhouder
+  
+  bgt_wegdeel:
+    ifc_class: IfcRoad  # IFC4X3
+    ifc_class_fallback: IfcCivilElement  # IFC4
+    assignment_method: aggregate
+    default_height: 0.3
+    name_attribute: lokaal_id
+    pset_name: Pset_BGT_Wegdeel
+    properties:
+      - gml_id
+      - lokaal_id
+      - functie
+      - plus_fysiek_voorkomen
+    color_attributes:
+      - plus_fysiek_voorkomen
+      - functie
+  
+  bgt_waterdeel:
+    ifc_class: IfcGeographicElement
+    assignment_method: spatial
+    default_height: 0.1
+    name_attribute: lokaal_id
+    pset_name: Pset_BGT_Waterdeel
+    properties:
+      - gml_id
+      - lokaal_id
+      - type
+      - plus_type
+    color_attributes:
+      - type
+      - plus_type
+  
+  bgt_begroeidterreindeel:
+    ifc_class: IfcGeographicElement
+    assignment_method: spatial
+    default_height: 0.05
+    name_attribute: lokaal_id
+    pset_name: Pset_BGT_Begroeid
+    properties:
+      - gml_id
+      - lokaal_id
+      - fysiek_voorkomen
+      - plus_fysiek_voorkomen
+    color_attributes:
+      - plus_fysiek_voorkomen
+      - fysiek_voorkomen
+  
+  bgt_onbegroeidterreindeel:
+    ifc_class: IfcGeographicElement
+    assignment_method: spatial
+    default_height: 0.02
+    name_attribute: lokaal_id
+    pset_name: Pset_BGT_Onbegroeid
+    properties:
+      - gml_id
+      - lokaal_id
+      - fysiek_voorkomen
+      - plus_fysiek_voorkomen
+    color_attributes:
+      - fysiek_voorkomen
+      - plus_fysiek_voorkomen
+  
+  bgt_ondersteunendwegdeel:
+    ifc_class: IfcCivilElement
+    assignment_method: spatial
+    default_height: 0.2
+    name_attribute: lokaal_id
+    pset_name: Pset_BGT_OndersteunendWegdeel
+    properties:
+      - gml_id
+      - lokaal_id
+      - functie
+      - plus_fysiek_voorkomen
+    color_attributes:
+      - functie
+      - plus_fysiek_voorkomen
+  
+  bgt_kunstwerkdeel:
+    ifc_class: IfcCivilElement
+    assignment_method: spatial
+    default_height: 1.0
+    name_attribute: lokaal_id
+    pset_name: Pset_BGT_Kunstwerk
+    properties:
+      - gml_id
+      - lokaal_id
+      - type
+    color_attributes:
+      - type
+  
+  bag3d_lod22:
+    ifc_class: IfcBuilding
+    assignment_method: aggregate
+    default_height: 0.0  # Uses 3D geometry
+    name_attribute: identificatie
+    pset_name: Pset_BAG3D
+    properties:
+      - identificatie
+      - bouwjaar
+      - status
+      - h_dak_max
+      - h_dak_min
+      - h_maaiveld
+      - opp_grond
+      - dak_type
+    surface_classification: true  # Enable roof/wall detection
+  
+  bag3d_lod12:
+    ifc_class: IfcBuilding
+    assignment_method: aggregate
+    default_height: 0.0
+    name_attribute: identificatie
+    pset_name: Pset_BAG3D
+    properties:
+      - identificatie
+      - bouwjaar
+      - status
+      - h_dak_max
+      - h_dak_min
+      - h_maaiveld
+  
+  bag3d_lod13:
+    ifc_class: IfcBuilding
+    assignment_method: aggregate
+    default_height: 0.0
+    name_attribute: identificatie
+    pset_name: Pset_BAG3D
+    properties:
+      - identificatie
+      - bouwjaar
+      - status
+      - h_dak_max
+      - h_dak_min
+      - h_maaiveld
+  
+  bag_pand:
+    ifc_class: IfcBuilding
+    assignment_method: aggregate
+    default_height: 8.0
+    name_attribute: identificatie
+    pset_name: Pset_BAG_Pand
+    properties:
+      - identificatie
+  
+  brk_perceel:
+    ifc_class: IfcGeographicElement
+    assignment_method: spatial
+    default_height: 0.02
+    name_attribute: identificatie
+    pset_name: Pset_BRK_Perceel
+    properties:
+      - identificatie
+      - kadastralegemeente
+      - sectie
+      - perceelnummer
+      - oppervlakte

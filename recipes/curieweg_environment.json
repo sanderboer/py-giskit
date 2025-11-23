@@ -1,0 +1,47 @@
+{
+  "name": "Curieweg Environment & Nature",
+  "description": "Download environmental and nature data (Natura2000, wetlands, agriculture) for Curieweg area",
+  "location": {
+    "type": "address",
+    "value": "Curieweg 7a, Spijkenisse, Netherlands",
+    "radius": 5000,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "natura2000",
+      "layers": [
+        "natura2000"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "nationale-parken",
+      "layers": [
+        "nationaleparken"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "wetlands",
+      "layers": [
+        "wetlands"
+      ]
+    },
+    {
+      "provider": "pdok",
+      "service": "gewaspercelen",
+      "layers": [
+        "gewaspercelen"
+      ]
+    }
+  ],
+  "output": {
+    "path": "data/curieweg_environment.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "env_"
+  }
+}

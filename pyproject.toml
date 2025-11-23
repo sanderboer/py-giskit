@@ -1,0 +1,131 @@
+[tool.poetry]
+name = "giskit"
+version = "0.1.0-dev"
+description = "Recipe-driven spatial data downloader for any location, any provider, anywhere"
+authors = ["A190 <info@a190.nl>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/a190/giskit"
+repository = "https://github.com/a190/giskit"
+keywords = ["gis", "spatial", "ogc", "wfs", "wmts", "geodata", "recipe", "openstreetmap", "pdok"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: GIS",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+httpx = "^0.27.0"
+geopandas = "^0.14.0"
+shapely = ">=2.0.0,<2.1.0"
+pyproj = "^3.6.0"
+pydantic = "^2.5.0"
+typer = {extras = ["all"], version = "^0.9.0"}
+rich = "^13.7.0"
+jsonschema = "^4.20.0"
+fiona = "^1.9.0"
+ifcopenshell = {version = "^0.8.0", optional = true}
+
+[tool.poetry.extras]
+ifc = ["ifcopenshell"]
+all = ["ifcopenshell"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.23.0"
+pytest-cov = "^4.1.0"
+mypy = "^1.8.0"
+ruff = "^0.1.0"
+black = "^23.12.0"
+
+[tool.poetry.scripts]
+giskit = "giskit.cli.main:app"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+markers = [
+    "unit: Unit tests (fast, no external dependencies)",
+    "integration: Integration tests (require real API calls)",
+    "slow: Slow tests (>1s runtime)",
+]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "geopandas.*",
+    "shapely.*",
+    "fiona.*",
+    "pyproj.*",
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "E402",  # module level import not at top of file (needed for lazy loading)
+    "E722",  # bare except (sometimes needed for backwards compat)
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"giskit/protocols/quirks.py" = ["E402"]
+"giskit/providers/pdok.py" = ["E402"]
+"giskit/indexer/monitor.py" = ["F821"]  # requests/httpx issue
+"giskit/core/spatial.py" = ["F821"]  # TYPE_CHECKING forward ref
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.coverage.run]
+source = ["giskit"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

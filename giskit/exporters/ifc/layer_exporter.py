@@ -1,0 +1,386 @@
+"""
+Layer exporters for different GeoPackage layer types.
+
+Generic plugin system that works with MaterialsManager and YAML configs.
+"""
+from typing import Any, Dict
+
+import geopandas as gpd
+import ifcopenshell
+import ifcopenshell.api
+from shapely.geometry import MultiPolygon, Polygon
+
+from .geometry import (
+    classify_surface,
+    create_extruded_area_solid,
+    create_faceted_brep,
+    create_shape_representation,
+    normalize_z_to_ground,
+    polygon_3d_to_ifc_face,
+    transform_to_relative,
+)
+from .materials import MaterialsManager
+from .schema_adapter import SchemaAdapter
+
+
+class LayerExporter:
+    """Generic layer exporter that works with MaterialsManager configs."""
+
+    def __init__(self, materials_manager: MaterialsManager):
+        """Initialize exporter with materials manager.
+
+        Args:
+            materials_manager: MaterialsManager instance
+        """
+        self.materials = materials_manager
+        self._material_cache: Dict[str, Any] = {}
+
+    def export(
+        self,
+        layer_name: str,
+        ifc_file: Any,
+        site: Any,
+        context: Any,
+        schema_adapter: SchemaAdapter,
+        db_path: str,
+        ref_x: float,
+        ref_y: float,
+        relative: bool,
+        normalize_z: bool = True
+    ) -> Dict[str, int]:
+        """Export layer to IFC.
+
+        Args:
+            layer_name: Layer name in GeoPackage
+            ifc_file: ifcopenshell file instance
+            site: IfcSite entity
+            context: IfcGeometricRepresentationContext
+            schema_adapter: Schema adapter for version-specific logic
+            db_path: Path to GeoPackage
+            ref_x, ref_y: Reference point for coordinate transformation
+            relative: Use relative coordinates
+            normalize_z: Normalize 3D building Z coordinates to ground level
+
+        Returns:
+            Statistics dict (e.g., {'buildings': 3})
+        """
+        # Get layer configuration
+        layer_config = self.materials.get_layer_config(layer_name)
+        if not layer_config:
+            print(f"Warning: No configuration for layer {layer_name}, skipping")
+            return {}
+
+        # Read GeoDataFrame
+        gdf = gpd.read_file(db_path, layer=layer_name)
+
+        # Detect if layer has 3D geometry
+        is_3d = layer_name.startswith('bag3d')
+        supports_surface_classification = self.materials.supports_surface_classification(layer_name)
+
+        count = 0
+
+        for _idx, row in gdf.iterrows():
+            geom = row['geometry']
+            if geom is None or geom.is_empty:
+                continue
+
+            # Convert row to dict for materials manager
+            feature_data = row.to_dict()
+
+            # Transform geometry if needed
+            if relative:
+                geom = transform_to_relative(geom, ref_x, ref_y)
+
+            if is_3d and normalize_z:
+                geom = normalize_z_to_ground(geom)
+
+            # Create IFC entity
+            entity = self._create_entity(
+                layer_name, layer_config, feature_data,
+                ifc_file, schema_adapter
+            )
+
+            # Create geometry representation
+            if is_3d and supports_surface_classification:
+                # BAG3D with surface classification
+                self._create_3d_representation_with_surfaces(
+                    entity, geom, ifc_file, context, layer_name, feature_data
+                )
+            elif is_3d:
+                # BAG3D without surface classification
+                self._create_3d_representation(
+                    entity, geom, ifc_file, context, layer_name, feature_data
+                )
+            else:
+                # 2D extruded geometry
+                default_height = self.materials.get_default_height(layer_name)
+                self._create_2d_representation(
+                    entity, geom, ifc_file, context,
+                    layer_name, feature_data, default_height
+                )
+
+            # Add property set
+            self._add_property_set(entity, layer_name, feature_data, ifc_file)
+
+            # Assign to site
+            assignment_method = layer_config.get('assignment_method', 'spatial')
+            if assignment_method == 'aggregate':
+                ifcopenshell.api.run("aggregate.assign_object", ifc_file,
+                    relating_object=site,
+                    products=[entity]
+                )
+            else:  # spatial / container
+                ifcopenshell.api.run("spatial.assign_container", ifc_file,
+                    relating_structure=site,
+                    products=[entity]
+                )
+
+            count += 1
+
+        return {layer_name: count}
+
+    def _create_entity(
+        self,
+        layer_name: str,
+        layer_config: Dict,
+        feature_data: Dict,
+        ifc_file: Any,
+        schema_adapter: SchemaAdapter
+    ) -> Any:
+        """Create IFC entity for a feature."""
+        # Get IFC class
+        ifc_class = self.materials.get_ifc_class(layer_name, ifc_file.schema)
+
+        # Get name
+        name_attr = layer_config.get('name_attribute')
+        if name_attr and name_attr in feature_data:
+            name = str(feature_data[name_attr])
+        else:
+            name = f"{layer_name}_{id(feature_data)}"
+
+        # Create entity
+        entity = ifcopenshell.api.run("root.create_entity", ifc_file,
+            ifc_class=ifc_class,
+            name=name
+        )
+
+        return entity
+
+    def _create_2d_representation(
+        self,
+        entity: Any,
+        geom: Any,
+        ifc_file: Any,
+        context: Any,
+        layer_name: str,
+        feature_data: Dict,
+        height: float
+    ):
+        """Create representation for 2D geometry (extruded)."""
+        polygons = []
+        if isinstance(geom, Polygon):
+            polygons = [geom]
+        elif isinstance(geom, MultiPolygon):
+            polygons = list(geom.geoms)
+
+        # Create material/style
+        color = self.materials.get_color(layer_name, feature_data)
+        material_name = self.materials.get_material_name(layer_name, feature_data)
+        style = self._get_or_create_style(ifc_file, material_name, color)
+
+        # Create solids
+        solids = []
+        for poly in polygons:
+            if poly.is_valid and not poly.is_empty:
+                solid = create_extruded_area_solid(ifc_file, poly, height)
+                solids.append(solid)
+
+        if not solids:
+            return
+
+        # Create shape representation
+        rep = create_shape_representation(
+            ifc_file, context, "SweptSolid", solids
+        )
+
+        # Assign style
+        ifcopenshell.api.run("style.assign_representation_styles", ifc_file,
+            shape_representation=rep,
+            styles=[style]
+        )
+
+        # Create product definition shape
+        product_shape = ifc_file.createIfcProductDefinitionShape(None, None, [rep])
+        entity.Representation = product_shape
+
+    def _create_3d_representation(
+        self,
+        entity: Any,
+        geom: Any,
+        ifc_file: Any,
+        context: Any,
+        layer_name: str,
+        feature_data: Dict
+    ):
+        """Create representation for 3D geometry (no surface classification)."""
+        polygons = []
+        if isinstance(geom, Polygon):
+            polygons = [geom]
+        elif isinstance(geom, MultiPolygon):
+            polygons = list(geom.geoms)
+
+        # Create material/style
+        color = self.materials.get_color(layer_name, feature_data)
+        material_name = self.materials.get_material_name(layer_name, feature_data)
+        style = self._get_or_create_style(ifc_file, material_name, color)
+
+        # Create faces
+        faces = []
+        for poly in polygons:
+            if poly.is_valid and not poly.is_empty:
+                face = polygon_3d_to_ifc_face(ifc_file, poly)
+                faces.append(face)
+
+        if not faces:
+            return
+
+        # Create B-rep
+        brep = create_faceted_brep(ifc_file, faces)
+
+        # Create shape representation
+        rep = create_shape_representation(
+            ifc_file, context, "Brep", [brep]
+        )
+
+        # Assign style
+        ifcopenshell.api.run("style.assign_representation_styles", ifc_file,
+            shape_representation=rep,
+            styles=[style]
+        )
+
+        # Create product definition shape
+        product_shape = ifc_file.createIfcProductDefinitionShape(None, None, [rep])
+        entity.Representation = product_shape
+
+    def _create_3d_representation_with_surfaces(
+        self,
+        entity: Any,
+        geom: Any,
+        ifc_file: Any,
+        context: Any,
+        layer_name: str,
+        feature_data: Dict
+    ):
+        """Create representation for 3D geometry with surface classification."""
+        polygons = []
+        if isinstance(geom, Polygon):
+            polygons = [geom]
+        elif isinstance(geom, MultiPolygon):
+            polygons = list(geom.geoms)
+
+        # Create faces grouped by surface type
+        faces_by_type = {'ROOF': [], 'WALL': [], 'FLOOR': []}
+
+        for poly in polygons:
+            if not poly.is_valid or poly.is_empty:
+                continue
+
+            surface_type = classify_surface(poly)
+            face = polygon_3d_to_ifc_face(ifc_file, poly)
+            faces_by_type[surface_type].append(face)
+
+        # Create separate representations for each surface type
+        all_faces = []
+        for surface_type, faces in faces_by_type.items():
+            if not faces:
+                continue
+
+            # Get color for this surface type
+            surface_feature_data = feature_data.copy()
+            surface_feature_data['surface_type'] = surface_type
+            color = self.materials.get_color(layer_name, surface_feature_data)
+            material_name = self.materials.get_material_name(layer_name, surface_feature_data)
+            style = self._get_or_create_style(ifc_file, material_name, color)
+
+            # Create B-rep for this surface type
+            brep = create_faceted_brep(ifc_file, faces)
+
+            # Create shape representation
+            rep = create_shape_representation(
+                ifc_file, context, "Brep", [brep]
+            )
+
+            # Assign style
+            ifcopenshell.api.run("style.assign_representation_styles", ifc_file,
+                shape_representation=rep,
+                styles=[style]
+            )
+
+            all_faces.extend(faces)
+
+        # Combine all representations
+        if all_faces:
+            # Create product definition shape with all representations
+            product_shape = ifc_file.createIfcProductDefinitionShape(None, None,
+                [rep for rep in entity.Representation.Representations if rep] if hasattr(entity, 'Representation') and entity.Representation else []
+            )
+            entity.Representation = product_shape
+
+    def _add_property_set(
+        self,
+        entity: Any,
+        layer_name: str,
+        feature_data: Dict,
+        ifc_file: Any
+    ):
+        """Add property set to entity."""
+        pset_name, properties = self.materials.get_pset_config(layer_name)
+
+        # Build properties dict
+        props = {}
+        for prop_name in properties:
+            if prop_name in feature_data:
+                value = feature_data[prop_name]
+                if value is not None:
+                    props[prop_name] = str(value)
+
+        if props:
+            pset = ifcopenshell.api.run("pset.add_pset", ifc_file,
+                product=entity,
+                name=pset_name
+            )
+            ifcopenshell.api.run("pset.edit_pset", ifc_file,
+                pset=pset,
+                properties=props
+            )
+
+    def _get_or_create_style(
+        self,
+        ifc_file: Any,
+        material_name: str,
+        color: tuple
+    ) -> Any:
+        """Get or create surface style for a material."""
+        if material_name in self._material_cache:
+            return self._material_cache[material_name]
+
+        # Create surface style
+        style = ifcopenshell.api.run("style.add_style", ifc_file, name=material_name)
+
+        # Add rendering color
+        ifcopenshell.api.run("style.add_surface_style", ifc_file,
+            style=style,
+            ifc_class="IfcSurfaceStyleRendering",
+            attributes={
+                "SurfaceColour": {
+                    "Name": None,
+                    "Red": color[0],
+                    "Green": color[1],
+                    "Blue": color[2],
+                },
+                "Transparency": 1.0 - color[3] if len(color) > 3 else 0.0,
+            }
+        )
+
+        self._material_cache[material_name] = style
+        return style
