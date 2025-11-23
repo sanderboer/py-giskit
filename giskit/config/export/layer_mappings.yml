@@ -149,9 +149,9 @@ layer_mappings:
       - h_maaiveld
   
   bag_pand:
-    ifc_class: IfcBuilding
-    assignment_method: aggregate
-    default_height: 8.0
+    ifc_class: IfcGeographicElement  # 2D footprint, not a full building
+    assignment_method: spatial
+    default_height: 0.1  # Minimal height for 2D representation
     name_attribute: identificatie
     pset_name: Pset_BAG_Pand
     properties:

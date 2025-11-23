@@ -224,6 +224,7 @@ class IFCExporter:
 
         # Set site location (reference point in RD coordinates)
         # NOTE: This uses Amersfoort RD New (EPSG:28992)
+        # The LocalPlacement origin should be at the reference point (e.g., site address)
         site_location = self.ifc.createIfcSite(
             self.site.GlobalId,
             self.site.OwnerHistory if hasattr(self.site, "OwnerHistory") else None,
@@ -233,7 +234,7 @@ class IFCExporter:
             self.ifc.createIfcLocalPlacement(
                 None,
                 self.ifc.createIfcAxis2Placement3D(
-                    self.ifc.createIfcCartesianPoint((0.0, 0.0, 0.0)), None, None
+                    self.ifc.createIfcCartesianPoint((self.ref_x, self.ref_y, 0.0)), None, None
                 ),
             ),
             None,  # Representation
@@ -269,7 +270,7 @@ class IFCExporter:
     def _auto_detect_reference_point(
         self, db_path: Path, layers: Optional[List[str]] = None
     ) -> tuple[float, float]:
-        """Auto-detect reference point from first feature's centroid.
+        """Auto-detect reference point from metadata or first feature's centroid.
 
         Args:
             db_path: Path to GeoPackage
@@ -279,6 +280,18 @@ class IFCExporter:
             Tuple of (ref_x, ref_y)
         """
         import geopandas as gpd
+
+        # First try to read from _metadata table (created by giskit)
+        try:
+            metadata_gdf = gpd.read_file(str(db_path), layer="_metadata")
+            if len(metadata_gdf) > 0 and "x" in metadata_gdf.columns and "y" in metadata_gdf.columns:
+                ref_x = float(metadata_gdf["x"].iloc[0])
+                ref_y = float(metadata_gdf["y"].iloc[0])
+                print(f"  Using reference point from _metadata: ({ref_x:.2f}, {ref_y:.2f})")
+                return (ref_x, ref_y)
+        except Exception:
+            # _metadata table doesn't exist or is invalid, fall back to auto-detection
+            pass
 
         if layers is None:
             layers = self._get_available_layers(db_path)
