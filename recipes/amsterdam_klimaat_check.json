@@ -1,0 +1,72 @@
+{
+  "name": "Amsterdam Climate Risk Assessment",
+  "description": "Download climate adaptation data (heat stress, flooding, green space) for Amsterdam neighborhood analysis",
+  "location": {
+    "type": "bbox",
+    "value": [
+      4.8500,
+      52.3400,
+      4.9200,
+      52.3900
+    ],
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "klimaateffectatlas",
+      "service": "sociale-kwetsbaarheid-hitte",
+      "layers": [
+        "kea_public:sociale_kwetsbaarheid_hitte"
+      ]
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "gevoelstemperatuur-buurt",
+      "layers": [
+        "kea_public:GevoelstemperatuurBuurt_2022"
+      ]
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "groen-per-buurt",
+      "layers": [
+        "kea_public:boom_per_buurt27"
+      ]
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "grijs-per-buurt",
+      "layers": [
+        "kea_public:grijs_per_buurt27"
+      ]
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "water-per-buurt",
+      "layers": [
+        "kea_public:water_per_buurt27"
+      ]
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "afstand-tot-koelte",
+      "layers": [
+        "kea_public:Afstand_tot_koelte"
+      ]
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "droge-plekken-extreem-kleine-kans",
+      "layers": [
+        "kea_public:Droge_plekken_Extreem_kleine_kans"
+      ]
+    }
+  ],
+  "output": {
+    "path": "data/amsterdam_klimaat.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "klimaat_"
+  }
+}

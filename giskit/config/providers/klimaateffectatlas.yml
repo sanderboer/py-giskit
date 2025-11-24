@@ -1,0 +1,382 @@
+provider:
+  name: klimaateffectatlas
+  title: Klimaateffectatlas Nederland
+  country: NL
+  homepage: https://www.klimaateffectatlas.nl
+  license: CC-BY-4.0
+  description: 'Dutch national climate adaptation atlas providing climate risk and vulnerability
+    data
+
+    including heat stress, flooding, drought impacts, and social vulnerability indicators.
+
+    '
+  maintainer: Sogelink Nederland & Climate Adaptation Services
+  contact: https://www.klimaateffectatlas.nl/nl/contact
+  attribution: 'Klimaateffectatlas Nederland, 2025'
+services:
+  sociale-kwetsbaarheid-hitte:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Sociale Kwetsbaarheid Hitte
+    category: climate
+    description: Social vulnerability to heat stress per neighborhood, combining demographic and environmental factors
+    keywords:
+    - klimaat
+    - hitte
+    - kwetsbaarheid
+    - buurten
+    - gezondheid
+    quirks: []
+    protocol: wfs
+    collection: kea_public:sociale_kwetsbaarheid_hitte
+  gevoelstemperatuur-buurt:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Gevoelstemperatuur per Buurt 2022
+    category: climate
+    description: Perceived temperature per neighborhood based on heat island effect measurements
+    keywords:
+    - klimaat
+    - temperatuur
+    - hitte-eiland
+    - buurten
+    quirks: []
+    protocol: wfs
+    collection: kea_public:GevoelstemperatuurBuurt_2022
+  groen-per-buurt:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Groen per Buurt
+    category: climate
+    description: Percentage of green space (vegetation/trees) per neighborhood
+    keywords:
+    - klimaat
+    - groen
+    - vegetatie
+    - buurten
+    - biodiversiteit
+    quirks: []
+    protocol: wfs
+    collection: kea_public:boom_per_buurt27
+  grijs-per-buurt:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Grijs per Buurt
+    category: climate
+    description: Percentage of paved/built-up area per neighborhood
+    keywords:
+    - klimaat
+    - verharding
+    - bebouwing
+    - buurten
+    quirks: []
+    protocol: wfs
+    collection: kea_public:grijs_per_buurt27
+  water-per-buurt:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Water per Buurt
+    category: climate
+    description: Percentage of water surface per neighborhood
+    keywords:
+    - klimaat
+    - water
+    - oppervlaktewater
+    - buurten
+    quirks: []
+    protocol: wfs
+    collection: kea_public:water_per_buurt27
+  afstand-tot-koelte:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Afstand tot Koelte
+    category: climate
+    description: Distance to cooling locations (parks, water bodies) for heat relief
+    keywords:
+    - klimaat
+    - koelte
+    - hitte
+    - parken
+    - water
+    quirks: []
+    protocol: wfs
+    collection: kea_public:Afstand_tot_koelte
+  droge-plekken-extreem-kleine-kans:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Droge Plekken bij Extreme Wateroverlast (T=1000)
+    category: climate
+    description: Areas that remain dry during extreme flooding events (1/1000 year probability)
+    keywords:
+    - klimaat
+    - wateroverlast
+    - overstromingen
+    - veilige-zones
+    quirks: []
+    protocol: wfs
+    collection: kea_public:Droge_plekken_Extreem_kleine_kans
+  gemeentegrenzen-klimaat:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Gemeentegrenzen (Klimaateffectatlas)
+    category: climate
+    description: Municipality boundaries for climate data aggregation
+    keywords:
+    - klimaat
+    - gemeenten
+    - grenzen
+    - administratief
+    quirks: []
+    protocol: wfs
+    collection: kea_public:Gemeentegrenzen
+  hitteeiland-effect:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Hitte-eiland Effect
+    category: climate
+    description: Urban heat island effect intensity across areas
+    keywords:
+    - klimaat
+    - hitte-eiland
+    - temperatuur
+    - stedelijk-gebied
+    quirks: []
+    protocol: wfs
+    collection: kea_public:hitteeiland
+  dagen-15mm-huidig:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Dagen met >15mm Neerslag (Huidig)
+    category: climate
+    description: Current number of days per year with heavy precipitation (>15mm) - baseline scenario
+    keywords:
+    - klimaat
+    - neerslag
+    - wateroverlast
+    - huidig
+    - extremen
+    quirks: []
+    protocol: wfs
+    collection: kea_public:dagen_15mm_huidig
+  dagen-15mm-2050-hoog:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Dagen met >15mm Neerslag (2050 Hoog)
+    category: climate
+    description: Projected number of days per year with heavy precipitation (>15mm) by 2050 - high scenario
+    keywords:
+    - klimaat
+    - neerslag
+    - wateroverlast
+    - 2050
+    - scenario
+    - extremen
+    quirks: []
+    protocol: wfs
+    collection: kea_public:dagen_15mm_2050hoog
+  dagen-25mm-huidig:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Dagen met >25mm Neerslag (Huidig)
+    category: climate
+    description: Current number of days per year with extreme precipitation (>25mm) - baseline scenario
+    keywords:
+    - klimaat
+    - neerslag
+    - wateroverlast
+    - huidig
+    - extremen
+    quirks: []
+    protocol: wfs
+    collection: kea_public:dagen_25mm_huidig
+  dagen-25mm-2050-laag:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Dagen met >25mm Neerslag (2050 Laag)
+    category: climate
+    description: Projected number of days per year with extreme precipitation (>25mm) by 2050 - low scenario
+    keywords:
+    - klimaat
+    - neerslag
+    - wateroverlast
+    - 2050
+    - scenario
+    - extremen
+    quirks: []
+    protocol: wfs
+    collection: kea_public:dagen_25mm_2050laag
+  ijsdagen-huidig:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: IJsdagen (Huidig)
+    category: climate
+    description: Current number of frost days per year (max temp <0°C) - baseline scenario
+    keywords:
+    - klimaat
+    - vorst
+    - temperatuur
+    - huidig
+    - winter
+    quirks: []
+    protocol: wfs
+    collection: kea_public:ijsdagen_huidig
+  ijsdagen-2050-hoog:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: IJsdagen (2050 Hoog)
+    category: climate
+    description: Projected number of frost days per year (max temp <0°C) by 2050 - high scenario
+    keywords:
+    - klimaat
+    - vorst
+    - temperatuur
+    - 2050
+    - scenario
+    - winter
+    quirks: []
+    protocol: wfs
+    collection: kea_public:ijsdagen_2050hoog
+  neerslagtekort-10j-huidig:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Neerslagtekort 10-jaar (Huidig)
+    category: climate
+    description: Current 10-year precipitation deficit indicator for drought risk assessment
+    keywords:
+    - klimaat
+    - droogte
+    - neerslag
+    - huidig
+    - water
+    quirks: []
+    protocol: wfs
+    collection: kea_public:neerslagtekort_10j_huidig
+  neerslagtekort-10j-2050-hoog:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Neerslagtekort 10-jaar (2050 Hoog)
+    category: climate
+    description: Projected 10-year precipitation deficit by 2050 - high scenario for future drought risk
+    keywords:
+    - klimaat
+    - droogte
+    - neerslag
+    - 2050
+    - scenario
+    - water
+    quirks: []
+    protocol: wfs
+    collection: kea_public:neerslagtekort_10j_2050hoog
+  kans-grondwateroverlast-2050-hoog:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Kans op Grondwateroverlast (2050 Hoog)
+    category: climate
+    description: Probability of groundwater flooding by 2050 - high scenario for building foundation risk
+    keywords:
+    - klimaat
+    - grondwater
+    - wateroverlast
+    - 2050
+    - scenario
+    - fundering
+    quirks: []
+    protocol: wfs
+    collection: kea_public:kans_grondwateroverlast_2050hoog
+  droge-verdiepingen-extreem-kleine-kans:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Droge Verdiepingen bij Extreme Wateroverlast
+    category: climate
+    description: Number of dry floors during extreme flooding events for building safety assessment
+    keywords:
+    - klimaat
+    - wateroverlast
+    - overstromingen
+    - gebouwen
+    - veiligheid
+    quirks: []
+    protocol: wfs
+    collection: kea_public:droge_verdiepingen_extreem_kleine_kans_20251120
+  schaduwkaart-fiets-wandelpaden:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Schaduwkaart Fiets- en Wandelpaden
+    category: climate
+    description: Shade coverage along cycling and walking paths for heat mitigation planning
+    keywords:
+    - klimaat
+    - hitte
+    - schaduw
+    - fietspaden
+    - wandelpaden
+    - groen
+    quirks: []
+    protocol: wfs
+    collection: kea_public:buurten_schaduwkaart_fiets_en_wandelpaden
+  eenzame-75plussers:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Eenzame 75-plussers
+    category: climate
+    description: Density of lonely elderly (75+) for heat vulnerability and social resilience assessment
+    keywords:
+    - klimaat
+    - kwetsbaarheid
+    - ouderen
+    - hitte
+    - gezondheid
+    - sociaal
+    quirks: []
+    protocol: wfs
+    collection: kea_public:eenzame_75plussers
+  oppervlaktewaterverzilting-3m:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Oppervlaktewaterverzilting 3 meter
+    category: climate
+    description: Surface water salinization at 3m depth - impact on vegetation and infrastructure
+    keywords:
+    - klimaat
+    - verzilting
+    - water
+    - bodem
+    - natuur
+    quirks: []
+    protocol: wfs
+    collection: kea_public:Oppervlaktewaterverzilting_3m
+  droogtegevoeligheid-natuur:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Droogtegevoeligheid Grondwaterafhankelijke Natuur
+    category: climate
+    description: Drought sensitivity of groundwater-dependent nature areas for biodiversity planning
+    keywords:
+    - klimaat
+    - droogte
+    - natuur
+    - grondwater
+    - biodiversiteit
+    quirks: []
+    protocol: wfs
+    collection: kea_public:droogtegevoeligheidgrondwaterafhankelijkenatuur
+  neerslag-jaar-huidig:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Jaarlijkse Neerslag (Huidig)
+    category: climate
+    description: Current annual precipitation totals - baseline for water management planning
+    keywords:
+    - klimaat
+    - neerslag
+    - huidig
+    - water
+    - jaar
+    quirks: []
+    protocol: wfs
+    collection: kea_public:neerslag_jaar_huidig
+  neerslag-jaar-2050-hoog:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: Jaarlijkse Neerslag (2050 Hoog)
+    category: climate
+    description: Projected annual precipitation totals by 2050 - high scenario for future water management
+    keywords:
+    - klimaat
+    - neerslag
+    - 2050
+    - scenario
+    - water
+    - jaar
+    quirks: []
+    protocol: wfs
+    collection: kea_public:neerslag_jaar_2050hoog
+  bkns-dreigingen-kansen:
+    url: https://cas.cloud.sogelink.com/public/data/org/gws/YWFMLMWERURF/kea_public/wfs
+    title: BKNS Dreigingen en Kansen
+    category: climate
+    description: Dutch Nature Classification threats and opportunities for biodiversity integration
+    keywords:
+    - klimaat
+    - natuur
+    - biodiversiteit
+    - classificatie
+    - planning
+    quirks: []
+    protocol: wfs
+    collection: kea_public:bkns_subklasse_2023_dreigingen_kansen

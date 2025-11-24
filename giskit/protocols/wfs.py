@@ -63,11 +63,11 @@ class WFSProtocol(Protocol):
         """Download vector features within bounding box.
 
         Args:
-            bbox: (minx, miny, maxx, maxy) in target CRS (usually EPSG:28992 for PDOK)
+            bbox: (minx, miny, maxx, maxy) in WGS84 (EPSG:4326)
             layers: Layer names to download (WFS typeNames)
-            crs: Target CRS
+            crs: Target CRS for output and WFS query
             limit: Maximum features per layer
-            **kwargs: Additional query parameters
+            **kwargs: Additional query parameters (can include bbox_crs to override input CRS)
 
         Returns:
             GeoDataFrame with downloaded features
@@ -75,13 +75,22 @@ class WFSProtocol(Protocol):
         if not layers:
             return gpd.GeoDataFrame()
 
+        # Transform bbox from WGS84 to target CRS if needed
+        bbox_crs = kwargs.get("bbox_crs", "EPSG:4326")
+        if bbox_crs != crs:
+            from giskit.core.spatial import transform_bbox
+
+            bbox_transformed = transform_bbox(bbox, bbox_crs, crs)
+        else:
+            bbox_transformed = bbox
+
         client = await self._get_client()
         all_gdfs = []
 
         for layer_name in layers:
             try:
                 gdf = await self._download_layer(
-                    client, layer_name, bbox, crs, limit or self.max_features
+                    client, layer_name, bbox_transformed, crs, limit or self.max_features
                 )
                 if not gdf.empty:
                     # Add layer name for identification

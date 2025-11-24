@@ -1,0 +1,205 @@
+{
+  "name": "Woningbouwcorporatie - Klimaat Risico Analyse",
+  "description": "Comprehensive climate risk assessment for new housing development sites. Includes current + 2050 scenarios for heat stress, flooding, drought, precipitation extremes, and social vulnerability. Ideal for feasibility studies, climate adaptation planning, and sustainable building design.",
+  "location": {
+    "type": "bbox",
+    "value": [
+      4.8500,
+      52.3400,
+      4.9200,
+      52.3900
+    ],
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "klimaateffectatlas",
+      "service": "sociale-kwetsbaarheid-hitte",
+      "comment": "Social vulnerability to heat stress - identify neighborhoods requiring extra heat mitigation measures"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "gevoelstemperatuur-buurt",
+      "comment": "Current perceived temperature (heat island baseline) - site-specific heat stress assessment"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "hitteeiland-effect",
+      "comment": "Urban heat island intensity - prioritize cooling infrastructure"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "afstand-tot-koelte",
+      "comment": "Distance to cooling locations - evaluate accessibility to parks/water for heat relief"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "schaduwkaart-fiets-wandelpaden",
+      "comment": "Shade coverage on paths - plan green corridors and street trees"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "eenzame-75plussers",
+      "comment": "Vulnerable elderly population - design cooling centers and community spaces"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "groen-per-buurt",
+      "comment": "Current green space percentage - identify green deficit areas"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "grijs-per-buurt",
+      "comment": "Paved area percentage - assess heat absorption and runoff risk"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "water-per-buurt",
+      "comment": "Water surface percentage - evaluate cooling potential and water features"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "dagen-15mm-huidig",
+      "comment": "Current heavy rain days (>15mm) - baseline for drainage system design"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "dagen-15mm-2050-hoog",
+      "comment": "Future heavy rain days (2050 high scenario) - future-proof water management"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "dagen-25mm-huidig",
+      "comment": "Current extreme rain days (>25mm) - assess flood risk baseline"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "dagen-25mm-2050-laag",
+      "comment": "Future extreme rain days (2050 low scenario) - conservative flood planning"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "neerslag-jaar-huidig",
+      "comment": "Current annual precipitation - water balance for green roofs/gardens"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "neerslag-jaar-2050-hoog",
+      "comment": "Future annual precipitation (2050) - long-term water infrastructure sizing"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "droge-plekken-extreem-kleine-kans",
+      "comment": "Flood-safe zones (T=1000) - critical infrastructure placement"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "droge-verdiepingen-extreem-kleine-kans",
+      "comment": "Dry floors during extreme flooding - building safety assessment"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "kans-grondwateroverlast-2050-hoog",
+      "comment": "Future groundwater flooding risk - foundation design requirements"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "neerslagtekort-10j-huidig",
+      "comment": "Current 10-year precipitation deficit - drought baseline for landscaping"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "neerslagtekort-10j-2050-hoog",
+      "comment": "Future drought risk (2050) - select drought-resistant vegetation"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "droogtegevoeligheid-natuur",
+      "comment": "Nature drought sensitivity - biodiversity integration planning"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "oppervlaktewaterverzilting-3m",
+      "comment": "Water salinization at 3m depth - vegetation and foundation material selection"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "ijsdagen-huidig",
+      "comment": "Current frost days - baseline for building materials and utilities"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "ijsdagen-2050-hoog",
+      "comment": "Future frost days (2050) - reduced frost action on foundations/pipes"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "bkns-dreigingen-kansen",
+      "comment": "Nature classification threats/opportunities - biodiversity net gain planning"
+    },
+    {
+      "provider": "klimaateffectatlas",
+      "service": "gemeentegrenzen-klimaat",
+      "comment": "Municipality boundaries - administrative context for climate policies"
+    }
+  ],
+  "output": {
+    "path": "data/woningbouw_klimaat_analyse.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true,
+    "layer_prefix": "klimaat_"
+  },
+  "use_cases": [
+    "Climate risk assessment for new housing development sites",
+    "Heat stress mitigation planning (green infrastructure, cooling centers)",
+    "Flood-resilient building design (drainage, foundations, safe zones)",
+    "Drought-resistant landscaping and water management",
+    "Social vulnerability analysis for community facility placement",
+    "Future-proofing infrastructure for 2050 climate scenarios",
+    "Biodiversity integration and nature-based solutions",
+    "Sustainable neighborhood planning (green-grey-blue balance)",
+    "Climate adaptation feasibility studies",
+    "Environmental impact assessments for housing projects"
+  ],
+  "output_layers": {
+    "heat_stress": [
+      "sociale-kwetsbaarheid-hitte",
+      "gevoelstemperatuur-buurt",
+      "hitteeiland-effect",
+      "afstand-tot-koelte",
+      "schaduwkaart-fiets-wandelpaden",
+      "eenzame-75plussers"
+    ],
+    "flooding_risk": [
+      "dagen-15mm-huidig",
+      "dagen-15mm-2050-hoog",
+      "dagen-25mm-huidig",
+      "dagen-25mm-2050-laag",
+      "neerslag-jaar-huidig",
+      "neerslag-jaar-2050-hoog",
+      "droge-plekken-extreem-kleine-kans",
+      "droge-verdiepingen-extreem-kleine-kans",
+      "kans-grondwateroverlast-2050-hoog"
+    ],
+    "drought_risk": [
+      "neerslagtekort-10j-huidig",
+      "neerslagtekort-10j-2050-hoog",
+      "droogtegevoeligheid-natuur",
+      "oppervlaktewaterverzilting-3m"
+    ],
+    "urban_characteristics": [
+      "groen-per-buurt",
+      "grijs-per-buurt",
+      "water-per-buurt",
+      "gemeentegrenzen-klimaat"
+    ],
+    "temperature_extremes": [
+      "ijsdagen-huidig",
+      "ijsdagen-2050-hoog"
+    ],
+    "biodiversity": [
+      "bkns-dreigingen-kansen"
+    ]
+  }
+}

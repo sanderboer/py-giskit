@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Klimaateffectatlas Provider** (26 climate services): Heat stress, flooding risk, drought, temperature extremes, and nature/biodiversity data for climate adaptation planning
+  - Heat Stress (6): Social vulnerability, heat island effect, perceived temperature, cooling access, shade maps, elderly vulnerability
+  - Flooding Risk (9): Precipitation extremes (current + 2050 scenarios), safe zones, dry floors, groundwater flooding risk
+  - Drought Risk (4): Precipitation deficit scenarios, nature drought sensitivity, water salinization
+  - Urban (4): Green/paved/water percentages, municipality boundaries
+  - Temperature (2): Frost days (current + 2050)
+  - Nature (1): BKNS biodiversity classification
+  - Recipe: `woningbouw_klimaat_risico_analyse.json` - comprehensive climate risk assessment for housing development
+  - Recipe: `amsterdam_klimaat_check.json` - example climate analysis for Amsterdam
+- **WFS Protocol**: Traditional WFS 2.0 support with automatic bbox CRS transformation (WGS84 → service CRS)
+
+### Fixed
+- **CRITICAL**: WFS protocol bbox transformation - now correctly transforms from WGS84 to service's native CRS (e.g., EPSG:28992)
+
+### Added (v0.1.0)
 - Initial release of GISKit
 - Recipe-driven spatial data download system
 - PDOK provider with 53 services (vector, aerial imagery, elevation)
