@@ -213,11 +213,11 @@ class OGCFeaturesProvider(Provider):
                     services.append(service_name)
         return services
 
-    def get_service_info(self, service: str) -> dict[str, Any]:
+    def get_service_info(self, service_id: str) -> dict[str, Any]:
         """Get detailed information about a specific service.
 
         Args:
-            service: Service name
+            service_id: Service identifier
 
         Returns:
             Dictionary with service metadata
@@ -225,25 +225,26 @@ class OGCFeaturesProvider(Provider):
         Raises:
             ValueError: If service not found
         """
-        if service not in self.services:
+        if service_id not in self.services:
             raise ValueError(
-                f"Service '{service}' not found. " f"Available: {', '.join(self.services.keys())}"
+                f"Service '{service_id}' not found. "
+                f"Available: {', '.join(self.services.keys())}"
             )
 
-        service_config = self.services[service]
+        service_config = self.services[service_id]
         if isinstance(service_config, str):
             # Old format - just URL
             return {
-                "name": service,
+                "name": service_id,
                 "url": service_config,
-                "title": service.upper(),
+                "title": service_id.upper(),
                 "category": "unknown",
                 "description": "",
                 "keywords": [],
             }
         else:
             # New format - full metadata
-            return {"name": service, **service_config}
+            return {"name": service_id, **service_config}
 
     def list_categories(self) -> list[str]:
         """Get list of all service categories.

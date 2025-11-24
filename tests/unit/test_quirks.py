@@ -355,28 +355,32 @@ class TestServiceFormatMetadata:
 
     def test_pdok_services_have_format_metadata(self):
         """Test 3D services in PDOK provider specify CityJSON format."""
-        from giskit.providers.pdok import PDOK_SERVICES
+        from giskit.config.loader import load_services
+
+        pdok_services = load_services("pdok")
 
         # These services should have format="cityjson"
         cityjson_services = ["bag3d", "3d-basisvoorziening", "3d-geluid"]
 
         for service_id in cityjson_services:
-            if service_id in PDOK_SERVICES:
-                service = PDOK_SERVICES[service_id]
+            if service_id in pdok_services:
+                service = pdok_services[service_id]
                 assert (
                     service.get("format") == "cityjson"
                 ), f"Service {service_id} uses CityJSON but format not specified"
 
     def test_non_3d_services_no_cityjson_format(self):
         """Test regular 2D services don't have CityJSON format."""
-        from giskit.providers.pdok import PDOK_SERVICES
+        from giskit.config.loader import load_services
+
+        pdok_services = load_services("pdok")
 
         # These 2D services should NOT have format="cityjson"
         regular_services = ["bgt", "bag", "brk"]
 
         for service_id in regular_services:
-            if service_id in PDOK_SERVICES:
-                service = PDOK_SERVICES[service_id]
+            if service_id in pdok_services:
+                service = pdok_services[service_id]
                 assert (
                     service.get("format") != "cityjson"
                 ), f"Service {service_id} is 2D but marked as CityJSON"

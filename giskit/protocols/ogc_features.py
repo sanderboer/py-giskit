@@ -209,6 +209,18 @@ class OGCFeaturesProtocol(Protocol):
             "limit": page_limit,
             **kwargs,
         }
+
+        # Add bbox-crs parameter to explicitly specify CRS of bbox coordinates
+        # OGC API Features spec recommends always including this for clarity
+        if self.quirks.bbox_crs and self.quirks.bbox_crs != "EPSG:4326":
+            # Bbox was transformed to RD or other CRS - specify the transformed CRS
+            params[
+                "bbox-crs"
+            ] = f"http://www.opengis.net/def/crs/EPSG/0/{self.quirks.bbox_crs.split(':')[1]}"
+        else:
+            # Using WGS84 - explicitly specify CRS84 (OGC standard for WGS84 lon/lat)
+            params["bbox-crs"] = "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+
         params = self.quirks.apply_to_params(params)
 
         all_gdfs = []

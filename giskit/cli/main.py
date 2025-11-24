@@ -62,9 +62,6 @@ async def _execute_recipe(recipe: Recipe, console: Console, verbose: bool):
     """
     import geopandas as gpd
 
-    # Import provider module to register providers
-    import giskit.providers.pdok  # noqa: F401
-
     # Get bbox from location
     with console.status("[bold green]Calculating bounding box..."):
         bbox = await recipe.get_bbox_wgs84()
