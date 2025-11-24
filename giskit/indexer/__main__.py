@@ -23,8 +23,8 @@ import asyncio
 import sys
 from pathlib import Path
 
+from giskit.config.loader import load_services
 from giskit.indexer.monitor import PDOKServiceMonitor
-from giskit.providers.pdok import PDOK_SERVICES
 
 
 async def cmd_check_all_async(args):
@@ -54,13 +54,16 @@ def cmd_check_all(args):
 
 async def cmd_check_one_async(args):
     """Check health of a single service."""
-    if args.service_id not in PDOK_SERVICES:
+    # Load PDOK services from config
+    pdok_services = load_services("pdok")
+
+    if args.service_id not in pdok_services:
         print(f"Error: Unknown service '{args.service_id}'")
-        print(f"Available services: {', '.join(sorted(PDOK_SERVICES.keys()))}")
+        print(f"Available services: {', '.join(sorted(pdok_services.keys()))}")
         return 1
 
     monitor = PDOKServiceMonitor(timeout=args.timeout)
-    result = await monitor.check_service_health(args.service_id, PDOK_SERVICES[args.service_id])
+    result = await monitor.check_service_health(args.service_id, pdok_services[args.service_id])
 
     print(f"\nService: {args.service_id}")
     print(f"Status:  {result['status']}")
@@ -90,7 +93,7 @@ def cmd_discover(args):
 
     if discovered:
         print(f"\n✓ Found {len(discovered)} new services!")
-        print("\nAdd these to PDOK_SERVICES in pdok.py:")
+        print("\nAdd these to config/providers/pdok/ogc-features.yml:")
         print("-" * 80)
 
         for svc in discovered:

@@ -24,7 +24,7 @@ from typing import Optional
 
 import httpx
 
-from giskit.providers.pdok import PDOK_SERVICES
+from giskit.config.loader import load_services
 
 
 class PDOKServiceMonitor:
@@ -37,9 +37,13 @@ class PDOKServiceMonitor:
             timeout: Request timeout in seconds
         """
         self.timeout = timeout
+
+        # Load PDOK services from config
+        self.pdok_services = load_services("pdok")
+
         self.results = {
             "timestamp": datetime.now().isoformat(),
-            "total_services": len(PDOK_SERVICES),
+            "total_services": len(self.pdok_services),
             "healthy": [],
             "unhealthy": [],
             "warnings": [],
@@ -157,13 +161,13 @@ class PDOKServiceMonitor:
         Returns:
             Health check results for all services
         """
-        print(f"Checking {len(PDOK_SERVICES)} PDOK services...")
+        print(f"Checking {len(self.pdok_services)} PDOK services...")
 
         # Check all services in parallel with asyncio.gather
         tasks = []
         service_ids = []
 
-        for service_id, service_info in PDOK_SERVICES.items():
+        for service_id, service_info in self.pdok_services.items():
             tasks.append(self.check_service_health(service_id, service_info))
             service_ids.append(service_id)
 
@@ -173,28 +177,31 @@ class PDOKServiceMonitor:
         for service_id, result in zip(service_ids, results, strict=False):
             print(f"  {service_id}...", end=" ")
 
+            # Handle exceptions from gather
             if isinstance(result, Exception):
-                result = {
+                result_dict = {
                     "service_id": service_id,
                     "status": "error",
                     "error": str(result),
                 }
+            else:
+                result_dict = result
 
-            if result["status"] == "healthy":
-                self.results["healthy"].append(result)
-                print(f"✓ OK ({result['collections_found']} collections)")
+            if result_dict["status"] == "healthy":
+                self.results["healthy"].append(result_dict)
+                print(f"✓ OK ({result_dict['collections_found']} collections)")
 
-            elif result["status"] == "not_found":
-                self.results["unhealthy"].append(result)
+            elif result_dict["status"] == "not_found":
+                self.results["unhealthy"].append(result_dict)
                 print("✗ NOT FOUND - may be deprecated!")
 
-            elif result["status"] == "timeout":
-                self.results["warnings"].append(result)
+            elif result_dict["status"] == "timeout":
+                self.results["warnings"].append(result_dict)
                 print("⚠ TIMEOUT")
 
             else:
-                self.results["unhealthy"].append(result)
-                print(f"✗ UNHEALTHY: {result['error']}")
+                self.results["unhealthy"].append(result_dict)
+                print(f"✗ UNHEALTHY: {result_dict['error']}")
 
         return self.results
 
@@ -217,7 +224,7 @@ class PDOKServiceMonitor:
             "https://api.pdok.nl/kadaster",
         ]
 
-        known_urls = {svc["url"] for svc in PDOK_SERVICES.values()}
+        known_urls = {svc["url"] for svc in self.pdok_services.values()}
 
         for catalog_url in catalog_urls:
             try:
@@ -314,7 +321,7 @@ class PDOKServiceMonitor:
         if self.results["discovered"]:
             lines.append("NEW SERVICES DISCOVERED")
             lines.append("-" * 80)
-            lines.append("  Consider adding these to PDOK_SERVICES:")
+            lines.append("  Consider adding these to config/providers/pdok/ogc-features.yml:")
             lines.append("")
             for svc in self.results["discovered"]:
                 lines.append(f"  • {svc['url']}")
@@ -329,7 +336,7 @@ class PDOKServiceMonitor:
             by_category = {}
             for svc in self.results["healthy"]:
                 service_id = svc["service_id"]
-                service_info = PDOK_SERVICES.get(service_id, {})
+                service_info = self.pdok_services.get(service_id, {})
                 category = service_info.get("category", "unknown")
 
                 if category not in by_category:
@@ -352,25 +359,27 @@ class PDOKServiceMonitor:
         return report
 
 
-def check_service_health(service_id: str) -> dict:
+async def check_service_health(service_id: str) -> dict:
     """Quick health check for a single service.
 
     Args:
-        service_id: Service ID from PDOK_SERVICES
+        service_id: Service ID from PDOK services config
 
     Returns:
         Health check result
 
     Example:
-        >>> result = check_service_health("bgt")
+        >>> import asyncio
+        >>> result = asyncio.run(check_service_health("bgt"))
         >>> print(result["status"])
         healthy
     """
-    if service_id not in PDOK_SERVICES:
+    monitor = PDOKServiceMonitor()
+
+    if service_id not in monitor.pdok_services:
         return {"status": "error", "error": f"Unknown service: {service_id}"}
 
-    monitor = PDOKServiceMonitor()
-    return monitor.check_service_health(service_id, PDOK_SERVICES[service_id])
+    return await monitor.check_service_health(service_id, monitor.pdok_services[service_id])
 
 
 def discover_services() -> list[dict]:
