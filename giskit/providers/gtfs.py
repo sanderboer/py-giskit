@@ -45,8 +45,9 @@ class GTFSProvider(Provider):
 
         # Load config if gtfs_url not provided
         if gtfs_url is None:
-            from giskit.config.discovery import get_provider_config
             import yaml
+
+            from giskit.config.discovery import get_provider_config
 
             provider_meta = get_provider_config(name)
             if provider_meta is None:

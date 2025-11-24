@@ -19,7 +19,7 @@ services:
     cache_hours: 720  # 30 days (monthly updates)
     geocoding:
       address_template: "{STRAATNAAM} {HUISNUMMER-TOEVOEGING}, {POSTCODE} {PLAATSNAAM}"
-  
+
   scholen-secondary:
     id: "scholen-secondary"
     title: "Voortgezet Onderwijs (Secondary Schools)"
@@ -32,7 +32,7 @@ services:
     cache_hours: 720  # 30 days (monthly updates)
     geocoding:
       address_template: "{STRAATNAAM} {HUISNUMMER-TOEVOEGING}, {POSTCODE} {PLAATSNAAM}"
-  
+
   scholen-special:
     id: "scholen-special"
     title: "Speciaal Onderwijs (Special Education)"
@@ -45,7 +45,7 @@ services:
     cache_hours: 720  # 30 days (monthly updates)
     geocoding:
       address_template: "{STRAATNAAM} {HUISNUMMER-TOEVOEGING}, {POSTCODE} {PLAATSNAAM}"
-  
+
   scholen-mbo:
     id: "scholen-mbo"
     title: "MBO (Vocational Education)"
@@ -58,7 +58,7 @@ services:
     cache_hours: 720  # 30 days (monthly updates)
     geocoding:
       address_template: "{STRAATNAAM} {HUISNUMMER-TOEVOEGING}, {POSTCODE} {PLAATSNAAM}"
-  
+
   scholen-hbo:
     id: "scholen-hbo"
     title: "Hoger Onderwijs (Higher Education - HBO/WO)"

@@ -4,9 +4,9 @@ This module provides user-friendly functions to explore what data is available,
 making it easy to compose recipes.
 """
 
-from typing import Any, cast
+from typing import Any
 
-from giskit.providers.base import Provider, get_provider, list_providers
+from giskit.providers.base import get_provider, list_providers
 
 
 def list_all_services(detailed: bool = False) -> dict[str, Any]:

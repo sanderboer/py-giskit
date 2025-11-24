@@ -1,8 +1,8 @@
 # NDOV - Public Transport Data (Netherlands)
-# 
+#
 # GTFS (General Transit Feed Specification) feed for Dutch public transport
 # Source: http://gtfs.ovapi.nl/
-# 
+#
 # Daily updated feed with all public transport stops/stations in NL
 # Includes bus, tram, metro, train, and ferry
 

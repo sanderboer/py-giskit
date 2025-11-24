@@ -3,17 +3,15 @@
 This protocol handles CSV files with optional geocoding support.
 """
 
-import csv
 import hashlib
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
 import geopandas as gpd
 import httpx
 import pandas as pd
-from pyproj import Transformer
 from shapely.geometry import Point
 
 logger = logging.getLogger(__name__)

@@ -100,8 +100,7 @@ Old hardcoded providers → New config-driven:
 ## Benefits
 
 ✅ **No code changes** to add services
-✅ **Version control** for service catalogs  
+✅ **Version control** for service catalogs
 ✅ **User extensible** - add custom providers
 ✅ **Portable** - configs can be external
 ✅ **Validatable** - schema validation before use
-

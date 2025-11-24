@@ -4,7 +4,6 @@ Downloads and parses GTFS feeds for public transport data.
 Focuses on stops/stations with geographic coordinates.
 """
 
-import csv
 import io
 import zipfile
 from pathlib import Path
@@ -213,7 +212,10 @@ class GTFSProtocol(Protocol):
             filtered = filtered.head(limit)
 
         # Create geometry from coordinates
-        geometry = [Point(lon, lat) for lon, lat in zip(filtered["stop_lon"], filtered["stop_lat"])]
+        geometry = [
+            Point(lon, lat)
+            for lon, lat in zip(filtered["stop_lon"], filtered["stop_lat"], strict=False)
+        ]
 
         # Create GeoDataFrame
         gdf = gpd.GeoDataFrame(filtered, geometry=geometry, crs="EPSG:4326")
