@@ -1,0 +1,41 @@
+# NDOV - Public Transport Data (Netherlands)
+# 
+# GTFS (General Transit Feed Specification) feed for Dutch public transport
+# Source: http://gtfs.ovapi.nl/
+# 
+# Daily updated feed with all public transport stops/stations in NL
+# Includes bus, tram, metro, train, and ferry
+
+provider:
+  name: "NDOV"
+  title: "NDOV - Nederlandse Openbaar Vervoer Data"
+  description: "Public transport stops and stations for all of Netherlands"
+  homepage: "http://gtfs.ovapi.nl/"
+  coverage: "Netherlands"
+  attribution: "NDOV / OVapi.nl"
+
+# GTFS feed configuration
+gtfs_url: "http://gtfs.ovapi.nl/nl/gtfs-nl.zip"
+cache_days: 1  # Cache for 1 day (feed updated daily)
+
+# Service definitions
+services:
+  haltes:
+    title: "OV Haltes (Public Transport Stops)"
+    description: |
+      All public transport stops and stations in the Netherlands.
+      Includes bus, tram, metro, train, and ferry stops.
+      Updated daily from GTFS feed.
+    protocol: gtfs
+    category: infrastructure
+    keywords:
+      - ov
+      - openbaar vervoer
+      - public transport
+      - haltes
+      - stations
+      - bus
+      - tram
+      - metro
+      - train
+    format: geojson

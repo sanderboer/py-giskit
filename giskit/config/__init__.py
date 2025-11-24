@@ -3,6 +3,11 @@
 Configuration loaders for services and quirks.
 """
 
+from giskit.config.discovery import (
+    discover_providers,
+    get_provider_config,
+    list_providers,
+)
 from giskit.config.loader import (
     QuirkDefinition,
     QuirksConfig,
@@ -23,4 +28,7 @@ __all__ = [
     "ServicesConfig",
     "QuirkDefinition",
     "QuirksConfig",
+    "discover_providers",
+    "get_provider_config",
+    "list_providers",
 ]

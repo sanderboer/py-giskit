@@ -216,7 +216,14 @@ def load_services(
     else:
         if config_dir is None:
             config_dir = DEFAULT_CONFIG_DIR
-        file_path = config_dir / "services" / f"{provider}.yml"
+
+        # Try new providers structure first: config/providers/{name}/ogc-features.yml
+        new_path = config_dir / "providers" / provider / "ogc-features.yml"
+        if new_path.exists():
+            file_path = new_path
+        else:
+            # Fall back to legacy structure: config/services/{name}.yml
+            file_path = config_dir / "services" / f"{provider}.yml"
 
     # Try to load from file
     if file_path.exists():

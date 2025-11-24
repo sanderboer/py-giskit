@@ -1,0 +1,34 @@
+provider:
+  name: bag3d
+  title: 3D BAG - 3D Building Models
+  country: NL
+  homepage: https://3dbag.nl
+  license: CC-BY-4.0
+  description: '3D building models of the Netherlands with multiple LOD (Level of Detail) levels.
+
+    Based on BAG building footprints combined with AHN elevation data.
+
+    '
+  maintainer: 3D geoinformation research group, TU Delft
+  contact: https://3dbag.nl/en/about
+services:
+  bag3d:
+    url: https://api.3dbag.nl
+    title: 3D BAG - 3D Building Models
+    category: buildings_3d
+    description: '3D building models with multiple LOD levels.
+
+      Returns CityJSON format instead of GeoJSON.
+
+      '
+    format: cityjson
+    keywords:
+    - 3d
+    - buildings
+    - bag
+    - lod
+    - cityjson
+    quirks:
+    - bag3d-ogc-features
+    - cityjson
+    protocol: ogc-features

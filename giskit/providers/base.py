@@ -96,6 +96,72 @@ class Provider(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_service_info(self, service_id: str) -> dict[str, Any]:
+        """Get detailed information about a specific service.
+
+        Args:
+            service_id: Service identifier
+
+        Returns:
+            Dictionary with service metadata:
+            {
+                "name": str,
+                "title": str,
+                "description": str,
+                "url": str,
+                "protocol": str,
+                "category": str,
+                "keywords": list[str],
+                ...
+            }
+
+        Raises:
+            ValueError: If service not found
+        """
+        pass
+
+    @abstractmethod
+    def list_categories(self) -> list[str]:
+        """Get list of all service categories.
+
+        Returns:
+            Sorted list of unique category names
+            (e.g., ['base_registers', 'elevation', 'imagery'])
+        """
+        pass
+
+    @abstractmethod
+    def get_services_by_category(self, category: str) -> list[str]:
+        """Get services in a specific category.
+
+        Args:
+            category: Category name (e.g., 'elevation', 'imagery')
+
+        Returns:
+            List of service identifiers in that category
+        """
+        pass
+
+    def get_services_by_protocol(self, protocol: str) -> list[str]:
+        """Get services that use a specific protocol.
+
+        This is optional - only multi-protocol providers need to implement this.
+        Single-protocol providers can use the default implementation which
+        returns all services if they match the protocol.
+
+        Args:
+            protocol: Protocol name (e.g., 'ogc-features', 'wcs', 'wmts')
+
+        Returns:
+            List of service identifiers that use this protocol
+        """
+        # Default: return all services if provider supports this protocol
+        supported = self.get_supported_protocols()
+        if protocol in supported:
+            return self.get_supported_services()
+        return []
+
     def register_protocol(self, name: str, protocol: Protocol) -> None:
         """Register a protocol instance for this provider.
 
@@ -155,15 +221,27 @@ class ProviderRegistry:
         return self._providers.get(name)
 
     def list_providers(self) -> list[str]:
-        """Get list of registered provider names.
+        """Get list of all available provider names.
+
+        Includes both explicitly registered and auto-discovered providers.
 
         Returns:
             List of provider identifiers
         """
-        return list(self._providers.keys())
+        from giskit.config.discovery import list_providers as discover_list
+
+        # Combine explicit registrations with auto-discovered
+        explicit = list(self._providers.keys())
+        discovered = discover_list()
+
+        # Return unique sorted list
+        return sorted(set(explicit + discovered))
 
     def create(self, name: str, **kwargs: Any) -> Provider:
         """Create a provider instance.
+
+        Uses auto-discovery if provider not explicitly registered.
+        Falls back to config-driven instantiation based on protocol.
 
         Args:
             name: Provider identifier
@@ -175,12 +253,50 @@ class ProviderRegistry:
         Raises:
             ValueError: If provider not found
         """
+        # First check explicit registrations (backward compatibility)
         provider_class = self.get(name)
-        if provider_class is None:
+        if provider_class is not None:
+            return provider_class(name=name, **kwargs)
+
+        # Try auto-discovery from config
+        from giskit.config.discovery import get_provider_config
+
+        config = get_provider_config(name)
+        if config is None:
             raise ValueError(
                 f"Provider '{name}' not found. Available: {', '.join(self.list_providers())}"
             )
-        return provider_class(name=name, **kwargs)
+
+        # Check config format
+        config_format = config.get("format", "split")
+
+        if config_format == "unified":
+            # Unified multi-protocol provider
+            from giskit.providers.multi_protocol import MultiProtocolProvider
+
+            return MultiProtocolProvider(
+                name=config["base_name"], config_file=config.get("config_file"), **kwargs
+            )
+
+        # Legacy split format - instantiate based on single protocol
+        protocol = config.get("protocol")
+        if not protocol:
+            raise ValueError(f"No protocol specified for provider '{name}'")
+
+        if protocol == "ogc-features":
+            from giskit.providers.ogc_features import OGCFeaturesProvider
+
+            return OGCFeaturesProvider(name=config["base_name"], **kwargs)
+        elif protocol == "wcs":
+            from giskit.providers.wcs import WCSProvider
+
+            return WCSProvider(name=f"{config['base_name']}-wcs", **kwargs)
+        elif protocol == "wmts":
+            from giskit.providers.wmts import WMTSProvider
+
+            return WMTSProvider(name=f"{config['base_name']}-wmts", **kwargs)
+        else:
+            raise ValueError(f"Unknown protocol '{protocol}' for provider '{name}'")
 
 
 # Global provider registry
