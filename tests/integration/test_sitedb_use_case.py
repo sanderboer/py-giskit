@@ -17,8 +17,6 @@ from pathlib import Path
 import geopandas as gpd
 import pytest
 
-# Import to register providers
-import giskit.providers.pdok  # noqa: F401
 from giskit.core.geocoding import geocode
 from giskit.core.recipe import Dataset, Location, LocationType, Output, Recipe
 from giskit.core.spatial import buffer_point_to_bbox, transform_bbox
