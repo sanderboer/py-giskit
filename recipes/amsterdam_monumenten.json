@@ -1,0 +1,22 @@
+{
+  "name": "Amsterdam Monumenten Test",
+  "description": "Test RCE cultural heritage monuments in Amsterdam centrum",
+  "location": {
+    "type": "bbox",
+    "value": [4.88, 52.36, 4.92, 52.39],
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "provider": "pdok",
+      "service": "cultureel-erfgoed",
+      "layers": ["rce_inspire_polygons"]
+    }
+  ],
+  "output": {
+    "path": "data/amsterdam_monumenten.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true
+  }
+}

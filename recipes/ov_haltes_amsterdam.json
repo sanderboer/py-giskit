@@ -1,0 +1,16 @@
+{
+  "name": "OV Haltes Amsterdam Centraal",
+  "description": "Public transport stops near Amsterdam Central Station",
+  "location": {
+    "type": "point",
+    "value": [4.9, 52.379],
+    "radius": 500,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "service": "haltes",
+      "provider": "ndov"
+    }
+  ]
+}
