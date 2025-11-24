@@ -4,7 +4,7 @@
 
 [![Python 3.10-3.12](https://img.shields.io/badge/python-3.10--3.12-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-110%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-123%20passing-brightgreen.svg)](tests/)
 
 > **⚠️ Version Policy**: Odd minor versions (0.1.x, 0.3.x, 0.5.x, etc.) may introduce breaking changes as we refine the architecture. Even minor versions (0.2.x, 0.4.x, etc.) maintain backward compatibility. Pin to specific versions in production.
 
@@ -23,11 +23,13 @@ GISKit is a Python tool for downloading Dutch spatial data using simple JSON "re
 ### Key Features
 
 - **Recipe-Driven**: Define your data needs in simple JSON
-- **PDOK Integration**: Access to 50+ Dutch government spatial datasets
+- **Multi-Provider**: Access 68+ datasets from 5 providers (PDOK, BAG3D, Klimaateffectatlas, DUO, NDOV)
+- **Service Catalog**: Discover available data with search and filtering
 - **Smart Downloads**: Automatic bbox calculation from addresses
 - **Single Output**: Everything combined in one GeoPackage
 - **CRS Handling**: Automatic coordinate transformation
 - **Export Options**: GeoPackage, GeoJSON, CityJSON, optional IFC/GLB
+- **Climate Data**: 26 climate adaptation services for heat, flood, drought analysis
 
 
 ## Quick Start
@@ -56,6 +58,7 @@ Create `dam_square.json`:
 ```json
 {
   "name": "Dam Square Buildings",
+  "description": "Download buildings and roads around Dam Square in Amsterdam",
   "location": {
     "type": "address",
     "value": "Dam 1, Amsterdam",
@@ -70,7 +73,9 @@ Create `dam_square.json`:
   ],
   "output": {
     "path": "./dam_square.gpkg",
-    "crs": "EPSG:28992"
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true
   }
 }
 ```
@@ -187,6 +192,15 @@ giskit run recipes/curieweg_multi_service.json
 # Amsterdam Dam Square with buildings
 giskit run recipes/amsterdam_dam_square.json
 
+# Climate risk assessment for Amsterdam
+giskit run recipes/amsterdam_klimaat_check.json
+
+# Public transport stops in Amsterdam
+giskit run recipes/ov_haltes_amsterdam.json
+
+# Schools in Amsterdam
+giskit run recipes/amsterdam_scholen.json
+
 # Simple bbox example
 giskit run recipes/bbox_simple.json
 ```
@@ -198,6 +212,7 @@ Comprehensive data for a project location:
 ```json
 {
   "name": "Curieweg Project Underlay",
+  "description": "Multi-service data collection for urban planning analysis",
   "location": {
     "type": "address",
     "value": "Curieweg 7a, Spijkenisse",
@@ -211,10 +226,34 @@ Comprehensive data for a project location:
   ],
   "output": {
     "path": "./curieweg.gpkg",
-    "crs": "EPSG:28992"
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true
   }
 }
 ```
+
+### Output Configuration
+
+The `output` section supports multiple options:
+
+```json
+{
+  "output": {
+    "path": "./output.gpkg",           // Output file path
+    "format": "gpkg",                   // Format: gpkg, geojson, shp
+    "crs": "EPSG:28992",                // Target coordinate system
+    "overwrite": true,                  // Overwrite existing file
+    "layer_prefix": "data_"             // Optional prefix for layer names
+  }
+}
+```
+
+**Available formats:**
+- `gpkg` - GeoPackage (default, recommended for multiple layers)
+- `geojson` - GeoJSON (single layer only)
+- `shp` - Shapefile (legacy support)
+- `json` - CityJSON (for 3D data from BAG3D)
 
 ### Location Types
 
@@ -258,9 +297,19 @@ Comprehensive data for a project location:
 **Quick Discovery:** Use the [catalog system](#discovering-available-data) to search for specific data types:
 ```python
 from giskit.catalog import search_services, print_catalog
-print_catalog()  # Browse all 52+ services
+print_catalog()  # Browse all 68+ services across 5 providers
 search_services("elevation")  # Find specific data
 ```
+
+### Current Providers
+
+GISKit provides access to **68+ datasets** from 5 different providers:
+
+**PDOK** (52 services) - Dutch government spatial data
+**BAG3D** (1 service) - 3D building models in CityJSON format
+**Klimaateffectatlas** (26 services) - Climate adaptation data (heat, flooding, drought)
+**DUO** (1 service) - School locations and data (CSV format)
+**NDOV** (1 service) - Public transport stops (GTFS format)
 
 ### PDOK (Platform Digitale Overheid - Netherlands)
 
@@ -288,7 +337,46 @@ GISKit provides access to **52 Dutch government datasets** via PDOK:
 - **Protected Areas** - Nature reserves, Natura 2000
 - **Soil Data** - Soil types, contamination
 
-**Current providers:** `pdok` (52 services), `bag3d` (1 service)
+### Klimaateffectatlas (Climate Effect Atlas - Netherlands)
+
+**26 climate adaptation datasets** for heat stress, flooding, and drought risk assessment:
+
+**Heat Stress (6 services):**
+- Social vulnerability to heat
+- Heat island effect
+- Perceived temperature
+- Distance to cooling areas
+- Shade maps
+- Elderly vulnerability
+
+**Flooding Risk (9 services):**
+- Heavy precipitation (current + 2050)
+- Extreme precipitation (current + 2050)
+- Safe zones and dry floors
+- Groundwater flooding risk
+
+**Drought Risk (4 services):**
+- 10-year precipitation deficit (current + 2050)
+- Nature sensitivity to drought
+- Water salinization risk
+
+**Urban Characteristics (4 services):**
+- Green percentage per neighborhood
+- Paved surface percentage
+- Water percentage
+- Municipality boundaries
+
+See [docs/KLIMAATEFFECTATLAS_INTEGRATION.md](docs/KLIMAATEFFECTATLAS_INTEGRATION.md) for complete service list.
+
+### DUO (Education Data - Netherlands)
+
+**School Locations** - All schools in Netherlands with type, students, address (CSV + geocoding)
+
+### NDOV (Public Transport - Netherlands)
+
+**OV Stops** - ~60,000 public transport stops across Netherlands (GTFS format)
+
+**Current providers:** `pdok`, `bag3d`, `klimaateffectatlas`, `duo`, `ndov`
 
 See [docs/PDOK_SERVICES.md](docs/PDOK_SERVICES.md) for complete catalog with all layers.
 
@@ -399,13 +487,18 @@ See [notes/EXPORT_GUIDE.md](notes/EXPORT_GUIDE.md) for details.
 giskit/
 ├── cli/              # Command-line interface
 ├── core/             # Recipe parsing, geocoding, spatial ops
-├── protocols/        # OGC Features, WMTS, WCS protocols
-├── providers/        # PDOK, OSM provider implementations
+├── protocols/        # OGC Features, WMTS, WCS, WFS, GTFS, CSV protocols
+├── providers/        # Multi-protocol provider system
 ├── exporters/        # IFC/GLB export (optional)
-└── config/           # YAML configurations for services
+├── config/           # YAML configurations for 68+ services
+│   ├── providers/    # Provider configs (pdok, bag3d, klimaateffectatlas, duo, ndov)
+│   ├── services/     # Service-specific settings
+│   └── quirks/       # API compatibility fixes
+└── catalog.py        # Service discovery and search
 
 recipes/              # Example recipes ready to use
-tests/                # 110+ unit and integration tests
+tests/                # 123 unit and integration tests
+docs/                 # Provider documentation and guides
 ```
 
 
@@ -414,7 +507,7 @@ tests/                # 110+ unit and integration tests
 ### Running Tests
 
 ```bash
-# All tests (110 passing)
+# All tests (123 passing)
 pytest
 
 # With coverage report
@@ -437,7 +530,9 @@ ruff format .
 
 ## Documentation
 
-- **[docs/PDOK_SERVICES.md](docs/PDOK_SERVICES.md)** - Complete PDOK service catalog
+- **[docs/PDOK_SERVICES.md](docs/PDOK_SERVICES.md)** - Complete PDOK service catalog (52 services)
+- **[docs/KLIMAATEFFECTATLAS_INTEGRATION.md](docs/KLIMAATEFFECTATLAS_INTEGRATION.md)** - Climate data guide (26 services)
+- **[docs/EXTERNAL_SERVICES.md](docs/EXTERNAL_SERVICES.md)** - Overview of all external data sources
 - **[notes/EXPORT_GUIDE.md](notes/EXPORT_GUIDE.md)** - IFC/GLB export instructions
 - **[notes/QUIRKS_SYSTEM.md](notes/QUIRKS_SYSTEM.md)** - API compatibility handling
 - **[notes/BAG3D_ARCHITECTURE.md](notes/BAG3D_ARCHITECTURE.md)** - 3D data handling
@@ -454,11 +549,18 @@ ruff format .
 - Project site context data (buildings, infrastructure, parcels)
 - Statistical area boundaries for reports
 - Base maps for presentations
+- Climate adaptation planning (heat stress, flooding risk)
 
 **Construction:**
 - Site underlay generation
 - Existing infrastructure mapping
 - Environmental constraints (protected areas, water)
+
+**Climate Adaptation:**
+- Heat stress vulnerability assessment
+- Flooding risk analysis (current + 2050 scenarios)
+- Drought impact evaluation
+- Green infrastructure planning
 
 **GIS Analysis:**
 - Batch download base data for multiple locations
