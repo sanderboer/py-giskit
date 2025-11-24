@@ -6,6 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-110%20passing-brightgreen.svg)](tests/)
 
+> **⚠️ Version Policy**: Odd minor versions (0.1.x, 0.3.x, 0.5.x, etc.) may introduce breaking changes as we refine the architecture. Even minor versions (0.2.x, 0.4.x, etc.) maintain backward compatibility. Pin to specific versions in production.
+
 ---
 
 ## What is GISKit?
@@ -80,6 +82,98 @@ giskit run dam_square.json
 ```
 
 Result: `dam_square.gpkg` with buildings and roads around Dam Square!
+
+
+## Discovering Available Data
+
+GISKit provides a **service catalog** to help you discover what data is available before writing recipes.
+
+### Python API
+
+```python
+from giskit.catalog import (
+    print_catalog,           # Browse all providers
+    search_services,         # Search by keyword
+    list_services_by_protocol,  # Filter by protocol type
+    export_catalog_json      # Export catalog as JSON
+)
+
+# Quick overview
+print_catalog()
+# Output:
+# 📦 PDOK
+#    PDOK - Publieke Dienstverlening Op de Kaart
+#    Services: 52
+#    Protocols: ogc-features, wmts, wcs
+
+# Search for specific data
+results = search_services("elevation")
+# → {'pdok': [{'id': 'ahn', 'title': 'Actueel Hoogtebestand Nederland', ...}]}
+
+# Find all raster/elevation services
+wcs_services = list_services_by_protocol("wcs")
+# → {'pdok': ['ahn']}
+
+# Export catalog for external tools
+export_catalog_json("catalog.json", detailed=True)
+```
+
+### Finding the Right Service
+
+**By keyword:**
+```python
+# Find 3D building data
+search_services("3d")
+# → bag3d/bag3d, pdok/3d-basisvoorziening, pdok/bag3d
+
+# Find elevation data
+search_services("elevation")
+# → pdok/ahn
+
+# Find cadastral parcels
+search_services("kadaster")
+# → pdok/brk
+```
+
+**By category:**
+```python
+from giskit.catalog import list_services_by_category
+
+# See all categories
+by_category = list_services_by_category()
+# → {'pdok': {'base_registers': ['bgt', 'bag', 'brk'],
+#             'elevation': ['ahn'],
+#             'infrastructure': ['nwb-wegen', ...], ...}}
+
+# Get only elevation data
+elevation = list_services_by_category("elevation")
+```
+
+**By protocol type:**
+```python
+# Vector data (OGC Features)
+vector_services = list_services_by_protocol("ogc-features")
+
+# Raster/elevation data (WCS)
+raster_services = list_services_by_protocol("wcs")
+
+# Pre-rendered tiles (WMTS)
+tile_services = list_services_by_protocol("wmts")
+```
+
+### Catalog Demo
+
+Run the interactive catalog demo:
+
+```bash
+python examples/catalog_demo.py
+```
+
+This shows:
+- Complete catalog overview
+- Search examples
+- Services by protocol and category
+- How to compose recipes from search results
 
 
 ## Recipe Examples
@@ -161,9 +255,16 @@ Comprehensive data for a project location:
 
 ## Available Data Sources
 
+**Quick Discovery:** Use the [catalog system](#discovering-available-data) to search for specific data types:
+```python
+from giskit.catalog import search_services, print_catalog
+print_catalog()  # Browse all 52+ services
+search_services("elevation")  # Find specific data
+```
+
 ### PDOK (Platform Digitale Overheid - Netherlands)
 
-GISKit provides access to **50+ Dutch government datasets** via PDOK's OGC API Features:
+GISKit provides access to **52 Dutch government datasets** via PDOK:
 
 **Base Registries (Basisregistraties):**
 - **BGT** - Large Scale Topography (54 layers: buildings, roads, water, terrain, etc.)
@@ -175,6 +276,10 @@ GISKit provides access to **50+ Dutch government datasets** via PDOK's OGC API F
 - **NWB Roads** - National Road Database (road segments, junctions)
 - **NWB Waterways** - Waterway network
 
+**Topography & Elevation:**
+- **AHN** - Actueel Hoogtebestand Nederland (elevation data via WCS)
+- **Luchtfoto** - Aerial imagery (WMTS tiles)
+
 **Statistics & Administration:**
 - **CBS Neighborhoods 2024** - Statistical areas (neighborhoods, districts, municipalities)
 - **Administrative Boundaries** - Municipalities, provinces, water boards
@@ -183,13 +288,13 @@ GISKit provides access to **50+ Dutch government datasets** via PDOK's OGC API F
 - **Protected Areas** - Nature reserves, Natura 2000
 - **Soil Data** - Soil types, contamination
 
+**Current providers:** `pdok` (52 services), `bag3d` (1 service)
+
 See [docs/PDOK_SERVICES.md](docs/PDOK_SERVICES.md) for complete catalog with all layers.
 
 ### Planned Providers
 
 - **OpenStreetMap** - Global POI, buildings, roads via Overpass API
-- **AHN Elevation** - Dutch elevation data via WCS
-- **Aerial Imagery** - Luchtfoto via WMTS
 
 
 ## CLI Commands

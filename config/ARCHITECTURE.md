@@ -1,8 +1,270 @@
 # GISKit Config-Driven Architecture
 
-Dit document beschrijft de **config-driven** refactoring van giskit.
+Dit document beschrijft de **config-driven** architectuur van giskit en de MultiProtocolProvider implementatie.
 
-## Huidige Situatie (November 2025)
+## Current Architecture (November 2025)
+
+### MultiProtocolProvider - Unified Provider System ✅ IMPLEMENTED
+
+**Status**: ✅ Fully implemented and working with PDOK (52 services), BAG3D (1 service), NDOV (1 service)
+
+The MultiProtocolProvider is a flexible, config-driven provider that supports multiple protocols per provider from a single YAML configuration file.
+
+#### Architecture
+
+```
+Provider Config (YAML)
+    ↓
+MultiProtocolProvider
+    ├── Service Discovery
+    ├── Protocol Routing (per service)
+    └── Dataset Download
+         ↓
+    Protocol Handlers
+         ├── OGC Features
+         ├── WMTS
+         ├── WCS
+         └── GTFS
+```
+
+#### Configuration Format
+
+```yaml
+# config/providers/pdok.yml
+provider:
+  name: "PDOK"
+  title: "PDOK - Publieke Dienstverlening Op de Kaart"
+  description: "Dutch national spatial data infrastructure"
+  homepage: "https://www.pdok.nl"
+  coverage: "Netherlands"
+
+services:
+  bgt:
+    title: "Basisregistratie Grootschalige Topografie"
+    url: "https://api.pdok.nl/lv/bgt/ogc/v1_0/"
+    protocol: "ogc-features"  # ← Protocol specified per service
+    category: "base_registers"
+    keywords: [bgt, topografie, gebouwen]
+
+  ahn:
+    title: "Actueel Hoogtebestand Nederland"
+    url: "https://service.pdok.nl/rws/ahn/wcs/v1_0"
+    protocol: "wcs"  # ← Different protocol, same provider
+    category: "elevation"
+    keywords: [ahn, elevation, dtm, dsm]
+```
+
+#### Key Features
+
+1. **Single Config File**: One YAML per provider with all services
+2. **Per-Service Protocol**: Each service specifies its own protocol
+3. **Auto-Discovery**: Providers automatically discovered from `config/providers/*.yml`
+4. **Protocol Routing**: Requests routed to appropriate protocol handler based on service
+5. **Catalog Integration**: Full metadata available for search and discovery
+
+#### Implementation Details
+
+Location: `giskit/providers/multi_protocol.py`
+
+```python
+class MultiProtocolProvider(Provider):
+    """Unified provider supporting multiple protocols from single config."""
+
+    def __init__(self, name: str, config_file: Path, **kwargs):
+        # Load unified config
+        self.config = load_yaml(config_file)
+        self.services = self.config["services"]
+
+        # Create protocol instances per service
+        for service_id, service_config in self.services.items():
+            protocol = service_config["protocol"]
+            self._init_protocol(service_id, protocol, service_config)
+
+    async def download_dataset(self, dataset, location, ...):
+        # Route to appropriate protocol based on service
+        service_id = dataset.service
+        protocol = self._get_protocol(service_id)
+        return await protocol.get_features(...)
+```
+
+#### Provider Discovery
+
+Location: `giskit/config/discovery.py`
+
+```python
+def discover_providers(config_dir: Path) -> dict[str, dict]:
+    """Auto-discover providers from config/providers/*.yml
+
+    Detects:
+    - Unified format: pdok.yml (NEW, preferred)
+    - Split format: pdok/ogc-features.yml (LEGACY, supported)
+    """
+```
+
+Discovery checks for:
+1. **Unified format**: `providers/*.yml` with `provider` and `services` keys
+2. **Legacy format**: `providers/{name}/{protocol}.yml` directories
+
+### Service Catalog System ✅ IMPLEMENTED
+
+**Location**: `giskit/catalog.py`
+
+Provides discovery API for all available services across all providers.
+
+#### API Functions
+
+```python
+from giskit.catalog import (
+    list_all_services,      # Browse all providers
+    search_services,        # Full-text search
+    list_services_by_category,  # Filter by category
+    list_services_by_protocol,  # Filter by protocol
+    print_catalog,          # Pretty-print overview
+    export_catalog_json,    # Export metadata
+)
+```
+
+#### Usage Examples
+
+```python
+# List all services
+catalog = list_all_services(detailed=True)
+# {
+#     "pdok": {
+#         "title": "PDOK - ...",
+#         "service_count": 52,
+#         "protocols": ["ogc-features", "wcs", "wmts"],
+#         "services": {"bgt": {...}, "ahn": {...}}
+#     },
+#     "ndov": {...},
+#     "bag3d": {...}
+# }
+
+# Search for services
+results = search_services("elevation")
+# {"pdok": [{"id": "ahn", "title": "...", "relevance": 0.95}]}
+
+# Filter by category
+infrastructure = list_services_by_category("infrastructure")
+# {"ndov": [{"id": "haltes", "title": "OV Haltes", ...}]}
+
+# Export for external tools
+export_catalog_json("catalog.json")
+```
+
+### Protocol System
+
+#### Available Protocols
+
+1. **OGC Features** (`ogc-features`) - Vector data via OGC API Features
+2. **WMTS** (`wmts`) - Pre-rendered raster tiles
+3. **WCS** (`wcs`) - Coverage data (elevation, raster)
+4. **GTFS** (`gtfs`) - Public transport data (NEW)
+
+#### Protocol Registration
+
+```python
+# giskit/protocols/__init__.py
+from giskit.protocols.ogc_features import OGCFeaturesProtocol
+from giskit.protocols.wmts import WMTSProtocol
+from giskit.protocols.wcs import WCSProtocol
+from giskit.protocols.gtfs import GTFSProtocol  # NEW
+
+# Each protocol implements Protocol base class
+```
+
+### Provider Types
+
+#### 1. MultiProtocolProvider (Config-Driven)
+
+**Used by**: PDOK, BAG3D
+**Config**: Single YAML with all services
+**Protocols**: Multiple per provider
+
+```yaml
+# config/providers/pdok.yml
+services:
+  bgt:
+    protocol: ogc-features
+  ahn:
+    protocol: wcs
+  luchtfoto:
+    protocol: wmts
+```
+
+#### 2. Single-Protocol Providers (Code-Based)
+
+**Used by**: NDOV (GTFS)
+**Implementation**: Direct Python class
+**Protocols**: One per provider
+
+```python
+# giskit/providers/gtfs.py
+class GTFSProvider(Provider):
+    """Provider for GTFS public transport data."""
+
+    def __init__(self, name: str, gtfs_url: str = None, **kwargs):
+        # Load gtfs_url from config if not provided
+        if gtfs_url is None:
+            config = get_provider_config(name)
+            gtfs_url = load_yaml(config["config_file"])["gtfs_url"]
+
+        self.protocol = GTFSProtocol(base_url=gtfs_url, cache_days=1)
+```
+
+#### Provider Registration
+
+Providers can be registered in two ways:
+
+1. **Auto-Discovery** (Preferred): Place config in `config/providers/{name}.yml`
+2. **Explicit Registration**: Call `register_provider(name, ProviderClass)` at module level
+
+```python
+# Auto-discovered (PDOK, BAG3D)
+# config/providers/pdok.yml exists → Automatically available
+
+# Explicitly registered (NDOV)
+from giskit.providers.base import register_provider
+register_provider("ndov", GTFSProvider)
+```
+
+### Data Flow
+
+```
+User Recipe (JSON)
+    ↓
+Recipe Parser
+    ↓
+Provider Factory (get_provider)
+    ├─→ Auto-discover from config
+    └─→ Check explicit registrations
+         ↓
+Provider Instance
+    ├─→ MultiProtocolProvider (for PDOK, BAG3D)
+    └─→ GTFSProvider (for NDOV)
+         ↓
+Protocol Handler
+    ├─→ OGCFeaturesProtocol
+    ├─→ WMTSProtocol
+    ├─→ WCSProtocol
+    └─→ GTFSProtocol
+         ↓
+Downloaded GeoDataFrame
+```
+
+### Supported Providers
+
+| Provider | Services | Protocols | Format | Status |
+|----------|----------|-----------|---------|--------|
+| **PDOK** | 52 | ogc-features, wcs, wmts | Unified YAML | ✅ Working |
+| **BAG3D** | 1 | ogc-features | Unified YAML | ✅ Working |
+| **NDOV** | 1 | gtfs | Unified YAML + Python | ✅ Working |
+
+---
+
+## Legacy Documentation (Pre-MultiProtocolProvider)
+
+### Oude Situatie (Voor November 2025)
 
 **Probleem**: Services en quirks zijn hardcoded in Python bestanden.
 
