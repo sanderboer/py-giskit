@@ -88,14 +88,25 @@ def info(provider_name: str) -> None:
 def json_cmd(provider: str | None, output: str | None, fetch_layers: bool, no_cache: bool) -> None:
     """Generate complete recipe template with all providers and layers.
 
-    By default, shows common layer examples from YAML configs (fast).
-    Use --fetch-layers to get complete layer lists from APIs (slower, requires internet).
+    TWO MODES:
+
+    1. FAST MODE (default):
+       - Shows common layer examples (e.g., BGT: pand, wegdeel, waterdeel)
+       - Instant results, works offline
+       - Good for quick exploration
+
+    2. COMPLETE MODE (--fetch-layers):
+       - Fetches ALL layers from APIs (e.g., BGT: all 49 layers)
+       - First run: ~1-2 minutes (queries all service APIs)
+       - Subsequent runs: <1 second (uses cache at ~/.cache/giskit/layers/)
+       - Use --no-cache to force refresh
 
     Examples:
-        giskit providers json                              # Common examples only (fast)
-        giskit providers json --fetch-layers               # Complete lists from APIs
-        giskit providers json -p pdok --fetch-layers       # PDOK with all layers
+        giskit providers json                              # Fast: common examples
+        giskit providers json --fetch-layers               # Complete: all layers
+        giskit providers json -p pdok --fetch-layers       # PDOK complete
         giskit providers json --fetch-layers -o template.json
+        giskit providers json --fetch-layers --no-cache    # Force refresh
     """
     # Run async version
     asyncio.run(_json_cmd_async(provider, output, fetch_layers, no_cache))

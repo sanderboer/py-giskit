@@ -109,25 +109,37 @@ GISKit provides a **service catalog** to help you discover what data is availabl
 ### CLI Commands
 
 **Generate complete recipe template:**
+
+GISKit has two modes for discovering available data:
+
+#### 🚀 Fast Mode (Default)
+Shows common layer examples - instant, works offline:
 ```bash
-# Fast: Show common layer examples (from YAML + recipe patterns)
-giskit providers json
-
-# Complete: Fetch ALL layers from APIs (slower, ~1-2 min first time)
-giskit providers json --fetch-layers
-
-# Only show PDOK services
-giskit providers json -p pdok --fetch-layers
-
-# Save to file for editing
-giskit providers json --fetch-layers -o template.json
-
-# Force refresh (skip cache)
-giskit providers json --fetch-layers --no-cache
+giskit providers json                    # All providers
+giskit providers json -p pdok           # Only PDOK
+giskit providers json -o template.json  # Save to file
 ```
+**Output:** Common examples (e.g., BGT: `["pand", "wegdeel", "waterdeel"]`)
 
-**Fast mode** (default): Shows common layer examples
-**--fetch-layers mode**: Fetches complete layer lists from APIs (e.g., BGT: 49 layers instead of 3 examples)
+#### 🔍 Complete Mode (--fetch-layers)
+Fetches ALL layers from service APIs - complete layer lists:
+```bash
+giskit providers json --fetch-layers                      # All providers, all layers
+giskit providers json -p pdok --fetch-layers             # PDOK complete
+giskit providers json --fetch-layers -o template.json    # Save complete template
+giskit providers json --fetch-layers --no-cache          # Force refresh
+```
+**Output:** Complete lists (e.g., BGT: all 49 layers including `ondersteunendwaterdeel`)
+**Performance:**
+- First run: ~1-2 minutes (queries 85 service APIs)
+- Cached runs: <1 second (uses `~/.cache/giskit/layers/`)
+- Use `--no-cache` to force refresh
+
+**Comparison:**
+| Mode | BGT Layers | Speed | Internet |
+|------|------------|-------|----------|
+| Fast | 3 examples | Instant | No |
+| Complete | 49 complete | 1-2 min (first) / <1s (cached) | Yes |
 
 The generated JSON shows:
 - All available providers, services, and complete layer lists
@@ -136,26 +148,38 @@ The generated JSON shows:
 - Default options (tile_format, tile_matrix_set, format)
 - Cached results for fast subsequent runs (~1 second)
 
-**Example output:**
+**Example output (Fast Mode):**
 ```json
 {
-  "datasets": [
-    {
-      "_provider": "PDOK",
-      "_service_title": "Actueel Hoogtebestand Nederland (AHN)",
-      "_protocol": "wcs",
-      "provider": "pdok",
-      "service": "ahn",
-      "layers": ["dsm", "dtm"],
-      "_available_coverages": {
-        "dsm": "dsm_05m",
-        "dtm": "dtm_05m"
-      },
-      "_defaults": {
-        "format": "image/tiff"
-      }
-    }
-  ]
+  "service": "bgt",
+  "layers": ["pand", "wegdeel", "waterdeel"],
+  "_note": "Common layers - use --fetch-layers for complete list"
+}
+```
+
+**Example output (Complete Mode with --fetch-layers):**
+```json
+{
+  "service": "bgt",
+  "layers": [
+    "bak", "begroeidterreindeel", "begroeidterreindeel_kruinlijn",
+    "bord", "buurt", "functioneelgebied", "gebouwinstallatie",
+    "installatie", "kast", "kunstwerkdeel_lijn", "kunstwerkdeel_punt",
+    "kunstwerkdeel_vlak", "mast", "onbegroeidterreindeel",
+    "onbegroeidterreindeel_kruinlijn", "ondersteunendwaterdeel",
+    "ondersteunendwegdeel", "ondersteunendwegdeel_kruinlijn",
+    "ongeclassificeerdobject", "openbareruimte", "openbareruimtelabel",
+    "overbruggingsdeel", "overigbouwwerk", "overigescheiding",
+    "paal", "pand", "pand_nummeraanduiding", "put",
+    "scheiding_lijn", "scheiding_vlak", "sensor_lijn", "sensor_punt",
+    "spoor", "stadsdeel", "straatmeubilair", "tunneldeel",
+    "vegetatieobject_lijn", "vegetatieobject_punt", "vegetatieobject_vlak",
+    "waterdeel", "waterinrichtingselement_lijn", "waterinrichtingselement_punt",
+    "waterschap", "wegdeel", "wegdeel_kruinlijn",
+    "weginrichtingselement_lijn", "weginrichtingselement_punt",
+    "weginrichtingselement_vlak", "wijk"
+  ],
+  "_note": "Complete list from API (49 layers)"
 }
 ```
 
