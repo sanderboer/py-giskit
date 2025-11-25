@@ -231,14 +231,27 @@ def _get_service_layers(provider, service_id: str, service_info: dict) -> list[s
     """
     # Common layer examples for frequently-used services (from recipe examples)
     COMMON_LAYERS = {
+        # Base registers
         "bgt": ["pand", "wegdeel", "waterdeel"],
         "bag": ["pand", "verblijfsobject"],
+        "brk": ["perceel"],
         "bestuurlijkegebieden": ["gemeenten", "provincies"],
+        # CBS statistics
         "cbs-wijken-buurten-2024": ["buurten", "wijken"],
         "cbs-wijken-buurten-2023": ["buurten", "wijken"],
         "cbs-wijken-buurten-2022": ["buurten", "wijken"],
+        "cbs-gebiedsindelingen": ["gemeenten", "provincies", "wijken", "buurten"],
+        "cbs-vierkant-100m": ["vierkant100m"],
+        "cbs-vierkant-500m": ["vierkant500m"],
+        # Infrastructure
         "nwb-wegen": ["wegvakken"],
-        "bag3d": ["lod22"],  # Most common LOD for BAG3D
+        "nwb-vaarwegen": ["vaarwegvakken"],
+        "spoorwegen": ["spoorwegvakken"],
+        # Topography
+        "top10nl": ["wegdeel", "waterdeel", "gebouw"],
+        # 3D
+        "bag3d": ["lod22"],
+        "3d-basisvoorziening": ["building"],
     }
 
     # Return common examples if available
