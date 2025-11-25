@@ -110,24 +110,31 @@ GISKit provides a **service catalog** to help you discover what data is availabl
 
 **Generate complete recipe template:**
 ```bash
-# Generate template with ALL providers and services (85 datasets)
+# Fast: Show common layer examples (from YAML + recipe patterns)
 giskit providers json
 
-# Only show PDOK services (52 datasets)
-giskit providers json -p pdok
+# Complete: Fetch ALL layers from APIs (slower, ~1-2 min first time)
+giskit providers json --fetch-layers
+
+# Only show PDOK services
+giskit providers json -p pdok --fetch-layers
 
 # Save to file for editing
-giskit providers json -o template.json
+giskit providers json --fetch-layers -o template.json
 
-# Generate climate data template
-giskit providers json -p klimaateffectatlas -o climate_template.json
+# Force refresh (skip cache)
+giskit providers json --fetch-layers --no-cache
 ```
 
+**Fast mode** (default): Shows common layer examples
+**--fetch-layers mode**: Fetches complete layer lists from APIs (e.g., BGT: 49 layers instead of 3 examples)
+
 The generated JSON shows:
-- All available providers, services, and layers from YAML configs
+- All available providers, services, and complete layer lists
 - Predefined layers for WMTS/WCS services (e.g., AHN: dsm, dtm)
+- All collections for OGC Features/WFS (e.g., BGT: all 49 layers including ondersteunendwaterdeel)
 - Default options (tile_format, tile_matrix_set, format)
-- Helpful notes about dynamic layers for OGC Features/WFS
+- Cached results for fast subsequent runs (~1 second)
 
 **Example output:**
 ```json

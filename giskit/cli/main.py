@@ -6,7 +6,8 @@ Usage:
     giskit export ifc input.gpkg output.ifc
     giskit export glb input.ifc output.glb
     giskit providers list
-    giskit providers json
+    giskit providers json                        # Fast: common examples
+    giskit providers json --fetch-layers         # Complete: all layers from APIs
     giskit providers json -p pdok -o template.json
     giskit providers info pdok
     giskit quirks list
@@ -27,7 +28,7 @@ console = Console()
 def cli() -> None:
     """GISKit - Recipe-driven spatial data downloader.
 
-    Discover data:  giskit providers json
+    Discover data:  giskit providers json --fetch-layers
     Run recipe:     giskit run recipe.json
     Export 3D:      giskit export glb data.ifc output.glb
     """

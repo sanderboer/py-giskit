@@ -1,5 +1,7 @@
 """Provider management commands."""
 
+import asyncio
+import hashlib
 import json
 from pathlib import Path
 
@@ -60,35 +62,62 @@ def info(provider_name: str) -> None:
 
 @providers.command("json")
 @click.option(
-    "--provider",
     "-p",
-    help="Only include specific provider (default: all providers)",
+    "--provider",
+    type=str,
+    help="Filter by provider name (e.g., pdok, bag3d)",
 )
 @click.option(
-    "--output",
     "-o",
+    "--output",
     type=click.Path(),
     help="Save to file instead of stdout",
 )
-def json_cmd(provider: str | None, output: str | None) -> None:
-    """Generate complete recipe template with all providers and layers from YAML configs.
+@click.option(
+    "--fetch-layers",
+    is_flag=True,
+    default=False,
+    help="Fetch complete layer lists from APIs (slower, requires internet)",
+)
+@click.option(
+    "--no-cache",
+    is_flag=True,
+    default=False,
+    help="Skip cache and force refresh all layers from APIs",
+)
+def json_cmd(provider: str | None, output: str | None, fetch_layers: bool, no_cache: bool) -> None:
+    """Generate complete recipe template with all providers and layers.
 
-    This command reads the YAML configuration files and generates a comprehensive
-    recipe template showing all available providers, their services, layers (where
-    defined), and default options. Users can copy and edit this JSON to create
-    custom recipes.
+    By default, shows common layer examples from YAML configs (fast).
+    Use --fetch-layers to get complete layer lists from APIs (slower, requires internet).
 
     Examples:
-        giskit providers json
-        giskit providers json -p pdok
-        giskit providers json -p klimaateffectatlas -o climate_template.json
+        giskit providers json                              # Common examples only (fast)
+        giskit providers json --fetch-layers               # Complete lists from APIs
+        giskit providers json -p pdok --fetch-layers       # PDOK with all layers
+        giskit providers json --fetch-layers -o template.json
     """
+    # Run async version
+    asyncio.run(_json_cmd_async(provider, output, fetch_layers, no_cache))
+
+
+async def _json_cmd_async(
+    provider: str | None, output: str | None, fetch_layers: bool, no_cache: bool
+) -> None:
+    """Async implementation of json_cmd."""
     # Get config directory
     config_dir = Path(__file__).parent.parent.parent / "config" / "providers"
 
     if not config_dir.exists():
         console.print(f"[red]Error: Config directory not found: {config_dir}[/red]")
         return
+
+    # Setup cache directory
+    cache_dir = Path.home() / ".cache" / "giskit" / "layers"
+    if fetch_layers:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        if not no_cache:
+            console.print("[dim]Using layer cache at: {}[/dim]".format(cache_dir))
 
     # Build recipe template
     recipe_template = {
@@ -160,23 +189,59 @@ def json_cmd(provider: str | None, output: str | None) -> None:
                     else:
                         dataset_entry["layers"] = []
                 else:
-                    # No layers in YAML - try to get common layer examples
-                    common_layers = _get_service_layers(None, service_id, service_config)
-                    if common_layers:
-                        dataset_entry["layers"] = common_layers
-                        dataset_entry["_note"] = "Common layers - see service API for full list"
-                    else:
-                        # No layers defined
+                    # No layers in YAML
+                    if fetch_layers:
+                        # Fetch complete layer list from API
                         protocol = service_config.get("protocol", "")
-                        dataset_entry["layers"] = []
-                        if protocol == "ogc-features":
+                        if protocol in ("ogc-features", "wfs"):
+                            console.print(
+                                f"[dim]Fetching layers for {provider_name}:{service_id}...[/dim]"
+                            )
+                            api_layers = await _fetch_layers_from_api(
+                                provider_name,
+                                service_id,
+                                service_config,
+                                cache_dir,
+                                use_cache=not no_cache,
+                            )
+                            if api_layers:
+                                dataset_entry["layers"] = api_layers
+                                dataset_entry[
+                                    "_note"
+                                ] = f"Complete list from API ({len(api_layers)} layers)"
+                            else:
+                                dataset_entry["layers"] = []
+                                dataset_entry[
+                                    "_note"
+                                ] = f"{protocol.upper()} - could not fetch layers"
+                        elif protocol in ("csv", "gtfs"):
+                            dataset_entry["layers"] = []
+                            dataset_entry["_note"] = f"{protocol.upper()} - no layers needed"
+                        else:
+                            dataset_entry["layers"] = []
+                            dataset_entry["_note"] = f"Unknown protocol: {protocol}"
+                    else:
+                        # Use common layer examples (fast mode)
+                        common_layers = _get_service_layers(None, service_id, service_config)
+                        if common_layers:
+                            dataset_entry["layers"] = common_layers
                             dataset_entry[
                                 "_note"
-                            ] = "OGC Features - layers fetched dynamically from API collections"
-                        elif protocol == "wfs":
-                            dataset_entry["_note"] = "WFS - layers fetched dynamically from service"
-                        elif protocol in ("csv", "gtfs"):
-                            dataset_entry["_note"] = f"{protocol.upper()} - no layers needed"
+                            ] = "Common layers - use --fetch-layers for complete list"
+                        else:
+                            # No layers defined
+                            protocol = service_config.get("protocol", "")
+                            dataset_entry["layers"] = []
+                            if protocol == "ogc-features":
+                                dataset_entry[
+                                    "_note"
+                                ] = "OGC Features - use --fetch-layers for complete list"
+                            elif protocol == "wfs":
+                                dataset_entry[
+                                    "_note"
+                                ] = "WFS - use --fetch-layers for complete list"
+                            elif protocol in ("csv", "gtfs"):
+                                dataset_entry["_note"] = f"{protocol.upper()} - no layers needed"
 
                 # Add service-specific defaults if present
                 defaults = {}
@@ -216,6 +281,71 @@ def json_cmd(provider: str | None, output: str | None) -> None:
         console.print("[dim]then run: giskit run {output}[/dim]")
     else:
         print(json_str)
+
+
+async def _fetch_layers_from_api(
+    provider_name: str, service_id: str, service_config: dict, cache_dir: Path, use_cache: bool
+) -> list[str]:
+    """Fetch complete layer list from service API.
+
+    Args:
+        provider_name: Provider name (e.g., 'pdok')
+        service_id: Service identifier (e.g., 'bgt')
+        service_config: Service configuration from YAML
+        cache_dir: Directory for caching layer lists
+        use_cache: Whether to use cached results
+
+    Returns:
+        List of all available layer IDs
+    """
+    protocol = service_config.get("protocol", "").lower()
+
+    # Generate cache key
+    service_url = service_config.get("url", "")
+    cache_key = hashlib.md5(f"{provider_name}:{service_id}:{service_url}".encode()).hexdigest()
+    cache_file = cache_dir / f"{cache_key}.json"
+
+    # Try cache first
+    if use_cache and cache_file.exists():
+        try:
+            cached_data = json.loads(cache_file.read_text())
+            return cached_data.get("layers", [])
+        except Exception:
+            pass  # Ignore cache errors, fetch fresh
+
+    # Fetch from API based on protocol
+    layers = []
+    try:
+        if protocol == "ogc-features":
+            from giskit.protocols.ogc_features import OGCFeaturesProtocol
+            from giskit.protocols.quirks import get_service_quirks
+
+            quirks = get_service_quirks(provider_name, protocol, service_id)
+            proto = OGCFeaturesProtocol(base_url=service_url, quirks=quirks, timeout=10.0)
+
+            capabilities = await proto.get_capabilities()
+            layers = capabilities.get("layers", [])
+
+        elif protocol == "wfs":
+            from giskit.protocols.quirks import get_service_quirks
+            from giskit.protocols.wfs import WFSProtocol
+
+            quirks = get_service_quirks(provider_name, protocol, service_id)
+            proto = WFSProtocol(base_url=service_url, quirks=quirks, timeout=10.0)
+
+            capabilities = await proto.get_capabilities()
+            layers = capabilities.get("layers", [])
+
+        # Cache the result
+        if use_cache:
+            cache_file.write_text(json.dumps({"layers": layers, "service": service_id}))
+
+    except Exception as e:
+        console.print(
+            f"[yellow]Warning: Could not fetch layers for {provider_name}:{service_id}: {e}[/yellow]"
+        )
+
+    return layers
 
 
 def _get_service_layers(provider, service_id: str, service_info: dict) -> list[str]:
