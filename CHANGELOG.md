@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **GLB Export**: Now uses `ifcopenshell.geom` Python API instead of external IfcConvert binary - eliminates binary dependency and simplifies installation
+- **IFC Export Structure**: Building surfaces (roof/wall/floor) now exported as separate `IfcBuildingElementProxy` elements instead of multiple representations on a single `IfcBuilding` - improves compatibility with Blender and other BIM tools
+
 ### Added
 - **Klimaateffectatlas Provider** (26 climate services): Heat stress, flooding risk, drought, temperature extremes, and nature/biodiversity data for climate adaptation planning
   - Heat Stress (6): Social vulnerability, heat island effect, perceived temperature, cooling access, shade maps, elderly vulnerability
@@ -18,9 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Recipe: `woningbouw_klimaat_risico_analyse.json` - comprehensive climate risk assessment for housing development
   - Recipe: `amsterdam_klimaat_check.json` - example climate analysis for Amsterdam
 - **WFS Protocol**: Traditional WFS 2.0 support with automatic bbox CRS transformation (WGS84 → service CRS)
+- **GLB Compression**: Automatic gzip compression for GLB exports (83% file size reduction) - enabled by default via `glb_compress: true` in export config
+- **Grid Subdivision for Large Downloads**: BAG3D downloads now automatically subdivide large bounding boxes into smaller grid cells with concurrent processing - dramatically improves performance and reliability for large areas
+- **CLI Version Shorthand**: Added `-v` flag as shorthand for `--version`
+- **Color Customization**: Support for custom colors in IFC/GLB exports via `colors` field in export config
 
 ### Fixed
 - **CRITICAL**: WFS protocol bbox transformation - now correctly transforms from WGS84 to service's native CRS (e.g., EPSG:28992)
+- **GLB Material Export**: GLB files now correctly show multiple materials (red roofs, beige walls, gray floors) instead of merging all surfaces into a single red material - uses color-based material IDs to preserve distinct materials
+- **IFC Blender Compatibility**: IFC files now display all building surfaces (roof/wall/floor) in Blender instead of only the first surface - each surface is now a separate element
 
 ### Added (v0.1.0)
 - Initial release of GISKit
@@ -33,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic CRS transformation
 - GeoPackage output format
 - IFC export for BIM workflows
-- GLB export for 3D visualization (requires IfcConvert)
+- GLB export for 3D visualization (uses ifcopenshell.geom)
 - CLI interface with `giskit` command
 - Quirks system for provider-specific API handling
 - Comprehensive test suite (117 tests)
@@ -53,6 +63,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - pydantic for data validation
 - typer for CLI
 - ifcopenshell (optional) for IFC/GLB export
+- pygltflib (optional) for GLB generation
+- numpy for geometry processing
 
 ## [0.1.0-dev] - 2024-11-23
 

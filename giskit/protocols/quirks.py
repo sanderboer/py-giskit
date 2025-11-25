@@ -51,6 +51,9 @@ class ProtocolQuirks(BaseModel):
         None, description="Maximum features per request (if API ignores limit parameter)"
     )
     pagination_broken: bool = Field(False, description="API pagination doesn't work correctly")
+    max_concurrent_cells: int = Field(
+        5, description="Maximum concurrent grid cell downloads (for grid walking)"
+    )
 
     # Timeout Quirks
     custom_timeout: Optional[float] = Field(
@@ -64,6 +67,10 @@ class ProtocolQuirks(BaseModel):
     bbox_crs: Optional[str] = Field(
         None,
         description="CRS for bbox parameter (if different from EPSG:4326). E.g., 'EPSG:28992' for BAG3D",
+    )
+    omit_bbox_crs_param: bool = Field(
+        False,
+        description="Do not include bbox-crs parameter in requests (some APIs don't support it)",
     )
 
     # Header Quirks

@@ -14,13 +14,18 @@ class MaterialsManager:
     """Manages colors and materials from YAML configuration."""
 
     def __init__(
-        self, colors_path: Optional[Path] = None, layer_mappings_path: Optional[Path] = None
+        self,
+        colors_path: Optional[Path] = None,
+        layer_mappings_path: Optional[Path] = None,
+        color_overrides: Optional[dict[str, dict[str, list[float]]]] = None,
     ):
         """Initialize materials manager.
 
         Args:
             colors_path: Path to colors.yml config file
             layer_mappings_path: Path to layer_mappings.yml config file
+            color_overrides: Recipe-level color overrides per layer
+                Format: {"layer_name": {"surface_type": [R, G, B]}}
         """
         # Default to config directory (giskit/giskit/config/export/)
         if colors_path is None:
@@ -41,10 +46,18 @@ class MaterialsManager:
             mappings_data = yaml.safe_load(f)
             self.layer_mappings = mappings_data.get("layer_mappings", {})
 
+        # Store color overrides from recipe
+        self.color_overrides = color_overrides or {}
+
     def get_color(
         self, layer_name: str, feature_data: Dict[str, Any]
     ) -> Tuple[float, float, float, float]:
         """Get RGB color for a feature based on its layer and attributes.
+
+        Priority order:
+        1. Recipe color overrides (from IFCExportConfig.layer_colors)
+        2. YAML color configuration (colors.yml)
+        3. Default gray
 
         Args:
             layer_name: Name of the GeoPackage layer
@@ -53,7 +66,21 @@ class MaterialsManager:
         Returns:
             RGBA tuple (r, g, b, a) in 0-1 range
         """
-        # Get color config for this layer
+        # Check for recipe-level color overrides FIRST
+        if layer_name in self.color_overrides:
+            override_colors = self.color_overrides[layer_name]
+
+            # For BAG3D: check surface_type
+            if layer_name.startswith("bag3d") and "surface_type" in feature_data:
+                surface_type = feature_data.get("surface_type", "").lower()
+                if surface_type in override_colors:
+                    return self._ensure_rgba(override_colors[surface_type])
+
+            # Check for default override
+            if "default" in override_colors:
+                return self._ensure_rgba(override_colors["default"])
+
+        # Fall back to YAML color config
         layer_colors = self.colors.get(layer_name, {})
 
         # Special handling for BAG3D surface classification

@@ -4,7 +4,11 @@ services:
       name: bag3d-cityjson
       description: 'BAG3D requires bbox in EPSG:28992 (RD) and returns CityJSON format. CRITICAL: Uses per-page transform for vertex compression - each pagination page has its own transform (scale/translate)'
       bbox_crs: EPSG:28992
+      omit_bbox_crs_param: true  # BAG3D doesn't support bbox-crs parameter
       require_format_param: false  # Override PDOK default - BAG3D doesn't need f=json
+      max_features_limit: 100  # BAG3D API ignores limit parameter and returns max 100 per page
+      custom_timeout: 300.0  # BAG3D API is slow - allow 5min for large datasets with complex 3D geometry
+      max_concurrent_cells: 3  # Lower concurrency to avoid 504 timeouts on BAG3D API (tested: 10 causes failures, 3-5 works reliably)
       # CityJSON format flags
       format_is_cityjson: true
       cityjson_version: '2.0'

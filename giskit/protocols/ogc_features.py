@@ -133,6 +133,7 @@ class OGCFeaturesProtocol(Protocol):
 
         # Transform bbox if quirk specifies different CRS
         request_bbox = bbox
+        bbox_crs_str = "EPSG:4326"
         if self.quirks.bbox_crs:
             bbox_crs = self.quirks.bbox_crs
             if bbox_crs != "EPSG:4326":
@@ -142,14 +143,50 @@ class OGCFeaturesProtocol(Protocol):
                 minx, miny = transformer.transform(bbox[0], bbox[1])
                 maxx, maxy = transformer.transform(bbox[2], bbox[3])
                 request_bbox = (minx, miny, maxx, maxy)
+                bbox_crs_str = bbox_crs
+
+        # Check if we need grid walking for large areas
+        # Grid walking splits large bbox into smaller cells to:
+        # 1. Avoid timeouts on slow APIs
+        # 2. Work around strict API feature limits
+        # 3. Provide better progress feedback
+        use_grid_walking = False
+        grid_cell_size = None
+
+        if self.quirks.max_features_limit and bbox_crs_str in ("EPSG:28992", "EPSG:3857"):
+            # For APIs with low feature limits, use grid walking for large areas
+            # Calculate approximate area and expected feature density
+            width = request_bbox[2] - request_bbox[0]
+            height = request_bbox[3] - request_bbox[1]
+            area = width * height  # in square meters for metric CRS
+
+            # Use grid walking if area > 0.5 km² (500m x 500m)
+            # This helps especially for BAG3D which has max 100 features per request
+            if area > 500 * 500:
+                use_grid_walking = True
+                # Use 250m grid cells - small enough to avoid limits, large enough to be efficient
+                grid_cell_size = 250.0  # meters
 
         # Download each collection
         all_gdfs = []
         for collection_id in layers:
             try:
-                gdf = await self._download_collection(
-                    client, collection_id, request_bbox, limit, temporal, **kwargs
-                )
+                if use_grid_walking and grid_cell_size:
+                    gdf = await self._download_collection_with_grid(
+                        client,
+                        collection_id,
+                        request_bbox,
+                        grid_cell_size,
+                        bbox_crs_str,
+                        limit,
+                        temporal,
+                        max_concurrent=self.quirks.max_concurrent_cells,
+                        **kwargs,
+                    )
+                else:
+                    gdf = await self._download_collection(
+                        client, collection_id, request_bbox, limit, temporal, **kwargs
+                    )
                 if not gdf.empty:
                     # Add source collection column
                     gdf["_collection"] = collection_id
@@ -168,6 +205,159 @@ class OGCFeaturesProtocol(Protocol):
         # Reproject if needed
         if crs != "EPSG:4326" and not combined.empty:
             combined = combined.to_crs(crs)
+
+        return combined
+
+    async def _download_collection_with_grid(
+        self,
+        client: httpx.AsyncClient,
+        collection_id: str,
+        bbox: tuple[float, float, float, float],
+        grid_cell_size: float,
+        bbox_crs: str,
+        limit: Optional[int],
+        temporal: str = "latest",
+        max_concurrent: int = 5,
+        **kwargs: Any,
+    ) -> gpd.GeoDataFrame:
+        """Download a collection using grid walking to split large areas into smaller cells.
+
+        This method:
+        1. Subdivides the bbox into grid cells of specified size
+        2. Downloads cells concurrently (max 5 at a time by default)
+        3. Deduplicates features that appear in multiple cells
+        4. Shows progress for each cell
+
+        Args:
+            client: HTTP client
+            collection_id: Collection ID (may include LOD prefix like "lod22")
+            bbox: Bounding box in bbox_crs coordinates
+            grid_cell_size: Size of grid cells in CRS units (e.g., 250 meters)
+            bbox_crs: CRS of the bbox (e.g., "EPSG:28992")
+            limit: Feature limit (total, not per cell)
+            temporal: Temporal filter strategy
+            max_concurrent: Maximum concurrent downloads (default: 5)
+            **kwargs: Additional parameters
+
+        Returns:
+            GeoDataFrame with deduplicated features from all cells
+        """
+        import asyncio
+
+        from giskit.core.spatial import subdivide_bbox
+
+        # Subdivide bbox into grid cells
+        cells = subdivide_bbox(bbox, grid_cell_size, crs=bbox_crs)
+        print(f"  Splitting area into {len(cells)} grid cells ({grid_cell_size}m each)...")
+        print(f"  Downloading with max {max_concurrent} concurrent requests...")
+
+        # Download cells in batches to limit concurrency
+        all_gdfs = []
+        seen_ids = set()  # For deduplication
+        total_features = 0
+
+        # Process cells in batches
+        for batch_start in range(0, len(cells), max_concurrent):
+            batch_end = min(batch_start + max_concurrent, len(cells))
+            batch_cells = cells[batch_start:batch_end]
+            batch_indices = list(range(batch_start + 1, batch_end + 1))
+
+            print(
+                f"  Processing batch: cells {batch_indices[0]}-{batch_indices[-1]} of {len(cells)}..."
+            )
+
+            # Download all cells in this batch concurrently
+            async def download_cell(cell_bbox: tuple, cell_idx: int):
+                """Download a single cell with retry logic"""
+                max_retries = 3
+                base_delay = 2.0  # seconds
+
+                for attempt in range(max_retries):
+                    try:
+                        gdf = await self._download_collection(
+                            client,
+                            collection_id,
+                            cell_bbox,
+                            limit=None,
+                            temporal=temporal,
+                            **kwargs,
+                        )
+                        return (cell_idx, gdf, None)
+                    except Exception as e:
+                        error_msg = str(e)
+                        # Check if it's a retryable error (timeout, 504, 503, connection errors)
+                        is_retryable = any(
+                            keyword in error_msg.lower()
+                            for keyword in ["timeout", "504", "503", "connection", "temporary"]
+                        )
+
+                        if attempt < max_retries - 1 and is_retryable:
+                            # Exponential backoff: 2s, 4s, 8s
+                            delay = base_delay * (2**attempt)
+                            print(
+                                f"  Cell {cell_idx}: Retry {attempt + 1}/{max_retries} after {delay}s (error: {error_msg})"
+                            )
+                            await asyncio.sleep(delay)
+                        else:
+                            return (cell_idx, None, error_msg)
+
+                # Should never reach here, but just in case
+                return (cell_idx, None, "Max retries exceeded")
+
+            # Launch concurrent downloads for this batch
+            # Create tasks first (don't await yet!)
+            tasks = [
+                asyncio.create_task(download_cell(cell_bbox, cell_idx))
+                for cell_bbox, cell_idx in zip(batch_cells, batch_indices, strict=False)
+            ]
+
+            # Now await all tasks concurrently
+            results = await asyncio.gather(*tasks)
+
+            # Process results from this batch
+            for cell_idx, gdf, error in results:
+                if error:
+                    print(f"  Cell {cell_idx}/{len(cells)}: Failed - {error}")
+                    continue
+
+                if gdf is None or gdf.empty:
+                    print(f"  Cell {cell_idx}/{len(cells)}: 0 features")
+                    continue
+
+                # Deduplicate features based on 'identificatie' or index
+                if "identificatie" in gdf.columns:
+                    # Filter out features we've already seen
+                    new_mask = ~gdf["identificatie"].isin(seen_ids)
+                    gdf = gdf[new_mask]
+                    seen_ids.update(gdf["identificatie"])
+
+                if not gdf.empty:
+                    all_gdfs.append(gdf)
+                    cell_count = len(gdf)
+                    total_features += cell_count
+                    print(
+                        f"  Cell {cell_idx}/{len(cells)}: {cell_count:,} features ({total_features:,} total)",
+                        flush=True,
+                    )
+                else:
+                    print(f"  Cell {cell_idx}/{len(cells)}: 0 new features (all duplicates)")
+
+            # Check if we've reached the limit
+            if limit and total_features >= limit:
+                print(f"  Reached limit of {limit:,} features, stopping...")
+                break
+
+        if not all_gdfs:
+            return gpd.GeoDataFrame()
+
+        # Combine all cells
+        combined = gpd.GeoDataFrame(gpd.pd.concat(all_gdfs, ignore_index=True))
+
+        # Apply limit if needed
+        if limit and len(combined) > limit:
+            combined = combined.head(limit)
+
+        print(f"  Grid walking complete: {len(combined):,} unique features downloaded")
 
         return combined
 
@@ -203,7 +393,13 @@ class OGCFeaturesProtocol(Protocol):
 
         # Build query parameters with quirks applied
         # Use smaller page size for pagination
-        page_limit = min(limit or self.max_features_per_request, 1000)
+        # If API has max_features_limit quirk, respect it
+        default_page_limit = 1000
+        if self.quirks.max_features_limit:
+            page_limit = self.quirks.max_features_limit
+        else:
+            page_limit = min(limit or self.max_features_per_request, default_page_limit)
+
         params = {
             "bbox": ",".join(map(str, bbox)),
             "limit": page_limit,
@@ -212,26 +408,34 @@ class OGCFeaturesProtocol(Protocol):
 
         # Add bbox-crs parameter to explicitly specify CRS of bbox coordinates
         # OGC API Features spec recommends always including this for clarity
-        if self.quirks.bbox_crs and self.quirks.bbox_crs != "EPSG:4326":
-            # Bbox was transformed to RD or other CRS - specify the transformed CRS
-            params[
-                "bbox-crs"
-            ] = f"http://www.opengis.net/def/crs/EPSG/0/{self.quirks.bbox_crs.split(':')[1]}"
-        else:
-            # Using WGS84 - explicitly specify CRS84 (OGC standard for WGS84 lon/lat)
-            params["bbox-crs"] = "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+        # However, some APIs (like BAG3D) don't support this parameter
+        if not self.quirks.omit_bbox_crs_param:
+            if self.quirks.bbox_crs and self.quirks.bbox_crs != "EPSG:4326":
+                # Bbox was transformed to RD or other CRS - specify the transformed CRS
+                params[
+                    "bbox-crs"
+                ] = f"http://www.opengis.net/def/crs/EPSG/0/{self.quirks.bbox_crs.split(':')[1]}"
+            else:
+                # Using WGS84 - explicitly specify CRS84 (OGC standard for WGS84 lon/lat)
+                params["bbox-crs"] = "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
 
         params = self.quirks.apply_to_params(params)
 
         all_gdfs = []
         total_features = 0
         next_url = None
+        page_num = 1
 
         try:
             # Download first page
             response = await client.get(url, params=params)
             response.raise_for_status()
             geojson = response.json()
+
+            # Check if we know total count for progress indicator
+            total_matched = geojson.get("numberMatched")
+            if total_matched:
+                print(f"  Downloading {total_matched:,} features (max {page_limit} per page)...")
 
             # Determine format from first response
             is_cityjson = False
@@ -267,6 +471,19 @@ class OGCFeaturesProtocol(Protocol):
                     all_gdfs.append(gdf)
                     total_features += len(gdf)
 
+                    # Show progress
+                    if total_matched:
+                        progress_pct = (total_features / total_matched) * 100
+                        print(
+                            f"  Progress: {total_features:,}/{total_matched:,} ({progress_pct:.0f}%) - page {page_num}",
+                            flush=True,
+                        )
+                    else:
+                        print(
+                            f"  Downloaded {total_features:,} features (page {page_num})",
+                            flush=True,
+                        )
+
                 # Check if we've reached the limit
                 if limit and total_features >= limit:
                     break
@@ -283,6 +500,7 @@ class OGCFeaturesProtocol(Protocol):
                     break  # No more pages
 
                 # Fetch next page
+                page_num += 1
                 response = await client.get(next_url)
                 response.raise_for_status()
                 geojson = response.json()

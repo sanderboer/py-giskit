@@ -203,6 +203,54 @@ def get_crs_info(crs: str) -> dict:
         raise SpatialError(f"Invalid CRS '{crs}': {e}") from e
 
 
+def subdivide_bbox(
+    bbox: Tuple[float, float, float, float], cell_size: float, crs: str = "EPSG:28992"
+) -> List[Tuple[float, float, float, float]]:
+    """Subdivide large bounding box into smaller grid cells.
+
+    This is useful for downloading large datasets in chunks to:
+    - Avoid timeouts on slow APIs
+    - Work around API feature limits
+    - Enable parallel downloads
+    - Show progress for large areas
+
+    Args:
+        bbox: (minx, miny, maxx, maxy) in specified CRS
+        cell_size: Size of each grid cell in CRS units (e.g., 250 meters for EPSG:28992)
+        crs: Coordinate reference system (default: EPSG:28992 for Dutch data)
+
+    Returns:
+        List of (minx, miny, maxx, maxy) tuples for each grid cell
+
+    Example:
+        >>> # Split 1km x 1km area into 250m x 250m cells
+        >>> bbox = (80000, 429000, 81000, 430000)
+        >>> cells = subdivide_bbox(bbox, cell_size=250)
+        >>> len(cells)
+        16  # 4x4 grid
+    """
+    minx, miny, maxx, maxy = bbox
+
+    # Calculate number of cells in each direction
+    width = maxx - minx
+    height = maxy - miny
+
+    cols = int((width + cell_size - 1) // cell_size)  # Ceiling division
+    rows = int((height + cell_size - 1) // cell_size)
+
+    cells = []
+    for row in range(rows):
+        for col in range(cols):
+            cell_minx = minx + col * cell_size
+            cell_miny = miny + row * cell_size
+            cell_maxx = min(cell_minx + cell_size, maxx)
+            cell_maxy = min(cell_miny + cell_size, maxy)
+
+            cells.append((cell_minx, cell_miny, cell_maxx, cell_maxy))
+
+    return cells
+
+
 async def location_to_bbox(
     location: "Location",  # type: ignore  # Forward reference
     target_crs: str = "EPSG:4326",

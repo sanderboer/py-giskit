@@ -102,7 +102,7 @@ class LayerExporter:
             if is_3d and supports_surface_classification:
                 # BAG3D with surface classification
                 self._create_3d_representation_with_surfaces(
-                    entity, geom, ifc_file, context, layer_name, feature_data
+                    entity, geom, ifc_file, context, site, layer_name, feature_data
                 )
             elif is_3d:
                 # BAG3D without surface classification
@@ -287,10 +287,15 @@ class LayerExporter:
         geom: Any,
         ifc_file: Any,
         context: Any,
+        site: Any,
         layer_name: str,
         feature_data: Dict,
     ):
-        """Create representation for 3D geometry with surface classification."""
+        """Create representation for 3D geometry with surface classification.
+
+        Creates separate IfcBuildingElementProxy child objects for each surface type
+        (roof, wall, floor) to ensure proper display in Blender/BIM viewers.
+        """
         polygons = []
         if isinstance(geom, Polygon):
             polygons = [geom]
@@ -338,8 +343,12 @@ class LayerExporter:
                 print(f"Warning: Failed to create IFC face for polygon: {e}")
 
         # Create separate representations for each surface type
-        all_faces = []
-        all_representations = []
+        # NEW APPROACH: Create separate IfcBuildingElementProxy for each surface type
+        # This ensures Blender/BIM tools show all surfaces correctly
+        # Each surface type becomes a separate child object in the hierarchy
+
+        created_elements = []
+
         for surface_type, faces in faces_by_type.items():
             if not faces:
                 continue
@@ -365,18 +374,31 @@ class LayerExporter:
                 styles=[style],
             )
 
-            all_faces.extend(faces)
-            all_representations.append(rep)
-
-        # Combine all representations
-        if all_representations:
-            # Create product definition shape with all representations
-            product_shape = ifc_file.createIfcProductDefinitionShape(
-                None,
-                None,
-                all_representations,
+            # Create a child IfcBuildingElementProxy for this surface
+            element_name = f"{entity.Name}_{surface_type.lower()}"
+            child_element = ifcopenshell.api.run(
+                "root.create_entity",
+                ifc_file,
+                ifc_class="IfcBuildingElementProxy",
+                name=element_name,
             )
-            entity.Representation = product_shape
+
+            # Set predefined type to indicate what kind of surface this is
+            child_element.ObjectType = surface_type
+
+            # Assign representation to child element
+            product_shape = ifc_file.createIfcProductDefinitionShape(None, None, [rep])
+            child_element.Representation = product_shape
+
+            # Add child to site (not as aggregate of parent, but as sibling)
+            ifcopenshell.api.run(
+                "spatial.assign_container",
+                ifc_file,
+                relating_structure=site,
+                products=[child_element],
+            )
+
+            created_elements.append(child_element)
 
     def _add_property_set(self, entity: Any, layer_name: str, feature_data: Dict, ifc_file: Any):
         """Add property set to entity."""

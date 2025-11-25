@@ -1,9 +1,9 @@
 """Tests for CLI quirks commands."""
 
 import pytest
-from typer.testing import CliRunner
+from click.testing import CliRunner
 
-from giskit.cli.main import app
+from giskit.cli.main import cli as app
 from giskit.protocols.quirks_monitor import get_monitor
 
 runner = CliRunner()

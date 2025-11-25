@@ -29,7 +29,6 @@ import geopandas as gpd
 from giskit.config import load_services
 from giskit.core.recipe import Dataset, Location
 from giskit.protocols.ogc_features import OGCFeaturesProtocol
-from giskit.protocols.quirks import get_format_quirks, get_quirks
 from giskit.providers.base import Provider, register_provider
 
 
@@ -76,27 +75,18 @@ class OGCFeaturesProvider(Provider):
                 f"Check config/services/{name}.yml exists and is valid."
             )
 
-        # Get provider-level quirks
-        provider_quirks = get_quirks(name, "ogc-features")
-
         # Register OGC Features protocols for each service
         for service_name, service_config in self.services.items():
             # Handle both old string format and new dict format
             if isinstance(service_config, str):
                 service_url = service_config
-                service_format = None
             else:
                 service_url = service_config["url"]
-                service_format = service_config.get("format", None)
 
-            # Apply format-specific quirks if specified
-            if service_format:
-                # Merge provider quirks with format quirks
-                format_quirks = get_format_quirks(service_format)
-                # For now, just use format quirks (TODO: merge logic)
-                quirks = format_quirks
-            else:
-                quirks = provider_quirks
+            # Get service-specific quirks (handles fallback to provider/format quirks)
+            from giskit.protocols.quirks import get_service_quirks
+
+            quirks = get_service_quirks(name, "ogc-features", service_name)
 
             # Create and register protocol for this service
             protocol = OGCFeaturesProtocol(base_url=service_url, quirks=quirks)
@@ -161,8 +151,10 @@ class OGCFeaturesProvider(Provider):
         if protocol is None:
             raise ValueError(f"Protocol not registered: {protocol_name}")
 
-        # Convert location to bbox
-        bbox = location.to_bbox()
+        # Convert location to bbox using spatial helper
+        from giskit.core.spatial import location_to_bbox
+
+        bbox = await location_to_bbox(location, "EPSG:4326")
 
         # Get temporal filter from dataset (default to 'latest')
         temporal = (

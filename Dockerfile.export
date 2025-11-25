@@ -1,7 +1,7 @@
 # GISKit Export - Docker Sample
 #
 # This Dockerfile demonstrates how to build a container with GISKit
-# and IfcConvert pre-installed for IFC/GLB export workflows.
+# and IFC/GLB export support using ifcopenshell.geom Python API.
 #
 # Build:
 #   docker build -f Dockerfile.export -t giskit-export .
@@ -16,8 +16,6 @@ LABEL description="GISKit with IFC/GLB export support"
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
     libsqlite3-mod-spatialite \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,25 +26,8 @@ WORKDIR /app
 COPY giskit/ /app/giskit/
 COPY pyproject.toml /app/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -e .
-
-# Download and install IfcConvert (Linux x86_64)
-ENV IFCCONVERT_VERSION=0.8.4
-ENV IFCCONVERT_PLATFORM=linux64
-
-RUN mkdir -p /app/bin && \
-    wget -q https://github.com/IfcOpenShell/IfcOpenShell/releases/download/ifcconvert-${IFCCONVERT_VERSION}/ifcconvert-${IFCCONVERT_VERSION}-${IFCCONVERT_PLATFORM}.zip -O /tmp/ifcconvert.zip && \
-    unzip -q /tmp/ifcconvert.zip -d /tmp/ifcconvert && \
-    find /tmp/ifcconvert -name "IfcConvert" -type f -exec mv {} /app/bin/ \; && \
-    chmod +x /app/bin/IfcConvert && \
-    rm -rf /tmp/ifcconvert.zip /tmp/ifcconvert
-
-# Add IfcConvert to PATH
-ENV PATH="/app/bin:${PATH}"
-
-# Verify installation
-RUN /app/bin/IfcConvert --version
+# Install Python dependencies with IFC support
+RUN pip install --no-cache-dir -e ".[ifc]"
 
 # Create data directory
 RUN mkdir -p /data

@@ -109,6 +109,14 @@ class Dataset(BaseModel):
             {"provider": "pdok", "service": "bgt", "layers": ["wegdeel"],
              "temporal": "2024-01-01"}
 
+        BAG3D with custom colors:
+            {"provider": "bag3d", "service": "bag3d", "layers": ["lod22"],
+             "colors": {
+                 "roof": [0.8, 0.2, 0.1],
+                 "wall": [0.9, 0.85, 0.75],
+                 "default": [0.7, 0.7, 0.7]
+             }}
+
         OSM Overpass query:
             {"provider": "osm", "query": "amenity=restaurant"}
 
@@ -135,6 +143,15 @@ class Dataset(BaseModel):
             "or ISO date like '2024-01-01'"
         ),
     )
+    colors: Optional[dict[str, list[float]]] = Field(
+        None,
+        description=(
+            "Color overrides for this dataset. "
+            "Keys are surface types (roof/wall/default) or attribute values. "
+            "Values are RGB lists [R, G, B] in 0-1 range. "
+            "Example: {'roof': [0.8, 0.2, 0.1], 'wall': [0.9, 0.85, 0.75]}"
+        ),
+    )
     extra: dict[str, Any] = Field(default_factory=dict, description="Provider-specific parameters")
 
     @model_validator(mode="after")
@@ -153,6 +170,8 @@ class OutputFormat(str, Enum):
     GEOJSON = "geojson"
     SHAPEFILE = "shp"
     FLATGEOBUF = "fgb"
+    IFC = "ifc"
+    GLB = "glb"
 
 
 class IFCExportConfig(BaseModel):
@@ -170,6 +189,13 @@ class IFCExportConfig(BaseModel):
         - GLB is created from IFC using IfcConvert (requires ifcopenshell)
         - GLB is ideal for web viewers (Three.js, Cesium, etc.)
 
+    Color Overrides:
+        - Use layer_colors to override default colors per layer
+        - Format: {"layer_name": {"surface_type": [R, G, B]}}
+        - Example: {"bag3d_lod22": {"roof": [0.8, 0.2, 0.1], "wall": [0.9, 0.85, 0.75]}}
+        - Surface types for BAG3D: "roof", "wall", "default"
+        - For other layers: "default" only
+
     Examples:
         Export to IFC only:
             {"path": "output.ifc"}
@@ -179,6 +205,14 @@ class IFCExportConfig(BaseModel):
 
         Export with absolute NAP elevations:
             {"path": "output.ifc", "normalize_z": false}
+
+        Export with custom BAG3D colors:
+            {"path": "output.ifc", "layer_colors": {
+                "bag3d_lod22": {
+                    "roof": [0.8, 0.2, 0.1],
+                    "wall": [0.9, 0.85, 0.75]
+                }
+            }}
     """
 
     path: Path = Field(..., description="Output IFC file path")
@@ -191,6 +225,15 @@ class IFCExportConfig(BaseModel):
     normalize_z: bool = Field(
         True, description="Normalize Z to ground level (True) or keep NAP elevations (False)"
     )
+    layer_colors: Optional[dict[str, dict[str, list[float]]]] = Field(
+        None,
+        description=(
+            "Color overrides per layer. "
+            "Format: {'layer_name': {'surface_type': [R, G, B]}}. "
+            "For BAG3D: surface_type can be 'roof', 'wall', or 'default'. "
+            "RGB values in 0-1 range."
+        ),
+    )
     glb_path: Optional[Path] = Field(
         None, description="Optional GLB export path (creates GLB from IFC)"
     )
@@ -199,6 +242,9 @@ class IFCExportConfig(BaseModel):
     )
     glb_center_model: bool = Field(
         False, description="Center GLB model at origin (useful for web viewers)"
+    )
+    glb_compress: bool = Field(
+        True, description="Gzip compress GLB output (creates .glb.gz, ~80% size reduction)"
     )
 
     @field_validator("path")

@@ -24,6 +24,7 @@ class IFCExporter:
         author: str = "GISKit",
         organization: str = "A190",
         materials_manager: Optional[MaterialsManager] = None,
+        color_overrides: Optional[dict[str, dict[str, list[float]]]] = None,
     ):
         """Initialize IFC exporter.
 
@@ -32,6 +33,8 @@ class IFCExporter:
             author: Author name for IFC metadata
             organization: Organization name for IFC metadata
             materials_manager: Optional MaterialsManager (creates default if None)
+            color_overrides: Recipe-level color overrides per layer
+                Format: {"layer_name": {"surface_type": [R, G, B]}}
         """
         # Type narrowing for IFC schema
         schema: Any = ifc_version
@@ -39,8 +42,11 @@ class IFCExporter:
         self.author = author
         self.organization = organization
 
-        # Materials manager
-        self.materials = materials_manager if materials_manager else MaterialsManager()
+        # Materials manager - create with color overrides
+        if materials_manager:
+            self.materials = materials_manager
+        else:
+            self.materials = MaterialsManager(color_overrides=color_overrides)
 
         # Schema adapter for version-specific logic
         self.schema_adapter = get_schema_adapter(self.ifc)

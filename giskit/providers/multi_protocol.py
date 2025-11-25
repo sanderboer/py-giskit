@@ -157,7 +157,9 @@ class MultiProtocolProvider(Provider):
         # Get or create protocol handler
         protocol = self.get_protocol(protocol_name)
         if protocol is None:
-            protocol = self._create_protocol_handler(protocol_name, service_config)
+            protocol = self._create_protocol_handler(
+                protocol_name, service_config, service_id=dataset.service
+            )
             self.register_protocol(protocol_name, protocol)
 
         # Convert location to bbox using spatial helper
@@ -205,13 +207,14 @@ class MultiProtocolProvider(Provider):
         return gdf
 
     def _create_protocol_handler(
-        self, protocol_name: str, service_config: dict[str, Any]
+        self, protocol_name: str, service_config: dict[str, Any], service_id: str | None = None
     ) -> Protocol:
         """Create appropriate protocol handler.
 
         Args:
             protocol_name: Protocol identifier (ogc-features, wcs, wmts)
             service_config: Service configuration
+            service_id: Service identifier for quirks lookup
 
         Returns:
             Protocol instance
@@ -221,10 +224,19 @@ class MultiProtocolProvider(Provider):
         """
         if protocol_name == "ogc-features":
             from giskit.protocols.ogc_features import OGCFeaturesProtocol
+            from giskit.protocols.quirks import get_service_quirks
 
-            return OGCFeaturesProtocol(
-                service_config["url"], quirks=service_config.get("quirks", [])
-            )
+            # Get proper quirks object for this service
+            if service_id:
+                quirks = get_service_quirks(self.name, protocol_name, service_id)
+            else:
+                # Fallback: try to extract from config
+                fallback_id = service_config.get("title", "").split(" - ")[0].lower()
+                if not fallback_id:
+                    fallback_id = service_config.get("url", "").split("/")[-2]
+                quirks = get_service_quirks(self.name, protocol_name, fallback_id)
+
+            return OGCFeaturesProtocol(service_config["url"], quirks=quirks)
 
         elif protocol_name == "wcs":
             from giskit.protocols.wcs import WCSProtocol

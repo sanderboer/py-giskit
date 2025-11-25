@@ -9,12 +9,9 @@
   },
   "datasets": [
     {
-      "provider": "pdok",
+      "provider": "bag3d",
       "service": "bag3d",
-      "layers": ["lod22"],
-      "query": "",
-      "product": "vector",
-      "resolution": null
+      "layers": ["lod22"]
     }
   ],
   "output": {
@@ -22,6 +19,22 @@
     "format": "gpkg",
     "crs": "EPSG:28992",
     "overwrite": true,
-    "layer_prefix": ""
+    "layer_prefix": "",
+    "ifc_export": {
+      "path": "site_underlegger_bag3d_lod22.ifc",
+      "ifc_version": "IFC4X3_ADD2",
+      "site_name": "Curieweg 7a - Spijkenisse",
+      "normalize_z": true,
+      "layer_colors": {
+        "bag3d_lod22": {
+          "roof": [0.8, 0.2, 0.1],
+          "wall": [0.9, 0.85, 0.75],
+          "default": [0.7, 0.7, 0.7]
+        }
+      },
+      "glb_path": "site_underlegger_bag3d_lod22.glb",
+      "glb_use_world_coords": true,
+      "glb_center_model": false
+    }
   }
 }

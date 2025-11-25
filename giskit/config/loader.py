@@ -121,14 +121,22 @@ class QuirkDefinition(BaseModel):
     # Pagination quirks
     max_features_limit: Optional[int] = Field(None)
     pagination_broken: bool = Field(False)
+    max_concurrent_cells: int = Field(5, description="Max concurrent grid cell downloads")
 
     # Timeout quirks
     custom_timeout: Optional[float] = Field(None)
 
     # CRS quirks
+    force_crs_in_query: bool = Field(False)
     bbox_crs: Optional[str] = Field(
         None, description="CRS for bbox parameter (e.g., 'EPSG:28992' for BAG3D)"
     )
+    omit_bbox_crs_param: bool = Field(
+        False, description="Do not include bbox-crs parameter in requests"
+    )
+
+    # Response quirks
+    empty_collections_return_404: bool = Field(False)
 
     # CityJSON format quirks
     format_is_cityjson: bool = Field(False)
@@ -155,8 +163,12 @@ class QuirkDefinition(BaseModel):
             format_param_value=self.format_param_value,
             max_features_limit=self.max_features_limit,
             pagination_broken=self.pagination_broken,
+            max_concurrent_cells=self.max_concurrent_cells,
             custom_timeout=self.custom_timeout,
+            force_crs_in_query=self.force_crs_in_query,
             bbox_crs=self.bbox_crs,
+            omit_bbox_crs_param=self.omit_bbox_crs_param,
+            empty_collections_return_404=self.empty_collections_return_404,
             format_is_cityjson=self.format_is_cityjson,
             cityjson_version=self.cityjson_version,
             has_per_page_transform=self.has_per_page_transform,

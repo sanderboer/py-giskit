@@ -133,7 +133,7 @@ layer_mappings:
       - h_maaiveld
       - opp_grond
       - dak_type
-    surface_classification: false  # All faces in one B-rep (simpler, always works)
+    surface_classification: true  # Classify surfaces as roof/wall for separate colors
 
   bag3d_lod12:
     ifc_class: IfcBuilding
@@ -148,6 +148,7 @@ layer_mappings:
       - h_dak_max
       - h_dak_min
       - h_maaiveld
+    surface_classification: true
 
   bag3d_lod13:
     ifc_class: IfcBuilding
@@ -162,6 +163,7 @@ layer_mappings:
       - h_dak_max
       - h_dak_min
       - h_maaiveld
+    surface_classification: true
 
   bag_pand:
     ifc_class: IfcGeographicElement  # 2D footprint, not a full building
