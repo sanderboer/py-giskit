@@ -1,0 +1,938 @@
+{
+  "name": "Complete Recipe Template - All Providers & Layers",
+  "description": "Template showing all available providers, services, and layers from YAML configs. Edit this JSON to select only the data you need.",
+  "location": {
+    "type": "point",
+    "value": [
+      4.90098,
+      52.37092
+    ],
+    "radius": 500,
+    "crs": "EPSG:4326"
+  },
+  "datasets": [
+    {
+      "_provider": "3D BAG - 3D Building Models",
+      "_service_title": "3D BAG - 3D Building Models",
+      "_protocol": "ogc-features",
+      "_category": "buildings_3d",
+      "provider": "bag3d",
+      "service": "bag3d",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections",
+      "_defaults": {
+        "format": "cityjson"
+      }
+    },
+    {
+      "_provider": "DUO - Dienst Uitvoering Onderwijs",
+      "_service_title": "Hoger Onderwijs (Higher Education - HBO/WO)",
+      "_protocol": "csv",
+      "_category": "education",
+      "provider": "duo",
+      "service": "scholen-hbo",
+      "layers": []
+    },
+    {
+      "_provider": "DUO - Dienst Uitvoering Onderwijs",
+      "_service_title": "MBO (Vocational Education)",
+      "_protocol": "csv",
+      "_category": "education",
+      "provider": "duo",
+      "service": "scholen-mbo",
+      "layers": []
+    },
+    {
+      "_provider": "DUO - Dienst Uitvoering Onderwijs",
+      "_service_title": "Basisonderwijs (Primary Schools)",
+      "_protocol": "csv",
+      "_category": "education",
+      "provider": "duo",
+      "service": "scholen-primary",
+      "layers": []
+    },
+    {
+      "_provider": "DUO - Dienst Uitvoering Onderwijs",
+      "_service_title": "Voortgezet Onderwijs (Secondary Schools)",
+      "_protocol": "csv",
+      "_category": "education",
+      "provider": "duo",
+      "service": "scholen-secondary",
+      "layers": []
+    },
+    {
+      "_provider": "DUO - Dienst Uitvoering Onderwijs",
+      "_service_title": "Speciaal Onderwijs (Special Education)",
+      "_protocol": "csv",
+      "_category": "education",
+      "provider": "duo",
+      "service": "scholen-special",
+      "layers": []
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Afstand tot Koelte",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "afstand-tot-koelte",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "BKNS Dreigingen en Kansen",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "bkns-dreigingen-kansen",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Dagen met >15mm Neerslag (2050 Hoog)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "dagen-15mm-2050-hoog",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Dagen met >15mm Neerslag (Huidig)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "dagen-15mm-huidig",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Dagen met >25mm Neerslag (2050 Laag)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "dagen-25mm-2050-laag",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Dagen met >25mm Neerslag (Huidig)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "dagen-25mm-huidig",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Droge Plekken bij Extreme Wateroverlast (T=1000)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "droge-plekken-extreem-kleine-kans",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Droge Verdiepingen bij Extreme Wateroverlast",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "droge-verdiepingen-extreem-kleine-kans",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Droogtegevoeligheid Grondwaterafhankelijke Natuur",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "droogtegevoeligheid-natuur",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Eenzame 75-plussers",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "eenzame-75plussers",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Gemeentegrenzen (Klimaateffectatlas)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "gemeentegrenzen-klimaat",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Gevoelstemperatuur per Buurt 2022",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "gevoelstemperatuur-buurt",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Grijs per Buurt",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "grijs-per-buurt",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Groen per Buurt",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "groen-per-buurt",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Hitte-eiland Effect",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "hitteeiland-effect",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "IJsdagen (2050 Hoog)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "ijsdagen-2050-hoog",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "IJsdagen (Huidig)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "ijsdagen-huidig",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Kans op Grondwateroverlast (2050 Hoog)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "kans-grondwateroverlast-2050-hoog",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Jaarlijkse Neerslag (2050 Hoog)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "neerslag-jaar-2050-hoog",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Jaarlijkse Neerslag (Huidig)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "neerslag-jaar-huidig",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Neerslagtekort 10-jaar (2050 Hoog)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "neerslagtekort-10j-2050-hoog",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Neerslagtekort 10-jaar (Huidig)",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "neerslagtekort-10j-huidig",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Oppervlaktewaterverzilting 3 meter",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "oppervlaktewaterverzilting-3m",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Schaduwkaart Fiets- en Wandelpaden",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "schaduwkaart-fiets-wandelpaden",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Sociale Kwetsbaarheid Hitte",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "sociale-kwetsbaarheid-hitte",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "Klimaateffectatlas Nederland",
+      "_service_title": "Water per Buurt",
+      "_protocol": "wfs",
+      "_category": "climate",
+      "provider": "klimaateffectatlas",
+      "service": "water-per-buurt",
+      "layers": [],
+      "_note": "WFS - layers fetched dynamically from service"
+    },
+    {
+      "_provider": "NDOV - Nederlandse Openbaar Vervoer Data",
+      "_service_title": "OV Haltes (Public Transport Stops)",
+      "_protocol": "gtfs",
+      "_category": "infrastructure",
+      "provider": "ndov",
+      "service": "haltes",
+      "layers": [],
+      "_defaults": {
+        "format": "geojson"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "3D Basisvoorziening",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "3d-basisvoorziening",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections",
+      "_defaults": {
+        "format": "cityjson"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "3D Geluid",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "3d-geluid",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections",
+      "_defaults": {
+        "format": "cityjson"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Actueel Hoogtebestand Nederland (AHN)",
+      "_protocol": "wcs",
+      "_category": "elevation",
+      "provider": "pdok",
+      "service": "ahn",
+      "layers": [
+        "dsm",
+        "dtm"
+      ],
+      "_available_coverages": {
+        "dsm": "dsm_05m",
+        "dtm": "dtm_05m"
+      },
+      "_note": "WCS - use coverage names as layers",
+      "_defaults": {
+        "format": "image/tiff"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Basisregistratie Adressen en Gebouwen",
+      "_protocol": "ogc-features",
+      "_category": "base_registers",
+      "provider": "pdok",
+      "service": "bag",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "3D BAG",
+      "_protocol": "ogc-features",
+      "_category": "base_registers",
+      "provider": "pdok",
+      "service": "bag3d",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections",
+      "_defaults": {
+        "format": "cityjson"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Bestuurlijke Gebieden",
+      "_protocol": "ogc-features",
+      "_category": "administrative",
+      "provider": "pdok",
+      "service": "bestuurlijkegebieden",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Basisregistratie Grootschalige Topografie",
+      "_protocol": "ogc-features",
+      "_category": "base_registers",
+      "provider": "pdok",
+      "service": "bgt",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Basisregistratie Kadaster - Kadastrale Kaart",
+      "_protocol": "ogc-features",
+      "_category": "base_registers",
+      "provider": "pdok",
+      "service": "brk",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "BRT Achtergrondkaart",
+      "_protocol": "wmts",
+      "_category": "maps",
+      "provider": "pdok",
+      "service": "brt-achtergrondkaart",
+      "layers": [
+        "standaard",
+        "grijs",
+        "pastel",
+        "water"
+      ],
+      "_available_layers": {
+        "standaard": "standaard",
+        "grijs": "grijs",
+        "pastel": "pastel",
+        "water": "water"
+      },
+      "_defaults": {
+        "tile_format": "png",
+        "tile_matrix_set": "EPSG:28992"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Bodemgebruik - Land Cover (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "brt-bodemgebruik",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Geografische Namen (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "brt-geografische-namen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Hydrografie (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "brt-hydrografie",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Vervoersnetwerken (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "brt-vervoersnetwerken",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Zeegebieden (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "brt-zeegebieden",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Bevolkingskernen 2011",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-bevolkingskernen-2011",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Bevolkingskernen 2021",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-bevolkingskernen-2021",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Bestand Bodemgebruik 2010",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-bodemgebruik-2010",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Bestand Bodemgebruik 2015",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-bodemgebruik-2015",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Bestand Bodemgebruik 2017",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-bodemgebruik-2017",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Gebiedsindelingen 2016-heden",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-gebiedsindelingen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Gebiedsindelingen 1995-2015",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-gebiedsindelingen-historisch",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Human Health Statistics (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-human-health",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Existing Land Use (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-landuse",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Population Distribution (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-population-distribution",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Postcode4 statistieken",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-postcode4",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Postcode6 statistieken",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-postcode6",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Vierkantstatistieken 100m",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-vierkant-100m",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Vierkantstatistieken 500m",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-vierkant-500m",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Wijken en Buurten 2022",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-wijken-buurten-2022",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Wijken en Buurten 2023",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-wijken-buurten-2023",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "CBS Wijken en Buurten 2024",
+      "_protocol": "ogc-features",
+      "_category": "statistics",
+      "provider": "pdok",
+      "service": "cbs-wijken-buurten-2024",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Beschermde Gebieden - Cultuurhistorie (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "culture",
+      "provider": "pdok",
+      "service": "cultureel-erfgoed",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Drone No-Fly Zones",
+      "_protocol": "ogc-features",
+      "_category": "aviation",
+      "provider": "pdok",
+      "service": "drone-nofly",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Basisregistratie Gewaspercelen (BRP)",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "gewaspercelen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Habitatrichtlijn - Verspreiding Soorten",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "habitatrichtlijn-soorten",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Habitatrichtlijn - Verspreiding Habitattypen",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "habitatrichtlijn-typen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Luchtfoto Beeldmateriaal Nederland",
+      "_protocol": "wmts",
+      "_category": "imagery",
+      "provider": "pdok",
+      "service": "luchtfoto",
+      "layers": [
+        "actueel_8cm",
+        "actueel_25cm",
+        "2025_8cm",
+        "2025_25cm",
+        "2024_8cm",
+        "2024_25cm"
+      ],
+      "_available_layers": {
+        "actueel_8cm": "Actueel_orthoHR",
+        "actueel_25cm": "Actueel_ortho25",
+        "2025_8cm": "2025_orthoHR",
+        "2025_25cm": "2025_ortho25",
+        "2024_8cm": "2024_orthoHR",
+        "2024_25cm": "2024_ortho25"
+      },
+      "_defaults": {
+        "tile_format": "jpeg",
+        "tile_matrix_set": "EPSG:28992"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Luchtfoto Infrarood",
+      "_protocol": "wmts",
+      "_category": "imagery",
+      "provider": "pdok",
+      "service": "luchtfoto-ir",
+      "layers": [
+        "actueel"
+      ],
+      "_available_layers": {
+        "actueel": "Actueel_ortho25IR"
+      },
+      "_defaults": {
+        "tile_format": "jpeg",
+        "tile_matrix_set": "EPSG:28992"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Nationale Parken",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "nationale-parken",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Nationale Parken (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "nationale-parken-inspire",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Natura 2000",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "natura2000",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Natura 2000 (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "natura2000-inspire",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Nationaal Wegenbestand - Vaarwegen",
+      "_protocol": "ogc-features",
+      "_category": "infrastructure",
+      "provider": "pdok",
+      "service": "nwb-vaarwegen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Nationaal Wegenbestand - Wegen",
+      "_protocol": "ogc-features",
+      "_category": "infrastructure",
+      "provider": "pdok",
+      "service": "nwb-wegen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Satellietbeelden Nederland",
+      "_protocol": "wmts",
+      "_category": "imagery",
+      "provider": "pdok",
+      "service": "satellite",
+      "layers": [
+        "actueel"
+      ],
+      "_available_layers": {
+        "actueel": "2023_ortho25"
+      },
+      "_defaults": {
+        "tile_format": "png",
+        "tile_matrix_set": "EPSG:28992"
+      }
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Spoorwegen",
+      "_protocol": "ogc-features",
+      "_category": "infrastructure",
+      "provider": "pdok",
+      "service": "spoorwegen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "BRT TOP10NL",
+      "_protocol": "ogc-features",
+      "_category": "topography",
+      "provider": "pdok",
+      "service": "top10nl",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Vaarwegmarkeringen Nederland",
+      "_protocol": "ogc-features",
+      "_category": "infrastructure",
+      "provider": "pdok",
+      "service": "vaarwegmarkeringen",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Vogelrichtlijn - Verspreiding Soorten",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "vogelrichtlijn-soorten",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Weggegevens",
+      "_protocol": "ogc-features",
+      "_category": "infrastructure",
+      "provider": "pdok",
+      "service": "weggegevens",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Wetlands",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "wetlands",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    },
+    {
+      "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
+      "_service_title": "Wetlands (INSPIRE)",
+      "_protocol": "ogc-features",
+      "_category": "environment",
+      "provider": "pdok",
+      "service": "wetlands-inspire",
+      "layers": [],
+      "_note": "OGC Features - layers fetched dynamically from API collections"
+    }
+  ],
+  "output": {
+    "path": "output.gpkg",
+    "format": "gpkg",
+    "crs": "EPSG:28992",
+    "overwrite": true
+  }
+}

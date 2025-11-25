@@ -53,6 +53,19 @@ pip install -e .
 
 ### Your First Recipe
 
+**Option 1: Generate from template**
+
+```bash
+# Generate complete template with all providers
+giskit providers json -o my_recipe.json
+
+# Edit the JSON to keep only the datasets you need
+# Then run it:
+giskit run my_recipe.json
+```
+
+**Option 2: Write from scratch**
+
 Create `dam_square.json`:
 
 ```json
@@ -92,6 +105,57 @@ Result: `dam_square.gpkg` with buildings and roads around Dam Square!
 ## Discovering Available Data
 
 GISKit provides a **service catalog** to help you discover what data is available before writing recipes.
+
+### CLI Commands
+
+**Generate complete recipe template:**
+```bash
+# Generate template with ALL providers and services (85 datasets)
+giskit providers json
+
+# Only show PDOK services (52 datasets)
+giskit providers json -p pdok
+
+# Save to file for editing
+giskit providers json -o template.json
+
+# Generate climate data template
+giskit providers json -p klimaateffectatlas -o climate_template.json
+```
+
+The generated JSON shows:
+- All available providers, services, and layers from YAML configs
+- Predefined layers for WMTS/WCS services (e.g., AHN: dsm, dtm)
+- Default options (tile_format, tile_matrix_set, format)
+- Helpful notes about dynamic layers for OGC Features/WFS
+
+**Example output:**
+```json
+{
+  "datasets": [
+    {
+      "_provider": "PDOK",
+      "_service_title": "Actueel Hoogtebestand Nederland (AHN)",
+      "_protocol": "wcs",
+      "provider": "pdok",
+      "service": "ahn",
+      "layers": ["dsm", "dtm"],
+      "_available_coverages": {
+        "dsm": "dsm_05m",
+        "dtm": "dtm_05m"
+      },
+      "_defaults": {
+        "format": "image/tiff"
+      }
+    }
+  ]
+}
+```
+
+Edit the generated JSON to keep only the datasets you need, then run:
+```bash
+giskit run template.json
+```
 
 ### Python API
 
@@ -401,11 +465,17 @@ giskit recipe validate recipe.json
 # List available providers and services
 giskit providers list
 
+# Generate complete recipe template with all providers/services
+giskit providers json
+
+# Generate template for specific provider
+giskit providers json -p pdok
+
+# Save template to file for editing
+giskit providers json -o template.json
+
 # Show PDOK service details
 giskit providers info pdok
-
-# Search for specific data
-giskit search "buildings"
 ```
 
 **Monitor API quirks:**
