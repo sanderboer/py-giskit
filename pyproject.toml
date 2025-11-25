@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pygiskit"
-version = "0.1.3"
+version = "0.1.4"
 description = "Recipe-driven spatial data downloader for Dutch geo-data"
 authors = ["A190 <info@a190.nl>"]
 license = "MIT"
