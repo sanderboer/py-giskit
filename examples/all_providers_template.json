@@ -18,8 +18,10 @@
       "_category": "buildings_3d",
       "provider": "bag3d",
       "service": "bag3d",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections",
+      "layers": [
+        "lod22"
+      ],
+      "_note": "Common layers - see service API for full list",
       "_defaults": {
         "format": "cityjson"
       }
@@ -31,7 +33,8 @@
       "_category": "education",
       "provider": "duo",
       "service": "scholen-hbo",
-      "layers": []
+      "layers": [],
+      "_note": "CSV - no layers needed"
     },
     {
       "_provider": "DUO - Dienst Uitvoering Onderwijs",
@@ -40,7 +43,8 @@
       "_category": "education",
       "provider": "duo",
       "service": "scholen-mbo",
-      "layers": []
+      "layers": [],
+      "_note": "CSV - no layers needed"
     },
     {
       "_provider": "DUO - Dienst Uitvoering Onderwijs",
@@ -49,7 +53,8 @@
       "_category": "education",
       "provider": "duo",
       "service": "scholen-primary",
-      "layers": []
+      "layers": [],
+      "_note": "CSV - no layers needed"
     },
     {
       "_provider": "DUO - Dienst Uitvoering Onderwijs",
@@ -58,7 +63,8 @@
       "_category": "education",
       "provider": "duo",
       "service": "scholen-secondary",
-      "layers": []
+      "layers": [],
+      "_note": "CSV - no layers needed"
     },
     {
       "_provider": "DUO - Dienst Uitvoering Onderwijs",
@@ -67,7 +73,8 @@
       "_category": "education",
       "provider": "duo",
       "service": "scholen-special",
-      "layers": []
+      "layers": [],
+      "_note": "CSV - no layers needed"
     },
     {
       "_provider": "Klimaateffectatlas Nederland",
@@ -337,6 +344,7 @@
       "provider": "ndov",
       "service": "haltes",
       "layers": [],
+      "_note": "GTFS - no layers needed",
       "_defaults": {
         "format": "geojson"
       }
@@ -348,8 +356,10 @@
       "_category": "topography",
       "provider": "pdok",
       "service": "3d-basisvoorziening",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections",
+      "layers": [
+        "building"
+      ],
+      "_note": "Common layers - see service API for full list",
       "_defaults": {
         "format": "cityjson"
       }
@@ -394,8 +404,11 @@
       "_category": "base_registers",
       "provider": "pdok",
       "service": "bag",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "pand",
+        "verblijfsobject"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -404,8 +417,10 @@
       "_category": "base_registers",
       "provider": "pdok",
       "service": "bag3d",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections",
+      "layers": [
+        "lod22"
+      ],
+      "_note": "Common layers - see service API for full list",
       "_defaults": {
         "format": "cityjson"
       }
@@ -417,8 +432,11 @@
       "_category": "administrative",
       "provider": "pdok",
       "service": "bestuurlijkegebieden",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "gemeenten",
+        "provincies"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -427,8 +445,12 @@
       "_category": "base_registers",
       "provider": "pdok",
       "service": "bgt",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "pand",
+        "wegdeel",
+        "waterdeel"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -437,8 +459,10 @@
       "_category": "base_registers",
       "provider": "pdok",
       "service": "brk",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "perceel"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -571,8 +595,13 @@
       "_category": "statistics",
       "provider": "pdok",
       "service": "cbs-gebiedsindelingen",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "gemeenten",
+        "provincies",
+        "wijken",
+        "buurten"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -641,8 +670,10 @@
       "_category": "statistics",
       "provider": "pdok",
       "service": "cbs-vierkant-100m",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "vierkant100m"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -651,8 +682,10 @@
       "_category": "statistics",
       "provider": "pdok",
       "service": "cbs-vierkant-500m",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "vierkant500m"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -661,8 +694,11 @@
       "_category": "statistics",
       "provider": "pdok",
       "service": "cbs-wijken-buurten-2022",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "buurten",
+        "wijken"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -671,8 +707,11 @@
       "_category": "statistics",
       "provider": "pdok",
       "service": "cbs-wijken-buurten-2023",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "buurten",
+        "wijken"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -681,8 +720,11 @@
       "_category": "statistics",
       "provider": "pdok",
       "service": "cbs-wijken-buurten-2024",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "buurten",
+        "wijken"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -827,8 +869,10 @@
       "_category": "infrastructure",
       "provider": "pdok",
       "service": "nwb-vaarwegen",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "vaarwegvakken"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -837,8 +881,10 @@
       "_category": "infrastructure",
       "provider": "pdok",
       "service": "nwb-wegen",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "wegvakken"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -865,8 +911,10 @@
       "_category": "infrastructure",
       "provider": "pdok",
       "service": "spoorwegen",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "spoorwegvakken"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
@@ -875,8 +923,12 @@
       "_category": "topography",
       "provider": "pdok",
       "service": "top10nl",
-      "layers": [],
-      "_note": "OGC Features - layers fetched dynamically from API collections"
+      "layers": [
+        "wegdeel",
+        "waterdeel",
+        "gebouw"
+      ],
+      "_note": "Common layers - see service API for full list"
     },
     {
       "_provider": "PDOK - Publieke Dienstverlening Op de Kaart",
