@@ -132,15 +132,48 @@ async def _execute_recipe(recipe: Recipe, console: Console, verbose: bool):
         # Transform bbox to output CRS
         bbox_output_crs = transform_bbox(bbox, "EPSG:4326", recipe.output.crs)
 
-        # Get center point
-        center_x = (bbox_output_crs[0] + bbox_output_crs[2]) / 2
-        center_y = (bbox_output_crs[1] + bbox_output_crs[3]) / 2
+        # Get origin point from recipe location (the point the user specified)
+        # This is the point that will be at (0,0,0) in IFC exports
+        from giskit.core.geocoding import geocode
+        from giskit.core.recipe import LocationType
+        from giskit.core.spatial import transform_point
+
+        if recipe.location.type == LocationType.POINT:
+            # Point location - use the exact coordinates specified
+            point_coords: list = recipe.location.value  # type: ignore
+            lon, lat = float(point_coords[0]), float(point_coords[1])
+            # Transform from location CRS to output CRS
+            origin_x, origin_y = transform_point(lon, lat, recipe.location.crs, recipe.output.crs)
+        elif recipe.location.type == LocationType.ADDRESS:
+            # Address location - geocode to get the point, then transform
+            address_str: str = recipe.location.value  # type: ignore
+            lon, lat = await geocode(address_str)
+            origin_x, origin_y = transform_point(lon, lat, "EPSG:4326", recipe.output.crs)
+        elif recipe.location.type == LocationType.BBOX:
+            # Bbox location - use center of bbox
+            origin_x = (bbox_output_crs[0] + bbox_output_crs[2]) / 2
+            origin_y = (bbox_output_crs[1] + bbox_output_crs[3]) / 2
+        elif recipe.location.type == LocationType.POLYGON:
+            # Polygon location - use 2D centroid
+            from shapely.geometry import Polygon
+
+            poly_coords: list = recipe.location.value  # type: ignore
+            polygon = Polygon(poly_coords)
+            centroid = polygon.centroid
+            # Transform centroid from location CRS to output CRS
+            origin_x, origin_y = transform_point(
+                centroid.x, centroid.y, recipe.location.crs, recipe.output.crs
+            )
+        else:
+            # Fallback to bbox center
+            origin_x = (bbox_output_crs[0] + bbox_output_crs[2]) / 2
+            origin_y = (bbox_output_crs[1] + bbox_output_crs[3]) / 2
 
         # Build metadata dict - exact column order matching Sitedb
         metadata_dict = {
             "address": [None],
-            "x": [center_x],
-            "y": [center_y],
+            "x": [origin_x],
+            "y": [origin_y],
             "radius": [None],
             "bbox_minx": [bbox_output_crs[0]],
             "bbox_miny": [bbox_output_crs[1]],
@@ -202,7 +235,7 @@ async def _execute_recipe(recipe: Recipe, console: Console, verbose: bool):
 
         # Create metadata GeoDataFrame
         metadata_gdf = gpd.GeoDataFrame(
-            metadata_dict, geometry=[Point(center_x, center_y)], crs=recipe.output.crs
+            metadata_dict, geometry=[Point(origin_x, origin_y)], crs=recipe.output.crs
         )
 
         layers["_metadata"] = metadata_gdf
@@ -364,6 +397,44 @@ def run(recipe_path: Path, verbose: bool, dry_run: bool) -> None:
                                     except Exception as glb_error:
                                         console.print(
                                             f"  [red]✗[/red] GLB export failed: {glb_error}"
+                                        )
+                                        if verbose:
+                                            console.print_exception()
+
+                                # Auto-export to OBJ ZIP if configured
+                                if recipe.output.ifc_export.obj_zip_path:
+                                    console.print(
+                                        f"\n[bold]Auto-exporting to OBJ ZIP:[/bold] {recipe.output.ifc_export.obj_zip_path}"
+                                    )
+                                    try:
+                                        from giskit.exporters.obj_zip_exporter import OBJZipExporter
+
+                                        obj_exporter = OBJZipExporter()
+                                        if not obj_exporter.is_available():
+                                            console.print(
+                                                "  [yellow]⚠[/yellow] OBJ export skipped: ifcopenshell not found"
+                                            )
+                                            console.print(
+                                                "    Install with: pip install ifcopenshell"
+                                            )
+                                        else:
+                                            obj_exporter.ifc_to_obj_zip(
+                                                ifc_path=recipe.output.ifc_export.path,
+                                                output_zip_path=recipe.output.ifc_export.obj_zip_path,
+                                                use_world_coords=True,
+                                            )
+
+                                            if recipe.output.ifc_export.obj_zip_path.exists():
+                                                obj_mb = (
+                                                    recipe.output.ifc_export.obj_zip_path.stat().st_size
+                                                    / (1024 * 1024)
+                                                )
+                                                console.print(
+                                                    f"  [bold green]✓[/bold green] OBJ ZIP export complete: {recipe.output.ifc_export.obj_zip_path} ({obj_mb:.1f} MB)"
+                                                )
+                                    except Exception as obj_error:
+                                        console.print(
+                                            f"  [red]✗[/red] OBJ export failed: {obj_error}"
                                         )
                                         if verbose:
                                             console.print_exception()

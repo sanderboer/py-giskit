@@ -10,8 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **GLB Export**: Now uses `ifcopenshell.geom` Python API instead of external IfcConvert binary - eliminates binary dependency and simplifies installation
 - **IFC Export Structure**: Building surfaces (roof/wall/floor) now exported as separate `IfcBuildingElementProxy` elements instead of multiple representations on a single `IfcBuilding` - improves compatibility with Blender and other BIM tools
+- **OBJ Export**: Complete rewrite to use `ifcopenshell.geom` for proper triangulation instead of manual fan triangulation - dramatically improves mesh quality and consistency with GLB exports
 
 ### Added
+- **OBJ ZIP Export**: New automated export format that converts IFC to OBJ with proper materials - works from IFC files using `ifcopenshell.geom` for consistent geometry with GLB exports
+  - Smart layer name extraction from IFC Property Sets (e.g., `bag3d_lod22`, `bgt_wegdeel`)
+  - Flat ZIP structure with layer-based OBJ/MTL files
+  - Configurable via `obj_zip_path` in IFC export config
 - **Klimaateffectatlas Provider** (26 climate services): Heat stress, flooding risk, drought, temperature extremes, and nature/biodiversity data for climate adaptation planning
   - Heat Stress (6): Social vulnerability, heat island effect, perceived temperature, cooling access, shade maps, elderly vulnerability
   - Flooding Risk (9): Precipitation extremes (current + 2050 scenarios), safe zones, dry floors, groundwater flooding risk
@@ -31,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CRITICAL**: WFS protocol bbox transformation - now correctly transforms from WGS84 to service's native CRS (e.g., EPSG:28992)
 - **GLB Material Export**: GLB files now correctly show multiple materials (red roofs, beige walls, gray floors) instead of merging all surfaces into a single red material - uses color-based material IDs to preserve distinct materials
 - **IFC Blender Compatibility**: IFC files now display all building surfaces (roof/wall/floor) in Blender instead of only the first surface - each surface is now a separate element
+- **IFC/GLB Origin Point**: Fixed exports to use user-specified location point (from recipe) as origin (0,0,0) instead of bbox center - POINT uses exact coordinates, ADDRESS uses geocoded location, BBOX uses center, POLYGON uses 2D centroid
 
 ### Added (v0.1.0)
 - Initial release of GISKit

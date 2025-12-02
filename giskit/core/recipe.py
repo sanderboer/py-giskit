@@ -246,6 +246,9 @@ class IFCExportConfig(BaseModel):
     glb_compress: bool = Field(
         True, description="Gzip compress GLB output (creates .glb.gz, ~80% size reduction)"
     )
+    obj_zip_path: Optional[Path] = Field(
+        None, description="Optional OBJ ZIP export path (creates layered OBJ+MTL from IFC)"
+    )
 
     @field_validator("path")
     @classmethod
