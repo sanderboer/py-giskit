@@ -66,6 +66,9 @@ class MaterialsManager:
         Returns:
             RGBA tuple (r, g, b, a) in 0-1 range
         """
+        # Normalize layer name for config lookup
+        normalized_layer = self._normalize_layer_name(layer_name)
+
         # Check for recipe-level color overrides FIRST
         if layer_name in self.color_overrides:
             override_colors = self.color_overrides[layer_name]
@@ -80,8 +83,8 @@ class MaterialsManager:
             if "default" in override_colors:
                 return self._ensure_rgba(override_colors["default"])
 
-        # Fall back to YAML color config
-        layer_colors = self.colors.get(layer_name, {})
+        # Fall back to YAML color config (use normalized name)
+        layer_colors = self.colors.get(normalized_layer, {})
 
         # Special handling for BAG3D surface classification
         if layer_name.startswith("bag3d") and "surface_type" in feature_data:
@@ -91,7 +94,7 @@ class MaterialsManager:
                 return self._ensure_rgba(color)
 
         # Get layer mapping to find color_attributes priority order
-        layer_config = self.layer_mappings.get(layer_name, {})
+        layer_config = self.get_layer_config(layer_name)
         color_attributes = layer_config.get("color_attributes", [])
 
         # Try each color attribute in priority order
@@ -138,7 +141,7 @@ class MaterialsManager:
             return f"BAG3D_{surface_type.upper()}"
 
         # For layers with specific attribute-based naming
-        layer_config = self.layer_mappings.get(layer_name, {})
+        layer_config = self.get_layer_config(layer_name)
         color_attributes = layer_config.get("color_attributes", [])
 
         # Try to build name from first color attribute
@@ -151,8 +154,31 @@ class MaterialsManager:
         # Default material name
         return f"{layer_name.upper()}_DEFAULT"
 
+    def _normalize_layer_name(self, layer_name: str) -> str:
+        """Normalize layer name by stripping common BGT suffixes.
+
+        BGT layers often have suffixes like _vlak, _lijn, _punt, _kruinlijn.
+        This method strips them to match base configuration keys.
+
+        Args:
+            layer_name: Raw layer name (e.g., 'bgt_kunstwerkdeel_vlak')
+
+        Returns:
+            Normalized layer name (e.g., 'bgt_kunstwerkdeel')
+        """
+        # Common BGT suffixes to strip
+        suffixes = ["_vlak", "_lijn", "_punt", "_kruinlijn", "_multivlak", "_multipunt"]
+
+        for suffix in suffixes:
+            if layer_name.endswith(suffix):
+                return layer_name[: -len(suffix)]
+
+        return layer_name
+
     def get_layer_config(self, layer_name: str) -> Dict[str, Any]:
         """Get complete layer configuration.
+
+        Tries exact match first, then normalized name (strips BGT suffixes).
 
         Args:
             layer_name: Name of the GeoPackage layer
@@ -160,7 +186,14 @@ class MaterialsManager:
         Returns:
             Layer configuration dict
         """
-        return self.layer_mappings.get(layer_name, {})
+        # Try exact match first
+        config = self.layer_mappings.get(layer_name)
+        if config:
+            return config
+
+        # Try normalized name (strip suffixes like _vlak, _lijn, etc.)
+        normalized = self._normalize_layer_name(layer_name)
+        return self.layer_mappings.get(normalized, {})
 
     def get_ifc_class(self, layer_name: str, ifc_schema: str = "IFC4X3") -> str:
         """Get IFC class for a layer based on schema version.
@@ -172,7 +205,7 @@ class MaterialsManager:
         Returns:
             IFC class name
         """
-        layer_config = self.layer_mappings.get(layer_name, {})
+        layer_config = self.get_layer_config(layer_name)
 
         # Check for schema-specific fallback
         if ifc_schema == "IFC4" and "ifc_class_fallback" in layer_config:
@@ -189,7 +222,7 @@ class MaterialsManager:
         Returns:
             Height in meters
         """
-        layer_config = self.layer_mappings.get(layer_name, {})
+        layer_config = self.get_layer_config(layer_name)
         return layer_config.get("default_height", 0.1)
 
     def get_pset_config(self, layer_name: str) -> Tuple[str, list]:
@@ -201,7 +234,7 @@ class MaterialsManager:
         Returns:
             Tuple of (pset_name, properties_list)
         """
-        layer_config = self.layer_mappings.get(layer_name, {})
+        layer_config = self.get_layer_config(layer_name)
         pset_name = layer_config.get("pset_name", f"Pset_{layer_name}")
         properties = layer_config.get("properties", [])
         return pset_name, properties
@@ -215,5 +248,5 @@ class MaterialsManager:
         Returns:
             True if surface classification enabled
         """
-        layer_config = self.layer_mappings.get(layer_name, {})
+        layer_config = self.get_layer_config(layer_name)
         return layer_config.get("surface_classification", False)
