@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **GLB Material Export**: GLB files now correctly show multiple materials (red roofs, beige walls, gray floors) instead of merging all surfaces into a single red material - uses color-based material IDs to preserve distinct materials
 - **IFC Blender Compatibility**: IFC files now display all building surfaces (roof/wall/floor) in Blender instead of only the first surface - each surface is now a separate element
 - **IFC/GLB Origin Point**: Fixed exports to use user-specified location point (from recipe) as origin (0,0,0) instead of bbox center - POINT uses exact coordinates, ADDRESS uses geocoded location, BBOX uses center, POLYGON uses 2D centroid
+- **BGT Layer Suffix Support**: IFC exporter now correctly handles BGT layer name suffixes (`_vlak`, `_lijn`, `_kruinlijn`) - layers like `bgt_kunstwerkdeel_vlak` now match base configuration `bgt_kunstwerkdeel`
+- **BAG3D Surface Classification**: Improved roof/wall/floor classification using surface normal vectors instead of Z-range heuristics - fixes issue where walls were incorrectly classified as roofs, ensuring correct material colors (red roofs, beige walls)
 
 ### Added (v0.1.0)
 - Initial release of GISKit

@@ -390,6 +390,12 @@ class LayerExporter:
             product_shape = ifc_file.createIfcProductDefinitionShape(None, None, [rep])
             child_element.Representation = product_shape
 
+            # Add property set to child element with surface_type
+            surface_feature_data_for_pset = surface_feature_data.copy()
+            self._add_property_set(
+                child_element, layer_name, surface_feature_data_for_pset, ifc_file
+            )
+
             # Add child to site (not as aggregate of parent, but as sibling)
             ifcopenshell.api.run(
                 "spatial.assign_container",

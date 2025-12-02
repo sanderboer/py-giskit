@@ -133,6 +133,7 @@ layer_mappings:
       - h_maaiveld
       - opp_grond
       - dak_type
+      - surface_type  # Added for roof/wall/floor classification
     surface_classification: true  # Classify surfaces as roof/wall for separate colors
 
   bag3d_lod12:

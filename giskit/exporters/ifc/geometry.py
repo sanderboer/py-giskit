@@ -231,6 +231,10 @@ def create_faceted_brep(ifc_file, faces: list) -> object:
 def classify_surface(polygon: Polygon) -> str:
     """Classify a 3D polygon surface as ROOF, WALL, or FLOOR.
 
+    Uses surface normal vector to determine orientation:
+    - Vertical surfaces (|normal.z| < 0.5) = WALL
+    - Horizontal surfaces (|normal.z| > 0.7) = ROOF or FLOOR based on height
+
     Args:
         polygon: Shapely Polygon with Z coordinates
 
@@ -248,18 +252,47 @@ def classify_surface(polygon: Polygon) -> str:
     z_range = z_max - z_min
     z_avg = sum(z_coords) / len(z_coords)
 
-    # Nearly horizontal surfaces
+    # Calculate surface normal using first 3 non-collinear points
+    # Normal = (p1-p0) × (p2-p0)
+    if len(coords) >= 3:
+        p0 = coords[0] if len(coords[0]) == 3 else coords[0] + (0.0,)
+        p1 = coords[1] if len(coords[1]) == 3 else coords[1] + (0.0,)
+        p2 = coords[2] if len(coords[2]) == 3 else coords[2] + (0.0,)
+
+        # Edge vectors
+        v1 = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
+        v2 = (p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2])
+
+        # Cross product for normal
+        nx = v1[1] * v2[2] - v1[2] * v2[1]
+        ny = v1[2] * v2[0] - v1[0] * v2[2]
+        nz = v1[0] * v2[1] - v1[1] * v2[0]
+
+        # Normalize
+        length = (nx * nx + ny * ny + nz * nz) ** 0.5
+        if length > 0:
+            nz_normalized = abs(nz / length)
+
+            # Vertical surface (normal pointing sideways)
+            if nz_normalized < 0.5:
+                return "WALL"
+
+            # Horizontal surface (normal pointing up/down)
+            if nz_normalized > 0.7:
+                # Distinguish roof from floor by average height
+                if z_avg < 1.0:
+                    return "FLOOR"
+                else:
+                    return "ROOF"
+
+    # Fallback: use Z range heuristic
     if z_range < 0.5:
         if z_avg < 1.0:
             return "FLOOR"
         else:
             return "ROOF"
-
-    # Vertical or slanted surfaces
-    if z_range > 3.0:
-        return "WALL"
     else:
-        return "ROOF"  # Slanted roof
+        return "WALL"  # If in doubt and not flat, it's probably a wall
 
 
 def create_shape_representation(ifc_file, context, representation_type: str, items: list) -> object:
