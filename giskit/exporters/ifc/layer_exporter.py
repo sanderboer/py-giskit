@@ -95,7 +95,7 @@ class LayerExporter:
 
             # Create IFC entity
             entity = self._create_entity(
-                layer_name, layer_config, feature_data, ifc_file, schema_adapter
+                layer_name, layer_config, feature_data, ifc_file, schema_adapter, site
             )
 
             # Create geometry representation
@@ -141,8 +141,21 @@ class LayerExporter:
         feature_data: Dict,
         ifc_file: Any,
         schema_adapter: SchemaAdapter,
+        site: Any = None,
     ) -> Any:
-        """Create IFC entity for a feature."""
+        """Create IFC entity for a feature.
+
+        Args:
+            layer_name: Layer name
+            layer_config: Layer configuration dict
+            feature_data: Feature attributes
+            ifc_file: IFC file instance
+            schema_adapter: Schema adapter
+            site: IfcSite entity (optional, used for placement)
+
+        Returns:
+            Created IFC entity
+        """
         # Get IFC class
         ifc_class = self.materials.get_ifc_class(layer_name, ifc_file.schema)
 
@@ -158,7 +171,46 @@ class LayerExporter:
             "root.create_entity", ifc_file, ifc_class=ifc_class, name=name
         )
 
+        # CRITICAL: Set explicit ObjectPlacement at (0,0,0) relative to Site
+        # This ensures consistent mesh origins in Blender/BIM viewers, especially
+        # for large IFC files (>1000 meshes) where importers may otherwise place
+        # mesh origins at the first vertex instead of the reference point.
+        #
+        # Context: In large export areas (e.g., radius=1000m), BlenderBIM/Bonsai
+        # optimizes mesh origins for objects far from (0,0,0). Without explicit
+        # placement, BAG3D building surfaces at dataset edges (~1km from origin)
+        # get their mesh origin placed at their geometry location instead of the
+        # common reference point, breaking rotation/scaling workflows.
+        #
+        # Solution: Explicitly set ObjectPlacement to (0,0,0) relative to Site.
+        # This forces all meshes to share the same origin point, regardless of
+        # their geometric location or the total number of objects in the file.
+        if site and site.ObjectPlacement:
+            entity.ObjectPlacement = self._create_placement_at_origin(ifc_file, site)
+
         return entity
+
+    def _create_placement_at_origin(self, ifc_file: Any, site: Any) -> Any:
+        """Create an IfcLocalPlacement at (0,0,0) relative to Site.
+
+        This helper method creates an explicit placement at the origin to ensure
+        consistent mesh origins in BIM viewers, particularly for large files.
+
+        Args:
+            ifc_file: IFC file instance
+            site: IfcSite entity to use as placement parent
+
+        Returns:
+            IfcLocalPlacement at (0,0,0)
+        """
+        return ifc_file.createIfcLocalPlacement(
+            PlacementRelTo=site.ObjectPlacement,
+            RelativePlacement=ifc_file.createIfcAxis2Placement3D(
+                Location=ifc_file.createIfcCartesianPoint((0.0, 0.0, 0.0)),
+                Axis=None,  # Default Z-axis
+                RefDirection=None,  # Default X-axis
+            ),
+        )
 
     def _create_2d_representation(
         self,
@@ -385,6 +437,22 @@ class LayerExporter:
 
             # Set predefined type to indicate what kind of surface this is
             child_element.ObjectType = surface_type
+
+            # CRITICAL: Set explicit ObjectPlacement at (0,0,0) relative to Site
+            # This ensures consistent mesh origins in Blender/BIM viewers, especially
+            # for large IFC files (>1000 meshes) where importers may otherwise place
+            # mesh origins at the first vertex instead of the reference point.
+            #
+            # Context: In large export areas (e.g., radius=1000m), BlenderBIM/Bonsai
+            # optimizes mesh origins for objects far from (0,0,0). Without explicit
+            # placement, BAG3D building surfaces at dataset edges (~1km from origin)
+            # get their mesh origin placed at their geometry location instead of the
+            # common reference point, breaking rotation/scaling workflows.
+            #
+            # Solution: Explicitly set ObjectPlacement to (0,0,0) relative to Site.
+            # This forces all meshes to share the same origin point, regardless of
+            # their geometric location or the total number of objects in the file.
+            child_element.ObjectPlacement = self._create_placement_at_origin(ifc_file, site)
 
             # Assign representation to child element
             product_shape = ifc_file.createIfcProductDefinitionShape(None, None, [rep])
